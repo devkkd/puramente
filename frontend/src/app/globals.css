@@ -1,0 +1,89 @@
+@import "tailwindcss";
+
+:root {
+  --background: #ffffff;
+  --foreground: #171717;
+}
+
+/* 🔥 Tailwind v4 theme mapping */
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+
+  /* ✅ CHANGE HERE: Create your Tailwind utility classes */
+  --font-mona: var(--font-mona-sans);
+  --font-playfair: var(--font-playfair-display);
+
+  /* optional */
+  --font-mono: monospace;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --background: #0a0a0a;
+    --foreground: #ededed;
+  }
+}
+
+/* ✅ FINAL FONT APPLY */
+body {
+  background: var(--background);
+  color: var(--foreground);
+  /* Sets Mona Sans as the global default font for the whole app */
+  font-family: var(--font-mona-sans), sans-serif; 
+}
+/* Slick Carousel core styles */
+@import "slick-carousel/slick/slick.css";
+/* Slick Carousel theme styles (for arrows/dots default styling) */
+@import "slick-carousel/slick/slick-theme.css";
+
+/* Optional: Customizing the dots to match your theme */
+.slick-dots li button:before {
+    color: #0082A4; /* Primary color */
+}
+.slick-dots li.slick-active button:before {
+    color: #00CEF3; /* Bright color */
+}
+
+/* Add this to the bottom of the file */
+@keyframes scroll {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+
+.animate-scroll {
+  animation: scroll 35s linear infinite;
+  display: flex;
+  width: max-content;
+}
+
+/* Pause animation on hover (optional but good for UX) */
+.animate-scroll:hover {
+  animation-play-state: paused;
+}
+
+/* --- GOOGLE TRANSLATE CUSTOMIZATION --- */
+/* Hide the Google Translate Top Banner */
+.goog-te-banner-frame.skiptranslate {
+  display: none !important;
+}
+/* Prevent Google from pushing the body down */
+body {
+  top: 0px !important;
+}
+/* Hide the default Google Translate dropdown widget */
+#google_translate_element {
+  display: none !important;
+}
+/* Hide the Google tooltips that appear on hover */
+.goog-tooltip {
+  display: none !important;
+}
+.goog-tooltip:hover {
+  display: none !important;
+}
+.goog-text-highlight {
+  background-color: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+}
