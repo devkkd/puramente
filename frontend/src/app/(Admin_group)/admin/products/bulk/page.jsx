@@ -11,24 +11,31 @@ export default function BulkUploadPage() {
   const [loading, setLoading] = useState(false);
   const [logs, setLogs] = useState([]);
 
-  const handleSubmit = async (e) => {
+const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
-    setLogs(["Preparing files..."]);
+    setLogs(["Preparing files... This might take a few moments."]);
 
     const formData = new FormData(e.target);
 
     try {
-      setLogs(prev => [...prev, "Uploading files and processing images via Cloudflare... (Since you have 1300+ images, this may take 5-10 minutes. Do not close this page!)"]);
+      setLogs(prev => [...prev, "Uploading massive package to server..."]);
       
       const data = await bulkUploadProducts(formData);
       
       if (data.success) {
-        setLogs(prev => [...prev, `✅ Success! Inserted ${data.count} products.`]);
-        if (data.errors && data.errors.length > 0) {
-          setLogs(prev => [...prev, "⚠️ Some items were skipped:", ...data.errors]);
-        }
-        alert(`Successfully uploaded ${data.count} products! Check logs below.`);
+        setLogs(prev => [
+          ...prev, 
+          "✅ Server received the files successfully!", 
+          "🔄 The server is now uploading images to Cloudflare in the background.", 
+          "⚠️ You may now leave this page. Check your backend terminal for live progress."
+        ]);
+        alert(data.message);
+        
+        // Push them back to the products page after 3 seconds
+        setTimeout(() => {
+          router.push("/admin/products");
+        }, 3000);
       } else {
         setLogs(prev => [...prev, `❌ Error: ${data.error}`]);
         alert(data.error || "Failed to bulk upload");
@@ -36,7 +43,7 @@ export default function BulkUploadPage() {
     } catch (err) {
       console.error(err);
       setLogs(prev => [...prev, "❌ Network error occurred or request timed out."]);
-      alert("Error submitting form. The payload might be too large or the server timed out.");
+      alert("Error submitting form.");
     } finally {
       setLoading(false);
     }

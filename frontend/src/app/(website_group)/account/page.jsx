@@ -54,11 +54,11 @@ export default function AccountPage() {
   };
 
   return (
-    <main className="w-full bg-white font-mona pb-24 pt-10 min-h-[70vh]">
+    <main className="w-full bg-white font-mona pb-12 md:pb-24 pt-8 md:pt-10 min-h-[70vh]">
       <div className="max-w-[800px] mx-auto px-4 sm:px-6 lg:px-8 flex flex-col items-center">
         
-        <div className="flex flex-col items-center text-center w-full mb-8">
-          <h1 className="font-playfair text-3xl md:text-4xl lg:text-5xl font-bold text-gray-900 mb-4 mt-6">
+        <div className="flex flex-col items-center text-center w-full mb-6 md:mb-8">
+          <h1 className="font-playfair text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold text-gray-900 mb-2 md:mb-4 mt-2 md:mt-6 leading-tight">
             {activeTab === "register" ? (
               <><span className="italic text-[#00a3c4] font-medium pr-1.5">Create</span> Your Puramente Account</>
             ) : (
@@ -67,11 +67,11 @@ export default function AccountPage() {
           </h1>
         </div>
 
-        <div className="w-full flex justify-center border-b border-gray-300 mb-10">
-          <div className="flex items-center gap-8">
+        <div className="w-full flex justify-center border-b border-gray-300 mb-6 md:mb-10">
+          <div className="flex items-center gap-6 md:gap-8">
             <button
               onClick={() => { setActiveTab("login"); setErrorMsg(""); }}
-              className={`pb-4 text-sm md:text-base tracking-widest uppercase transition-colors relative ${
+              className={`pb-3 md:pb-4 text-[13px] sm:text-sm md:text-base tracking-widest uppercase transition-colors relative ${
                 activeTab === "login" ? "text-black font-bold" : "text-gray-400 font-medium hover:text-gray-600"
               }`}
             >
@@ -80,7 +80,7 @@ export default function AccountPage() {
             </button>
             <button
               onClick={() => { setActiveTab("register"); setErrorMsg(""); }}
-              className={`pb-4 text-sm md:text-base tracking-widest uppercase transition-colors relative ${
+              className={`pb-3 md:pb-4 text-[13px] sm:text-sm md:text-base tracking-widest uppercase transition-colors relative ${
                 activeTab === "register" ? "text-black font-bold" : "text-gray-400 font-medium hover:text-gray-600"
               }`}
             >
@@ -98,36 +98,36 @@ export default function AccountPage() {
 
         <div className="w-full max-w-2xl">
           {activeTab === "login" && (
-            <form onSubmit={handleLoginSubmit} className="flex flex-col gap-6 max-w-md mx-auto">
+            <form onSubmit={handleLoginSubmit} className="flex flex-col gap-5 md:gap-6 max-w-md mx-auto">
               <div className="flex flex-col gap-1">
-                <label className="text-sm text-gray-900 font-medium">Email*</label>
+                <label className="text-xs sm:text-sm text-gray-900 font-medium">Email*</label>
                 <input 
                   type="email" 
                   value={loginData.email} 
                   onChange={(e) => setLoginData({...loginData, email: e.target.value})} 
-                  className="w-full border-b border-gray-300 py-3 text-sm text-gray-900 placeholder-gray-400 bg-transparent focus:outline-none focus:border-[#00a3c4]" 
+                  className="w-full border-b border-gray-300 py-2.5 md:py-3 text-[13px] md:text-sm text-gray-900 placeholder-gray-400 bg-transparent focus:outline-none focus:border-[#00a3c4]" 
                   placeholder="Enter your email"
                   required 
                 />
               </div>
               <div className="flex flex-col gap-1 relative">
-                <label className="text-sm text-gray-900 font-medium">Password*</label>
+                <label className="text-xs sm:text-sm text-gray-900 font-medium">Password*</label>
                 <input 
                   type={showPassword ? "text" : "password"} 
                   value={loginData.password} 
                   onChange={(e) => setLoginData({...loginData, password: e.target.value})} 
-                  className="w-full border-b border-gray-300 py-3 text-sm text-gray-900 placeholder-gray-400 bg-transparent focus:outline-none focus:border-[#00a3c4] pr-10" 
+                  className="w-full border-b border-gray-300 py-2.5 md:py-3 text-[13px] md:text-sm text-gray-900 placeholder-gray-400 bg-transparent focus:outline-none focus:border-[#00a3c4] pr-10" 
                   placeholder="Enter your password"
                   required 
                 />
-                <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute right-0 bottom-3 text-gray-500 hover:text-black">
+                <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute right-0 bottom-2.5 md:bottom-3 text-gray-500 hover:text-black">
                   {showPassword ? <Eye size={18} /> : <EyeOff size={18} />}
                 </button>
               </div>
-              <button type="submit" className="bg-[#0082A4] text-white px-10 py-3.5 text-sm font-bold tracking-widest uppercase rounded-3xl hover:bg-[#006a85] transition-colors mt-4">
+              <button type="submit" className="w-full sm:w-auto bg-[#0082A4] text-white px-8 md:px-10 py-3 md:py-3.5 text-xs sm:text-sm font-bold tracking-widest uppercase rounded-3xl hover:bg-[#006a85] transition-colors mt-2 md:mt-4">
                 Login &rarr;
               </button>
-              <Link className="text-sm text-gray-500 hover:text-[#0082A4] transition-colors" href="/forgot-password">
+              <Link className="text-xs sm:text-sm text-gray-500 hover:text-[#0082A4] transition-colors text-center sm:text-left" href="/forgot-password">
                 Forgot Password?
               </Link>
             </form>
@@ -135,57 +135,57 @@ export default function AccountPage() {
           )}
 
           {activeTab === "register" && (
-            <form onSubmit={handleRegisterSubmit} className="flex flex-col gap-8">
+            <form onSubmit={handleRegisterSubmit} className="flex flex-col gap-5 md:gap-8">
               
               {/* Row 1: Email & Password */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-5 md:gap-8">
                 <div className="flex flex-col gap-1">
-                  <label className="text-sm text-gray-900 font-medium">Email*</label>
+                  <label className="text-xs sm:text-sm text-gray-900 font-medium">Email*</label>
                   <input 
                     type="email" 
                     value={regData.email} 
                     onChange={(e) => setRegData({...regData, email: e.target.value})} 
-                    className="w-full border-b border-gray-300 py-3 text-sm text-gray-900 placeholder-gray-400 bg-transparent focus:outline-none focus:border-[#00a3c4]" 
+                    className="w-full border-b border-gray-300 py-2.5 md:py-3 text-[13px] md:text-sm text-gray-900 placeholder-gray-400 bg-transparent focus:outline-none focus:border-[#00a3c4]" 
                     placeholder="Enter your email address"
                     required 
                   />
                 </div>
                 <div className="flex flex-col gap-1 relative">
-                  <label className="text-sm text-gray-900 font-medium">Password*</label>
+                  <label className="text-xs sm:text-sm text-gray-900 font-medium">Password*</label>
                   <input 
                     type={showPassword ? "text" : "password"} 
                     value={regData.password} 
                     onChange={(e) => setRegData({...regData, password: e.target.value})} 
-                    className="w-full border-b border-gray-300 py-3 text-sm text-gray-900 placeholder-gray-400 bg-transparent focus:outline-none focus:border-[#00a3c4] pr-10" 
+                    className="w-full border-b border-gray-300 py-2.5 md:py-3 text-[13px] md:text-sm text-gray-900 placeholder-gray-400 bg-transparent focus:outline-none focus:border-[#00a3c4] pr-10" 
                     placeholder="Create a password"
                     required 
                   />
-                  <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute right-0 bottom-3 text-gray-500 hover:text-black">
+                  <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute right-0 bottom-2.5 md:bottom-3 text-gray-500 hover:text-black">
                     {showPassword ? <Eye size={18} /> : <EyeOff size={18} />}
                   </button>
                 </div>
               </div>
 
               {/* Row 2: Full Name & Country */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-5 md:gap-8">
                 <div className="flex flex-col gap-1">
-                  <label className="text-sm text-gray-900 font-medium">Full Name*</label>
+                  <label className="text-xs sm:text-sm text-gray-900 font-medium">Full Name*</label>
                   <input 
                     type="text" 
                     value={regData.fullName} 
                     onChange={(e) => setRegData({...regData, fullName: e.target.value})} 
-                    className="w-full border-b border-gray-300 py-3 text-sm text-gray-900 placeholder-gray-400 bg-transparent focus:outline-none focus:border-[#00a3c4]" 
+                    className="w-full border-b border-gray-300 py-2.5 md:py-3 text-[13px] md:text-sm text-gray-900 placeholder-gray-400 bg-transparent focus:outline-none focus:border-[#00a3c4]" 
                     placeholder="Enter your full name"
                     required 
                   />
                 </div>
                 <div className="flex flex-col gap-1">
-                  <label className="text-sm text-gray-900 font-medium">Country</label>
+                  <label className="text-xs sm:text-sm text-gray-900 font-medium">Country</label>
                   <div className="relative">
                     <select 
                       value={regData.country}
                       onChange={(e) => setRegData({...regData, country: e.target.value})}
-                      className="appearance-none w-full border-b border-gray-300 py-3 text-sm text-gray-900 bg-transparent focus:outline-none focus:border-[#00a3c4] cursor-pointer"
+                      className="appearance-none w-full border-b border-gray-300 py-2.5 md:py-3 text-[13px] md:text-sm text-gray-900 bg-transparent focus:outline-none focus:border-[#00a3c4] cursor-pointer"
                     >
                       <option value="" className="text-gray-500">Select your country</option>
                       <option value="United States" className="text-gray-900">United States</option>
@@ -201,46 +201,46 @@ export default function AccountPage() {
               </div>
 
               {/* Row 3: WhatsApp & Company Name */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-5 md:gap-8">
                 <div className="flex flex-col gap-1">
-                  <label className="text-sm text-gray-900 font-medium">Phone / WhatsApp Number</label>
+                  <label className="text-xs sm:text-sm text-gray-900 font-medium">Phone / WhatsApp Number</label>
                   <input 
                     type="tel" 
                     value={regData.whatsappNo} 
                     onChange={(e) => setRegData({...regData, whatsappNo: e.target.value})} 
                     placeholder="Enter your phone / whatsapp number" 
-                    className="w-full border-b border-gray-300 py-3 text-sm text-gray-900 placeholder-gray-400 bg-transparent focus:outline-none focus:border-[#00a3c4]" 
+                    className="w-full border-b border-gray-300 py-2.5 md:py-3 text-[13px] md:text-sm text-gray-900 placeholder-gray-400 bg-transparent focus:outline-none focus:border-[#00a3c4]" 
                   />
                 </div>
                 <div className="flex flex-col gap-1">
-                  <label className="text-sm text-gray-900 font-medium">Company Name</label>
+                  <label className="text-xs sm:text-sm text-gray-900 font-medium">Company Name</label>
                   <input 
                     type="text" 
                     value={regData.companyName} 
                     onChange={(e) => setRegData({...regData, companyName: e.target.value})} 
                     placeholder="Enter your company/business name" 
-                    className="w-full border-b border-gray-300 py-3 text-sm text-gray-900 placeholder-gray-400 bg-transparent focus:outline-none focus:border-[#00a3c4]" 
+                    className="w-full border-b border-gray-300 py-2.5 md:py-3 text-[13px] md:text-sm text-gray-900 placeholder-gray-400 bg-transparent focus:outline-none focus:border-[#00a3c4]" 
                   />
                 </div>
               </div>
 
               {/* Row 4: Company Website & Empty spacer */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-5 md:gap-8">
                 <div className="flex flex-col gap-1">
-                  <label className="text-sm text-gray-900 font-medium">Company/Business Website</label>
+                  <label className="text-xs sm:text-sm text-gray-900 font-medium">Company/Business Website</label>
                   <input 
                     type="url" 
                     value={regData.companyWebsite} 
                     onChange={(e) => setRegData({...regData, companyWebsite: e.target.value})} 
                     placeholder="Enter your company website (e.g., https://...)" 
-                    className="w-full border-b border-gray-300 py-3 text-sm text-gray-900 placeholder-gray-400 bg-transparent focus:outline-none focus:border-[#00a3c4]" 
+                    className="w-full border-b border-gray-300 py-2.5 md:py-3 text-[13px] md:text-sm text-gray-900 placeholder-gray-400 bg-transparent focus:outline-none focus:border-[#00a3c4]" 
                   />
                 </div>
-                <div></div>
+                <div className="hidden md:block"></div>
               </div>
 
-              <div className="w-full flex justify-center mt-6">
-                <button type="submit" className="bg-[#0082A4] text-white px-10 py-3.5 text-sm font-bold tracking-widest uppercase rounded-3xl hover:bg-[#006a85] transition-colors">
+              <div className="w-full flex justify-center mt-4 md:mt-6">
+                <button type="submit" className="w-full sm:w-auto bg-[#0082A4] text-white px-8 md:px-10 py-3 md:py-3.5 text-xs sm:text-sm font-bold tracking-widest uppercase rounded-3xl hover:bg-[#006a85] transition-colors">
                   Create An Account &rarr;
                 </button>
               </div>

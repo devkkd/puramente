@@ -36,37 +36,46 @@ const DelhiFair = ({ isExhibitionPage = false }) => {
     { label: 'Minutes', value: timeLeft.minutes },
   ];
 
-  // The Header block that moves based on the page layout
+  // The Header block extracted so we can position it smartly on mobile vs desktop
   const HeaderBlock = () => (
-    <div className={isExhibitionPage ? "flex flex-col items-center text-center mb-12" : "mb-10"}>
+    <div className={isExhibitionPage ? "flex flex-col items-center text-center mb-8 lg:mb-12" : "mb-6 lg:mb-10"}>
       {!isExhibitionPage && (
-        <div className="flex items-center gap-4 text-[#00a3c4] text-base font-normal tracking-widest uppercase mb-6">
-          <span className="w-16 h-px bg-[#00a3c4]"></span>
+        <div className="flex items-center gap-3 lg:gap-4 text-[#00a3c4] text-xs sm:text-sm lg:text-base font-normal tracking-widest uppercase mb-4 lg:mb-6">
+          <span className="w-12 sm:w-16 lg:w-24 h-px bg-[#00a3c4]"></span>
           <span>World-Class Exhibitions</span>
         </div>
       )}
       
-      <h2 className={`font-playfair font-bold text-gray-900 mb-4 ${isExhibitionPage ? 'text-3xl md:text-4xl' : 'text-2xl md:text-3xl lg:text-4xl'}`}>
+      <h2 className={`font-playfair font-bold text-gray-900 mb-3 lg:mb-4 ${isExhibitionPage ? 'text-3xl lg:text-4xl' : 'text-3xl lg:text-4xl'}`}>
         Upcoming Trade <span className="italic text-[#00a3c4] font-medium">Fairs</span>
       </h2>
 
-      <p className={`text-sm font-normal text-gray-800 leading-relaxed ${isExhibitionPage ? 'max-w-2xl mx-auto' : 'max-w-2xl'}`}>
+      <p className={`text-sm font-normal text-gray-700 lg:text-gray-800 leading-relaxed ${isExhibitionPage ? 'max-w-2xl mx-auto' : 'max-w-2xl'}`}>
         Explore Extraordinary Art Exhibitions Discover groundbreaking exhibitions featuring the world's most innovative artists, designers, and creative minds.
       </p>
     </div>
   );
 
   return (
-    <section className={`w-full bg-white font-mona overflow-hidden ${isExhibitionPage ? 'py-4' : 'py-8'}`}>
+    <section className={`w-full bg-white font-mona overflow-hidden ${isExhibitionPage ? 'py-6 lg:py-8' : 'py-10 lg:py-16'}`}>
       <div className="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8">
         
         {/* Render header centered at the top if on the Exhibitions page */}
         {isExhibitionPage && <HeaderBlock />}
 
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-12 items-stretch">
+        {/* --- MOBILE FIX: Render header ABOVE the image on mobile for Homepage --- */}
+        {!isExhibitionPage && (
+          <div className="lg:hidden w-full">
+            <HeaderBlock />
+          </div>
+        )}
+
+        {/* Reduced mobile gap, kept desktop gap exactly the same */}
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-12 items-stretch">
           
           {/* --- LEFT COLUMN: Exhibition Image --- */}
-          <div className="w-full lg:col-span-5 relative min-h-[400px] lg:min-h-full rounded-xl overflow-hidden shadow-sm">
+          {/* Adjusted mobile height to prevent excessive scrolling, desktop stays min-h-full */}
+          <div className="w-full lg:col-span-5 relative min-h-[250px] sm:min-h-[350px] lg:min-h-full rounded-xl overflow-hidden shadow-sm">
             <img 
               src="/images/home/delhiIMG.svg" 
               alt="Puramente International Exhibition Booth" 
@@ -77,8 +86,12 @@ const DelhiFair = ({ isExhibitionPage = false }) => {
           {/* --- RIGHT COLUMN: Content & Event Widget --- */}
           <div className="w-full lg:col-span-7 flex flex-col justify-center">
             
-            {/* Render header inside the right column if on the Homepage */}
-            {!isExhibitionPage && <HeaderBlock />}
+            {/* --- DESKTOP FIX: Render header inside right column ONLY on desktop for Homepage --- */}
+            {!isExhibitionPage && (
+              <div className="hidden lg:block">
+                <HeaderBlock />
+              </div>
+            )}
 
             {/* The Event Details Widget */}
             <div className="w-full space-y-6">
@@ -94,22 +107,22 @@ const DelhiFair = ({ isExhibitionPage = false }) => {
               <div className="grid grid-cols-1 xl:grid-cols-5 gap-6">
 
                 {/* Left: Info Cards */}
-                <div className="xl:col-span-3 space-y-5">
-                  <div className="bg-white rounded-xl shadow-md p-5 border-l-4 border-[#c28680]">
-                    <h2 className="text-xl font-bold text-[#1e4d8b] mb-2">
+                <div className="xl:col-span-3 space-y-4 lg:space-y-5">
+                  <div className="bg-white rounded-xl shadow-md p-4 lg:p-5 border-l-4 border-[#c28680]">
+                    <h2 className="text-lg lg:text-xl font-bold text-[#1e4d8b] mb-2">
                       Welcome to IHGF Delhi Fair Autumn 2026
                     </h2>
-                    <div className="bg-gradient-to-r from-[#c28680] to-[#f4a582] h-1 w-24 mb-4 rounded-full" />
-                    <p className="text-gray-700 text-sm leading-relaxed mb-3">
+                    <div className="bg-gradient-to-r from-[#c28680] to-[#f4a582] h-1 w-16 lg:w-24 mb-4 rounded-full" />
+                    <p className="text-gray-700 text-[13px] lg:text-sm leading-relaxed mb-3">
                       We are excited to announce our participation in the <span className="font-semibold text-[#1e4d8b]">IHGF Delhi Fair – Autumn 2026</span>, one of Asia's leading trade shows.
                     </p>
-                    <p className="text-gray-700 text-sm leading-relaxed mb-6">
+                    <p className="text-gray-700 text-[13px] lg:text-sm leading-relaxed mb-6">
                       At Puramente International, we specialize in exporting premium-quality jewellery that blends craftsmanship with modern design. We look forward to connecting with global buyers.
                     </p>
 
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 lg:gap-4 mb-6">
                       <div className="bg-blue-50/50 p-4 rounded-xl border border-[#1e4d8b]/20">
-                        <h4 className="font-bold text-sm text-[#1e4d8b] mb-2 flex items-center">
+                        <h4 className="font-bold text-[13px] lg:text-sm text-[#1e4d8b] mb-2 flex items-center">
                           <span className="text-[#c28680] mr-2">✦</span> Exclusive Collection
                         </h4>
                         <p className="text-gray-700 text-xs leading-relaxed">
@@ -117,13 +130,13 @@ const DelhiFair = ({ isExhibitionPage = false }) => {
                         </p>
                       </div>
                       <div className="bg-[#de9891] p-4 rounded-xl flex items-center justify-center">
-                        <p className="font-medium text-white text-sm text-center leading-relaxed">
+                        <p className="font-medium text-white text-xs lg:text-sm text-center leading-relaxed">
                           We look forward to meeting you and presenting our latest designs and export-ready collections.
                         </p>
                       </div>
                     </div>
 
-                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                    <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
                       {[
                         { color: '#1e4d8b', title: 'Venue', line1: 'India Expo Centre', line2: 'Greater Noida' },
                         { color: '#c28680', title: 'Dates', line1: '13 – 17 Oct 2026', line2: 'Autumn Edition' },
@@ -140,23 +153,23 @@ const DelhiFair = ({ isExhibitionPage = false }) => {
                 </div>
 
                 {/* Right: Countdown & Organizer */}
-                <div className="xl:col-span-2 flex flex-col gap-5">
+                <div className="xl:col-span-2 flex flex-col gap-4 lg:gap-5">
                   <div className="bg-[#2c5b96] rounded-xl shadow-lg p-5 text-white h-full flex flex-col justify-center">
                     <div className="text-center mb-5">
                       <span className="bg-[#c28680] text-white text-[10px] font-bold uppercase tracking-wider px-3 py-1 rounded-full">Autumn 2026</span>
-                      <h3 className="text-lg font-bold mt-3">Countdown to the Fair</h3>
+                      <h3 className="text-base lg:text-lg font-bold mt-3">Countdown to the Fair</h3>
                     </div>
 
-                    <div className="flex items-start justify-center gap-2 mb-5">
+                    <div className="flex items-start justify-center gap-1.5 lg:gap-2 mb-5">
                       {timeUnits.map(({ label, value }, i) => (
                         <React.Fragment key={label}>
                           <div className="flex flex-col items-center">
-                            <div className="bg-white rounded-lg w-10 h-10 flex items-center justify-center shadow border-b-2 border-[#c28680]">
-                              <span className="text-lg font-bold text-[#1e4d8b]">{fmt(value)}</span>
+                            <div className="bg-white rounded-lg w-9 h-9 lg:w-10 lg:h-10 flex items-center justify-center shadow border-b-2 border-[#c28680]">
+                              <span className="text-base lg:text-lg font-bold text-[#1e4d8b]">{fmt(value)}</span>
                             </div>
                             <p className="text-blue-100 text-[8px] font-bold uppercase tracking-wide mt-2">{label}</p>
                           </div>
-                          {i < timeUnits.length - 1 && <span className="text-white font-bold text-lg mt-1.5 opacity-50">:</span>}
+                          {i < timeUnits.length - 1 && <span className="text-white font-bold text-base lg:text-lg mt-1 lg:mt-1.5 opacity-50">:</span>}
                         </React.Fragment>
                       ))}
                     </div>
@@ -166,8 +179,8 @@ const DelhiFair = ({ isExhibitionPage = false }) => {
                     </div>
                   </div>
 
-                  <div className="bg-white rounded-xl shadow-md p-5 border border-gray-100">
-                    <h4 className="font-bold text-gray-800 mb-1 text-[11px] uppercase tracking-wide text-[#c28680]">Organized By</h4>
+                  <div className="bg-white rounded-xl shadow-md p-4 lg:p-5 border border-gray-100">
+                    <h4 className="font-bold text-gray-800 mb-1 text-[10px] lg:text-[11px] uppercase tracking-wide text-[#c28680]">Organized By</h4>
                     <p className="text-xs sm:text-sm font-bold text-[#1e4d8b] mb-2 mt-1">Export Promotion Council for Handicrafts</p>
                     <div className="bg-gray-50 p-2.5 rounded-lg border border-gray-100 text-[10px] text-gray-500 leading-relaxed">
                       Asia's premier trade fair for home, lifestyle & textiles

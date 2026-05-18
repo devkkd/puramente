@@ -8,7 +8,8 @@ export default function BlogCard({ post }) {
     <div className="flex flex-col group cursor-pointer w-full h-full">
       
       {/* Image Container */}
-      <div className="relative w-full aspect-[4/3] bg-gray-100 overflow-hidden mb-6 rounded-sm shadow-sm">
+      {/* Added rounded-xl on mobile for a softer UI, preserved rounded-sm on desktop */}
+      <div className="relative w-full aspect-[4/3] bg-gray-100 overflow-hidden mb-4 lg:mb-6 rounded-xl lg:rounded-sm shadow-sm">
         <img 
           src={post.image} 
           alt={post.title} 
@@ -19,20 +20,20 @@ export default function BlogCard({ post }) {
       </div>
 
       {/* Blog Details */}
-      <div className="flex flex-col flex-grow">
-        <h3 className="font-bold text-base md:text-lg text-gray-900 mb-4 leading-snug line-clamp-2">
+      <div className="flex flex-col flex-grow px-1 sm:px-0">
+        <h3 className="font-bold text-lg md:text-lg text-gray-900 mb-2 lg:mb-4 leading-snug line-clamp-2">
           {post.title}
         </h3>
-        <p className="text-sm font-normal text-gray-700 leading-relaxed mb-6">
+        <p className="text-sm font-normal text-gray-600 lg:text-gray-700 leading-relaxed mb-4 lg:mb-6 line-clamp-3 lg:line-clamp-none">
           {post.excerpt}
         </p>
       </div>
 
       {/* Read More Link (Pushed to bottom) */}
-      <div className="mt-auto">
+      <div className="mt-auto px-1 sm:px-0">
         <Link 
           href={post.link} 
-          className="inline-flex items-center text-[#00a3c4] text-sm font-normal pb-1 border-b border-[#00a3c4]/30 hover:border-[#00a3c4] transition-colors"
+          className="inline-flex items-center text-[#00a3c4] text-xs sm:text-sm font-medium lg:font-normal uppercase tracking-widest lg:tracking-normal lg:capitalize pb-1 border-b border-[#00a3c4]/30 hover:border-[#00a3c4] transition-colors"
         >
           Read Full Blog <span className="ml-1.5 font-serif text-lg leading-none">&rarr;</span>
         </Link>

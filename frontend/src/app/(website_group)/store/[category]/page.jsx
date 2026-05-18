@@ -17,14 +17,13 @@ function StoreContent() {
   
   // --- AUTH & PAGINATION STATE ---
   const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const [visibleCount, setVisibleCount] = useState(25); // Start with 25 products
+  const [visibleCount, setVisibleCount] = useState(25); 
 
-  // Check login status on mount (to avoid Next.js hydration mismatch)
+  // Fixed auth status check on mount
   useEffect(() => {
-    // Adjust this check based on how you store your auth state (token, user object, cookies, etc.)
-    const token =  localStorage.getItem("userToken") || localStorage.getItem("adminToken") || localStorage.getItem("token");
-    if (token) {
-      setIsLoggedIn(true);
+    if (typeof window !== "undefined") {
+      const token = localStorage.getItem("userToken");
+      setIsLoggedIn(!!token);
     }
   }, []);
 

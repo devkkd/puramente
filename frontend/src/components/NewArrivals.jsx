@@ -92,33 +92,34 @@ export default function NewArrivals() {
   };
 
   return (
-    <section className="w-full py-16 bg-white font-mona overflow-hidden" ref={sectionRef}>
+    <section className="w-full py-10 lg:py-16 bg-white font-mona overflow-hidden" ref={sectionRef}>
       <div className="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8 flex flex-col items-center">
         
         {/* --- HEADER SECTION --- */}
-        {/* Wrapped in an animation div */}
-        <div className={`flex flex-col items-center transform transition-all duration-1000 ${isVisible ? 'translate-y-0 opacity-100' : 'translate-y-10 opacity-0'}`}>
+        <div className={`flex flex-col items-center transform transition-all duration-1000 w-full px-2 ${isVisible ? 'translate-y-0 opacity-100' : 'translate-y-10 opacity-0'}`}>
           {/* Top Subheading */}
-          <div className="flex items-center gap-4 text-[#00a3c4] text-base font-normal tracking-widest uppercase mb-6">
-            <span className="w-16 md:w-24 h-px bg-[#00a3c4]"></span>
+          <div className="flex items-center gap-3 lg:gap-4 text-[#00a3c4] text-xs sm:text-sm lg:text-base font-normal tracking-widest uppercase mb-4 lg:mb-6">
+            <span className="w-12 sm:w-16 lg:w-24 h-px bg-[#00a3c4]"></span>
             <span>Just Landed</span>
-            <span className="w-16 md:w-24 h-px bg-[#00a3c4]"></span>
+            <span className="w-12 sm:w-16 lg:w-24 h-px bg-[#00a3c4]"></span>
           </div>
 
           {/* Main Heading */}
-          <h2 className="font-playfair text-2xl md:text-3xl lg:text-4xl font-bold text-gray-900 mb-5 text-center">
+          <h2 className="font-playfair text-3xl md:text-3xl lg:text-4xl font-bold text-gray-900 mb-3 lg:mb-5 text-center leading-tight">
             <span className="italic text-[#00a3c4] font-medium pr-1">New</span> Arrivals
           </h2>
 
           {/* Content Text */}
-          <p className="text-sm font-normal text-gray-800 mb-16 max-w-2xl text-center">
+          <p className="text-sm font-normal text-gray-600 lg:text-gray-800 mb-8 lg:mb-16 max-w-2xl text-center leading-relaxed">
             Fresh From Our Jaipur Atelier, Pieces That Just Completed Their Journey From The Artisan&apos;s Hands To Yours.
           </p>
         </div>
 
         {/* --- CAROUSEL SECTION --- */}
         {loading ? (
-          <div className="w-full py-20 flex justify-center text-gray-400">Loading new arrivals...</div>
+          <div className="w-full py-16 lg:py-20 flex justify-center text-gray-400 text-sm tracking-widest uppercase animate-pulse">
+            Loading new arrivals...
+          </div>
         ) : (
           <div className="w-full flex flex-col items-center">
             
@@ -126,7 +127,7 @@ export default function NewArrivals() {
             <div 
               ref={scrollContainerRef}
               onScroll={handleScroll}
-              className="w-full flex overflow-x-auto gap-6 pb-12 snap-x snap-mandatory hide-scrollbar pt-4"
+              className="w-full flex overflow-x-auto gap-4 lg:gap-6 pb-6 lg:pb-12 snap-x snap-mandatory hide-scrollbar pt-2 lg:pt-4"
               style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
             >
               {products.length > 0 ? (
@@ -137,7 +138,7 @@ export default function NewArrivals() {
                   return (
                     <div 
                       key={product._id} 
-                      className={`snap-start shrink-0 w-[240px] md:w-[250px] lg:w-[calc(20%-19.2px)] transform transition-all duration-1000 ease-out
+                      className={`snap-start shrink-0 w-[220px] sm:w-[240px] md:w-[250px] lg:w-[calc(20%-19.2px)] transform transition-all duration-1000 ease-out
                         ${isVisible ? 'translate-y-0 opacity-100' : 'translate-y-16 opacity-0'}
                       `}
                       style={{ transitionDelay: isVisible ? animationDelay : '0ms' }}
@@ -153,14 +154,14 @@ export default function NewArrivals() {
 
             {/* --- NAVIGATION CONTROLS --- */}
             {products.length > 0 && (
-              <div className={`flex items-center gap-6 mt-4 w-full max-w-xl px-4 transform transition-all duration-1000 delay-500 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}>
+              <div className={`flex items-center gap-4 lg:gap-6 mt-2 lg:mt-4 w-full max-w-xl px-2 lg:px-4 transform transition-all duration-1000 delay-500 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}>
                 {/* Left Arrow */}
                 <button 
                   onClick={() => scroll('left')} 
                   className="text-[#00a3c4] hover:opacity-70 transition-opacity p-2"
                   aria-label="Scroll left"
                 >
-                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="w-5 h-5 lg:w-6 lg:h-6">
                     <line x1="19" y1="12" x2="5" y2="12"></line>
                     <polyline points="12 19 5 12 12 5"></polyline>
                   </svg>
@@ -183,7 +184,7 @@ export default function NewArrivals() {
                   className="text-[#00a3c4] hover:opacity-70 transition-opacity p-2"
                   aria-label="Scroll right"
                 >
-                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="w-5 h-5 lg:w-6 lg:h-6">
                     <line x1="5" y1="12" x2="19" y2="12"></line>
                     <polyline points="12 5 19 12 12 19"></polyline>
                   </svg>
