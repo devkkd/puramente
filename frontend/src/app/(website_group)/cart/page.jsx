@@ -131,7 +131,7 @@ export default function CartPage() {
             Thank you for your inquiry. Our team will review your request and get back to you shortly.
           </p>
           <Link 
-            href="/store/all" 
+            href="/store/new-arrivals" 
             className="bg-[#0082A4] text-white px-8 lg:px-10 py-3.5 text-xs lg:text-sm font-bold tracking-widest uppercase rounded-3xl hover:bg-[#006a85] transition-colors shadow-sm w-full sm:w-auto"
           >
             Explore More Collections
@@ -182,7 +182,7 @@ export default function CartPage() {
             </h2>
             <p className="text-gray-500 text-sm lg:text-base mb-8 max-w-sm mx-auto">Looks like you haven&apos;t added any collections to your request list yet.</p>
             <Link 
-              href="/store/all" 
+              href="/store/necklace" 
               className="bg-[#0082A4] text-white px-8 lg:px-10 py-3.5 text-xs lg:text-sm font-bold tracking-widest uppercase rounded-3xl hover:bg-[#006a85] transition-colors shadow-sm w-full sm:w-auto"
             >
               Explore Collections

@@ -19,7 +19,7 @@ const s3 = new S3Client({
 
 // 3. Helper function to upload buffer to R2
 const uploadToCloudflare = async (file) => {
-  // Generate a unique filename to prevent overwriting
+  // Generate a unique filename
   const fileName = `${crypto.randomBytes(16).toString("hex")}${path.extname(file.originalname)}`;
   
   const command = new PutObjectCommand({
@@ -31,8 +31,9 @@ const uploadToCloudflare = async (file) => {
 
   await s3.send(command);
   
-  // Return the public URL to be stored in the database
-  return `${process.env.CLOUDFLARE_PUBLIC_URL}/${fileName}`;
+  // FIX: Strip any trailing slashes from the .env variable to prevent // in the URL
+  const baseUrl = process.env.CLOUDFLARE_PUBLIC_URL.replace(/\/$/, "");
+  return `${baseUrl}/${fileName}`;
 };
 
 module.exports = { upload, uploadToCloudflare };

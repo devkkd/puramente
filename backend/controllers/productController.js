@@ -196,112 +196,123 @@ exports.deleteProduct = async (req, res) => {
   }
 };
 
-// --- UPDATED: Bulk Upload Controller ---
+// --- UPDATED: Bulk Upload Controller (Background Processing) ---
 exports.bulkUploadProducts = async (req, res) => {
   try {
-    // 1. Extract files from upload.any() flat array
     if (!req.files || req.files.length === 0) {
       return res.status(400).json({ error: "No files were uploaded." });
     }
 
-    // Find the Excel file (ends in .xlsx or .xls)
     const excelFile = req.files.find(file => file.originalname.match(/\.(xlsx|xls|csv)$/i));
-    
-    // Filter out all image files
     const images = req.files.filter(file => file.mimetype.startsWith('image/'));
 
     if (!excelFile) {
       return res.status(400).json({ error: "Excel file is required." });
     }
 
-    // 2. Parse Excel File
-    const workbook = xlsx.read(excelFile.buffer, { type: 'buffer' });
-    const sheetName = workbook.SheetNames[0]; 
-    const rows = xlsx.utils.sheet_to_json(workbook.Sheets[sheetName]);
-
-    // 3. Fetch categories from DB
-    const categoriesDB = await Category.find();
-
-    const productsToInsert = [];
-    const errors = [];
-
-    // 4. Loop through Excel rows
-    for (const row of rows) {
-      const code = row['Product Code'] ? row['Product Code'].toString().trim() : null;
-      const name = row['Product Name'];
-      const desc = row['Description'];
-      const catName = row['Category'] ? row['Category'].toString().trim() : null;
-      const subCat = row['Sub - Category'] ? row['Sub - Category'].toString().trim() : "";
-
-      if (!code || !name) continue; 
-
-      // 5. SMART IMAGE MATCHING
-      // This strips out folder paths (e.g., "Images to Kontent Kraft/Rings/RS0463A.JPG" becomes "RS0463A.JPG")
-      const matchedImage = images.find(img => {
-        const fileName = img.originalname.split('/').pop().split('\\').pop();
-        return fileName.toUpperCase().startsWith(code.toUpperCase());
-      });
-
-      if (!matchedImage) {
-        errors.push(`Skipped ${code}: No image found matching this code.`);
-        continue; 
-      }
-
-      // 6. SMART CATEGORY MATCHING
-      // This handles Excel "Ring" matching DB "Rings"
-      let categoryId = null;
-      if (catName) {
-        const normalizedExcelCat = catName.toLowerCase();
-        const match = categoriesDB.find(c => 
-          c.name.toLowerCase() === normalizedExcelCat || 
-          c.name.toLowerCase() === `${normalizedExcelCat}s` // adds an 's' to match plurals
-        );
-        if (match) categoryId = match._id;
-      }
-
-      if (!categoryId) {
-        errors.push(`Skipped ${code}: Category '${catName}' not found in database.`);
-        continue;
-      }
-
-      // 7. Upload to Cloudflare
-      const imageUrl = await uploadToCloudflare(matchedImage);
-
-      // 8. Generate URL Slug
-      const baseSlug = name.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)+/g, "");
-      const generatedSlug = `${baseSlug}-${code.toLowerCase()}`;
-
-      // 9. Format Option String
-      const optionEnum = subCat.toLowerCase() === "with gemstone" ? "with gem" : "without gem";
-
-      // 10. Prepare product object
-      productsToInsert.push({
-        productName: name,
-        slug: generatedSlug,
-        designCode: code,
-        description: desc,
-        imageUrl: imageUrl,
-        newArrival: true,
-        bestSeller: false,
-        option: optionEnum,
-        category: categoryId
-      });
-    }
-
-    // 11. Insert into MongoDB
-    if (productsToInsert.length > 0) {
-      await Product.insertMany(productsToInsert);
-    }
-
-    res.status(201).json({
+    // 1. Immediately tell the Frontend "Success" so it doesn't time out
+    res.status(202).json({
       success: true,
-      count: productsToInsert.length,
-      errors: errors,
-      message: `Bulk upload processed. ${productsToInsert.length} products added.`
+      message: "Bulk upload received! Processing 1000+ items in the background. Check your backend terminal for live progress, and refresh the Products table in 5-10 minutes."
     });
 
+    // 2. BACKGROUND WORKER (Runs after response is sent)
+    (async () => {
+      try {
+        console.log("\n🚀 BACKGROUND WORKER STARTED: Parsing Excel File...");
+        const workbook = xlsx.read(excelFile.buffer, { type: 'buffer' });
+        const sheetName = workbook.SheetNames[0]; 
+        const rows = xlsx.utils.sheet_to_json(workbook.Sheets[sheetName]);
+
+        const categoriesDB = await Category.find();
+        const productsToInsert = [];
+        let successCount = 0;
+        let skipCount = 0;
+
+        console.log(`📦 Found ${rows.length} rows in Excel. Starting Cloudflare uploads...`);
+
+        // Loop through Excel rows sequentially to prevent Cloudflare rate limits
+        for (let i = 0; i < rows.length; i++) {
+          const row = rows[i];
+          const code = row['Product Code'] ? row['Product Code'].toString().trim() : null;
+          const name = row['Product Name'];
+          const desc = row['Description'];
+          const catName = row['Category'] ? row['Category'].toString().trim() : null;
+          const subCat = row['Sub - Category'] ? row['Sub - Category'].toString().trim() : "";
+
+          if (!code || !name) continue; 
+
+          // SMART EXACT IMAGE MATCHING (Fixes "RS10" matching "RS100.jpg")
+          const matchedImage = images.find(img => {
+            const fileName = img.originalname.split('/').pop().split('\\').pop();
+            const nameWithoutExt = fileName.substring(0, fileName.lastIndexOf('.')); // Removes .jpg
+            return nameWithoutExt.toUpperCase() === code.toUpperCase();
+          });
+
+          if (!matchedImage) {
+            skipCount++;
+            continue; 
+          }
+
+          let categoryId = null;
+          if (catName) {
+            const normalizedExcelCat = catName.toLowerCase();
+            const match = categoriesDB.find(c => 
+              c.name.toLowerCase() === normalizedExcelCat || 
+              c.name.toLowerCase() === `${normalizedExcelCat}s`
+            );
+            if (match) categoryId = match._id;
+          }
+
+          if (!categoryId) {
+            skipCount++;
+            continue;
+          }
+
+          // Upload to Cloudflare
+          const imageUrl = await uploadToCloudflare(matchedImage);
+
+          const baseSlug = name.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)+/g, "");
+          const generatedSlug = `${baseSlug}-${code.toLowerCase()}`;
+          const optionEnum = subCat.toLowerCase() === "with gemstone" ? "with gem" : "without gem";
+
+          productsToInsert.push({
+            productName: name,
+            slug: generatedSlug,
+            designCode: code,
+            description: desc,
+            imageUrl: imageUrl,
+            newArrival: true,
+            bestSeller: false,
+            option: optionEnum,
+            category: categoryId
+          });
+
+          successCount++;
+
+          // Log progress every 50 items so you know it's working
+          if (successCount % 50 === 0) {
+            console.log(`⏳ Uploaded ${successCount} / ${rows.length} items to Cloudflare...`);
+          }
+        }
+
+        // Save everything to MongoDB at the very end
+        if (productsToInsert.length > 0) {
+          console.log(`💾 Saving ${productsToInsert.length} products to MongoDB...`);
+          await Product.insertMany(productsToInsert);
+        }
+
+        console.log(`✅ BACKGROUND TASK COMPLETE! Successfully added ${successCount} products. Skipped ${skipCount}.`);
+
+      } catch (bgError) {
+        console.error("❌ Background Worker Crashed:", bgError);
+      }
+    })();
+
   } catch (error) {
-    console.error("Bulk Upload Error:", error);
-    res.status(500).json({ error: "Server error during bulk upload. Check server logs." });
+    console.error("Bulk Upload Init Error:", error);
+    if (!res.headersSent) {
+      res.status(500).json({ error: "Server error initializing bulk upload." });
+    }
   }
 };
