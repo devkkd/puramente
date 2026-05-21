@@ -137,7 +137,7 @@ export default function CustomJewelryPage() {
           <h1 className="font-playfair text-3xl md:text-4xl lg:text-5xl font-bold text-gray-900 mb-4">
             Request <span className="italic text-[#00a3c4] font-medium">Submitted!</span>
           </h1>
-          <p className="text-gray-600 text-lg max-w-md mx-auto mb-8">
+          <p className="text-gray-700 text-sm md:text-base font-normal leading-relaxed max-w-md mx-auto mb-8">
             Your custom jewelry request has been received. Our master jewelers will review your specifications and contact you shortly.
           </p>
           <button onClick={() => window.location.reload()} className="bg-[#0082A4] text-white px-10 py-3.5 text-sm font-bold tracking-widest uppercase rounded-3xl hover:bg-[#006a85] transition-colors shadow-sm">
@@ -154,36 +154,36 @@ export default function CustomJewelryPage() {
       {/* --- HERO --- */}
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-16 pb-12">
         <div className="flex flex-col items-center text-center mb-16">
-          <div className="flex items-center gap-4 text-[#4fa3b9] text-xs font-semibold tracking-widest uppercase mb-6">
+          <div className="flex items-center gap-4 text-[#4fa3b9] text-xs md:text-sm font-normal tracking-widest uppercase mb-6">
             <span className="w-16 h-px bg-gray-300"></span>
             <span>Custom</span>
             <span className="w-16 h-px bg-gray-300"></span>
           </div>
-          <h1 className="font-playfair text-4xl md:text-5xl lg:text-6xl font-bold text-gray-900 tracking-tight mb-6">
+          <h1 className="font-playfair text-3xl md:text-4xl lg:text-5xl font-bold text-gray-900 tracking-tight mb-6">
             <span className="italic text-[#4fa3b9] font-medium pr-2">Jewellery</span> 
             Crafted to Your Exact Vision
           </h1>
-          <p className="max-w-3xl text-gray-800 md:text-lg leading-relaxed">
+          <p className="max-w-3xl text-sm font-normal text-gray-700 leading-relaxed">
             From Concept To Creation We Partner With Jewellery Brands, Retailers, And Designers Worldwide To Produce Bespoke Fine Jewellery Collections At Scale, Without Compromising Artisanal Quality.
           </p>
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-0 border border-gray-100 shadow-sm rounded-xl overflow-hidden">
           <div className="p-8 md:p-12 bg-white flex flex-col justify-center">
-            <h2 className="font-playfair text-3xl md:text-4xl font-bold text-gray-900 mb-6">
+            <h2 className="font-playfair text-2xl md:text-3xl lg:text-4xl font-bold text-gray-900 mb-6">
               <span className="italic text-[#4fa3b9] font-medium pr-2">Create</span> a Bespoke Jewelry Piece
             </h2>
-            <p className="text-gray-700 leading-relaxed mb-4">Commission A One-of-a-kind Design Tailored To Your Exact Specifications.</p>
-            <p className="text-gray-700 leading-relaxed">Share Dimensions, Material Preferences, And Reference Visuals our Master Artisans Will Translate Your Concept Into A Finished Piece With Precision And Discretion.</p>
+            <p className="text-sm font-normal text-gray-700 leading-relaxed mb-4">Commission A One-of-a-kind Design Tailored To Your Exact Specifications.</p>
+            <p className="text-sm font-normal text-gray-700 leading-relaxed">Share Dimensions, Material Preferences, And Reference Visuals our Master Artisans Will Translate Your Concept Into A Finished Piece With Precision And Discretion.</p>
           </div>
           <div className="p-8 md:p-12 bg-[#E6FDF9] flex flex-col justify-center">
-            <h2 className="font-playfair text-3xl md:text-4xl font-bold text-gray-900 mb-8">
+            <h2 className="font-playfair text-2xl md:text-3xl lg:text-4xl font-bold text-gray-900 mb-8">
               <span className="italic text-[#4fa3b9] font-medium pr-2">Why</span> Work With Us
             </h2>
             <div className="grid grid-cols-3 gap-6 divide-x divide-[#4fa3b9]/20">
-              <p className="text-gray-800 font-medium">Precision-led Craftsmanship</p>
-              <p className="text-gray-800 font-medium pl-6">Dedicated Expert Consultation</p>
-              <p className="text-gray-800 font-medium pl-6">Assured Quality Standards</p>
+              <p className="text-sm font-normal text-gray-700">Precision-led Craftsmanship</p>
+              <p className="text-sm font-normal text-gray-700 pl-6">Dedicated Expert Consultation</p>
+              <p className="text-sm font-normal text-gray-700 pl-6">Assured Quality Standards</p>
             </div>
           </div>
         </div>
@@ -198,10 +198,10 @@ export default function CustomJewelryPage() {
             
             {/* 00. Category Selection */}
             <div>
-              <h2 className="font-playfair text-3xl font-bold text-gray-900 mb-2">
+              <h2 className="font-playfair text-2xl md:text-3xl font-bold text-gray-900 mb-2">
                 <span className="italic text-[#4fa3b9] font-medium pr-1.5">Select</span> Jewelry Category
               </h2>
-              <p className="text-gray-600 mb-6">Choose the base format for your custom piece:</p>
+              <p className="text-sm font-normal text-gray-700 leading-relaxed mb-6">Choose the base format for your custom piece:</p>
               
               <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                 {categories.length > 0 ? categories.map(cat => (
@@ -218,7 +218,7 @@ export default function CustomJewelryPage() {
                       )}
                     </div>
                     <div className="p-4">
-                      <h3 className="font-bold text-gray-900 mb-1">{cat.name}</h3>
+                      <h3 className="font-bold text-gray-900 text-sm md:text-base mb-1">{cat.name}</h3>
                       <p className="text-xs text-gray-500 leading-relaxed">{cat.homeName || "Custom design base"}</p>
                     </div>
                   </div>
@@ -233,10 +233,10 @@ export default function CustomJewelryPage() {
             {/* 01. Client Info */}
             <div>
               <div className="flex justify-between items-end mb-6">
-                <h2 className="font-playfair text-3xl font-bold text-gray-900">
+                <h2 className="font-playfair text-2xl md:text-3xl font-bold text-gray-900">
                   <span className="italic text-[#4fa3b9] font-medium pr-1.5">(01.)</span> Client Information
                 </h2>
-                <p className="text-sm text-gray-600 hidden md:block">Provide your contact and delivery details:</p>
+                <p className="text-sm font-normal text-gray-700 leading-relaxed hidden md:block">Provide your contact and delivery details:</p>
               </div>
               
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -278,10 +278,10 @@ export default function CustomJewelryPage() {
             {/* 02. Dimensions */}
             <div>
               <div className="flex justify-between items-end mb-6">
-                <h2 className="font-playfair text-3xl font-bold text-gray-900">
+                <h2 className="font-playfair text-2xl md:text-3xl font-bold text-gray-900">
                   <span className="italic text-[#4fa3b9] font-medium pr-1.5">(02.)</span> Dimensions
                 </h2>
-                <p className="text-sm text-gray-600 hidden md:block">Provide exact measurements if known:</p>
+                <p className="text-sm font-normal text-gray-700 leading-relaxed hidden md:block">Provide exact measurements if known:</p>
               </div>
               
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-4">
@@ -300,7 +300,7 @@ export default function CustomJewelryPage() {
                   </div>
                 </div>
               </div>
-              <div className="bg-[#E6FDF9] p-4 text-sm text-[#0082a4]">
+              <div className="bg-[#E6FDF9] p-4 text-sm font-normal text-[#0082a4] leading-relaxed">
                 Need assistance? Our specialists will guide you during consultation.
               </div>
             </div>
@@ -310,10 +310,10 @@ export default function CustomJewelryPage() {
             {/* 03. Metal Selection */}
             <div>
               <div className="flex justify-between items-end mb-6">
-                <h2 className="font-playfair text-3xl font-bold text-gray-900">
+                <h2 className="font-playfair text-2xl md:text-3xl font-bold text-gray-900">
                   <span className="italic text-[#4fa3b9] font-medium pr-1.5">(03.)</span> Metal Selection
                 </h2>
-                <p className="text-sm text-gray-600 hidden md:block">Choose your preferred base material:</p>
+                <p className="text-sm font-normal text-gray-700 leading-relaxed hidden md:block">Choose your preferred base material:</p>
               </div>
               
               <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
@@ -323,7 +323,6 @@ export default function CustomJewelryPage() {
                     onClick={() => setFormData({...formData, metal: metal.name})}
                     className={`cursor-pointer border p-4 text-center transition-all ${formData.metal === metal.name ? 'bg-[#E6FDF9] border-[#4fa3b9]' : 'bg-white border-gray-200 hover:border-gray-300'}`}
                   >
-                    {/* Transforming vertical bar to horizontal by using -rotate-90 */}
                     <div className="w-full h-12 mb-3 rounded shadow-sm overflow-hidden flex items-center justify-center relative bg-gray-50 border border-gray-100">
                       <img 
                         src={metal.img} 
@@ -342,10 +341,10 @@ export default function CustomJewelryPage() {
             {/* 04. Stone Specification */}
             <div>
               <div className="flex justify-between items-end mb-6">
-                <h2 className="font-playfair text-3xl font-bold text-gray-900">
+                <h2 className="font-playfair text-2xl md:text-3xl font-bold text-gray-900">
                   <span className="italic text-[#4fa3b9] font-medium pr-1.5">(04.)</span> Stone Specification
                 </h2>
-                <p className="text-sm text-gray-600 hidden md:block">Please specify the type of stone you want for your custom jewelry:</p>
+                <p className="text-sm font-normal text-gray-700 leading-relaxed hidden md:block">Please specify the type of stone you want for your custom jewelry:</p>
               </div>
               
               <div className="flex flex-wrap gap-3 mb-6">
@@ -371,21 +370,21 @@ export default function CustomJewelryPage() {
             {/* 05. Design Notes */}
             <div>
               <div className="flex justify-between items-end mb-6">
-                <h2 className="font-playfair text-3xl font-bold text-gray-900">
+                <h2 className="font-playfair text-2xl md:text-3xl font-bold text-gray-900">
                   <span className="italic text-[#4fa3b9] font-medium pr-1.5">(05.)</span> Design Notes / Instructions
                 </h2>
               </div>
               
               <div className="mb-2 flex justify-between text-sm text-gray-700">
-                <label>Describe your concept in detail:</label>
-                <span>(Up to 1000 characters)</span>
+                <label className="font-normal">Describe your concept in detail:</label>
+                <span className="font-normal">(Up to 1000 characters)</span>
               </div>
               <textarea 
                 name="designNotes" 
                 value={formData.designNotes} 
                 onChange={handleChange} 
                 rows="5"
-                className="w-full border border-gray-300 p-4 text-sm text-gray-900 placeholder-gray-400 focus:outline-none focus:border-[#4fa3b9] resize-none" 
+                className="w-full border border-gray-300 p-4 text-sm font-normal text-gray-900 placeholder-gray-400 focus:outline-none focus:border-[#4fa3b9] resize-none leading-relaxed" 
                 placeholder={`"Inspired by the attached reference, with reduced stone size"\n"Incorporate subtle floral detailing"\n"Minimalist interpretation with clean edges"`}
               ></textarea>
             </div>
@@ -395,12 +394,12 @@ export default function CustomJewelryPage() {
             {/* 06. Reference Uploads */}
             <div>
               <div className="flex justify-between items-end mb-6">
-                <h2 className="font-playfair text-3xl font-bold text-gray-900">
+                <h2 className="font-playfair text-2xl md:text-3xl font-bold text-gray-900">
                   <span className="italic text-[#4fa3b9] font-medium pr-1.5">(06.)</span> Reference Uploads
                 </h2>
               </div>
               
-              <p className="text-sm text-gray-700 mb-4">Sketches, inspiration images, or comparable designs</p>
+              <p className="text-sm font-normal text-gray-700 leading-relaxed mb-4">Sketches, inspiration images, or comparable designs</p>
               
               <div 
                 onClick={() => fileInputRef.current?.click()}
@@ -433,13 +432,13 @@ export default function CustomJewelryPage() {
           {/* RIGHT: STICKY ORDER OVERVIEW */}
           <div className="lg:col-span-1">
             <div className="sticky top-24 bg-[#E6FDF9] p-6 shadow-sm border border-[#4fa3b9]/10">
-              <h2 className="font-playfair text-3xl font-bold text-gray-900 mb-6">
+              <h2 className="font-playfair text-2xl md:text-3xl font-bold text-gray-900 mb-6">
                 <span className="italic text-[#4fa3b9] font-medium pr-1.5">Order</span> Overview
               </h2>
 
               <div className="bg-white p-5 mb-4 shadow-sm border border-gray-100">
-                <h3 className="font-bold text-gray-900 mb-2">Custom Jewelry Request</h3>
-                <p className="text-sm text-gray-600 leading-relaxed">Your submission will be reviewed and executed by our master jewelers in line with the provided specifications.</p>
+                <h3 className="font-bold text-gray-900 mb-2 text-sm md:text-base">Custom Jewelry Request</h3>
+                <p className="text-sm font-normal text-gray-700 leading-relaxed">Your submission will be reviewed and executed by our master jewelers in line with the provided specifications.</p>
               </div>
 
               <div className="divide-y divide-[#4fa3b9]/20 border-b border-[#4fa3b9]/20 mb-6">
@@ -471,7 +470,6 @@ export default function CustomJewelryPage() {
                   <span className="text-sm text-gray-700 font-medium">{formData.metal || "-"}</span>
                 </div>
 
-                {/* --- ADDED: STONE SELECTION TO OVERVIEW --- */}
                 <div className="py-4 flex justify-between">
                   <span className="font-bold text-gray-900 text-sm">Stone Selection</span>
                   <div className="text-right">
@@ -482,10 +480,9 @@ export default function CustomJewelryPage() {
                   </div>
                 </div>
 
-                {/* --- ADDED: DESIGN NOTES TO OVERVIEW --- */}
                 <div className="py-4 flex flex-col">
                   <span className="font-bold text-gray-900 text-sm mb-1">Design Notes</span>
-                  <span className="text-sm text-gray-700 italic line-clamp-2">
+                  <span className="text-sm font-normal text-gray-700 italic line-clamp-2">
                     {formData.designNotes ? `"${formData.designNotes}"` : "-"}
                   </span>
                 </div>
@@ -500,7 +497,6 @@ export default function CustomJewelryPage() {
                 </div>
               </div>
 
-              {/* Timeline Graphic */}
               <div className="bg-white p-5 mb-6 shadow-sm border border-gray-100">
                 <div className="flex justify-between items-center mb-4">
                   <span className="font-bold text-gray-900 text-sm">Estimated Timeline:</span>
@@ -530,7 +526,7 @@ export default function CustomJewelryPage() {
                 {loading ? "Submitting..." : "Submit Request \u2192"}
               </button>
               
-              <p className="text-xs text-center text-gray-500">Please ensure all required fields are completed before submission.</p>
+              <p className="text-xs text-center font-normal text-gray-600">Please ensure all required fields are completed before submission.</p>
 
             </div>
           </div>

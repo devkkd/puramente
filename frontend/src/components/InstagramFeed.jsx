@@ -1,47 +1,24 @@
 "use client";
 
-import React, { useRef } from "react";
-
-// The data array where you will map your local images/videos and external Insta links
-const instaPosts = [
-  {
-    id: 1,
-    type: "image", 
-    mediaUrl: "/images/home/insta1.jpg", 
-    instaLink: "https://instagram.com/puramentejewel",
-    icon: "carousel", 
-  },
-  {
-    id: 2,
-    type: "video",
-    mediaUrl: "/videos/home/reel1.mp4", 
-    instaLink: "https://instagram.com/puramentejewel",
-    icon: "reel",
-  },
-  {
-    id: 3,
-    type: "video",
-    mediaUrl: "/videos/home/reel2.mp4",
-    instaLink: "https://instagram.com/puramentejewel",
-    icon: "reel",
-  },
-  {
-    id: 4,
-    type: "image",
-    mediaUrl: "/images/home/insta2.jpg",
-    instaLink: "https://instagram.com/puramentejewel",
-    icon: "carousel",
-  },
-  {
-    id: 5,
-    type: "video",
-    mediaUrl: "/videos/home/reel3.mp4",
-    instaLink: "https://instagram.com/puramentejewel",
-    icon: "reel",
-  },
-];
+import React, { useEffect, useRef, useState } from "react";
+import { getInstaPosts } from "@/lib/api";
 
 export default function InstagramFeed() {
+  const [instaPosts, setInstaPosts] = useState([]);
+  const INSTA_PROFILE_URL = "https://instagram.com/puramenteinternational";
+
+  useEffect(() => {
+    const fetchPosts = async () => {
+      try {
+        const res = await getInstaPosts();
+        if (res.success) setInstaPosts(res.data);
+      } catch (error) {
+        console.error("Failed to fetch Instagram posts:", error);
+      }
+    };
+    fetchPosts();
+  }, []);
+  
   return (
     <section className="w-full py-10 lg:py-24 bg-white font-mona overflow-hidden">
       <div className="flex flex-col items-center mb-8 lg:mb-12 px-4 text-center">
@@ -61,7 +38,7 @@ export default function InstagramFeed() {
 
         {/* Subtext */}
         <a 
-          href="https://instagram.com/puramentejewel" 
+          href={INSTA_PROFILE_URL}
           target="_blank" 
           rel="noopener noreferrer"
           className="text-xs sm:text-sm font-normal text-gray-600 lg:text-gray-800 hover:text-[#00a3c4] transition-colors"
@@ -78,9 +55,9 @@ export default function InstagramFeed() {
       >
         {instaPosts.map((post) => (
           <InstaItem 
-            key={post.id} 
+            key={post._id} // Using _id from MongoDB
             post={post} 
-            // Mobile: 70vw width, rounded corners, snap center. Desktop: full width of grid cell, square corners.
+            profileUrl={INSTA_PROFILE_URL}
             className="snap-center shrink-0 w-[70vw] sm:w-[45vw] md:w-full rounded-2xl md:rounded-none shadow-md md:shadow-none" 
           />
         ))}
@@ -98,7 +75,7 @@ export default function InstagramFeed() {
 
 /** * Extracted into a separate component so we can manage individual Video DOM Refs easily 
  */
-function InstaItem({ post, className = "" }) {
+function InstaItem({ post, className = "", profileUrl }) {
   const videoRef = useRef(null);
 
   const handleMouseEnter = () => {
@@ -115,7 +92,7 @@ function InstaItem({ post, className = "" }) {
 
   return (
     <a 
-      href={post.instaLink} 
+      href={profileUrl} 
       target="_blank" 
       rel="noopener noreferrer"
       className={`relative aspect-[4/5] bg-gray-100 group overflow-hidden block ${className}`}

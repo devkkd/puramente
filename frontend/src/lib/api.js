@@ -87,3 +87,10 @@ export const getBlogById = (id) => api.get(`/blogs/${id}`);
 export const createBlog = (data) => api.post('/blogs', data, { headers: { 'Content-Type': 'multipart/form-data' } });
 export const updateBlog = (id, data) => api.put(`/blogs/${id}`, data, { headers: { 'Content-Type': 'multipart/form-data' } }); 
 export const deleteBlog = (id) => api.delete(`/blogs/${id}`);
+
+// Remove the fetch functions and replace them with these:
+export const getInstaPosts = () => api.get('/insta');
+export const addInstaPost = (data) => api.post('/insta', data, { 
+    headers: { 'Content-Type': 'multipart/form-data' } 
+});
+export const deleteInstaPost = (id) => api.delete(`/insta/${id}`);

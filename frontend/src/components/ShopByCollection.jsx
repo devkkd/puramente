@@ -132,7 +132,7 @@ export default function ShopByCollection() {
       <div className="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8 flex flex-col lg:flex-row items-center gap-10 lg:gap-8 relative">
         
         {/* --- LEFT COLUMN: TEXT CONTENT --- */}
-        <div className="w-full lg:w-[25%] flex flex-col items-center lg:items-start text-center lg:text-left shrink-0 z-50 bg-white/80 backdrop-blur-sm lg:bg-transparent rounded-xl relative lg:pr-8">
+        <div className="w-full lg:w-[25%] flex flex-col items-center lg:items-start text-center lg:text-left shrink-0 z-49 bg-white/80 backdrop-blur-sm lg:bg-transparent rounded-xl relative lg:pr-8">
           <div className="flex items-center gap-4 text-[#4fa3b9] text-sm md:text-md font-normal tracking-widest uppercase mb-4 lg:mb-6">
             <span className="w-12 md:w-16 h-px bg-[#4fa3b9] hidden lg:block"></span>
             <span>Explore</span>
@@ -141,7 +141,7 @@ export default function ShopByCollection() {
 
           <h2 className="font-playfair text-3xl md:text-4xl lg:text-5xl font-bold text-gray-900 mb-6 lg:mb-8 leading-tight">
             Shop by <br className="hidden lg:block" />
-            <span className="italic text-[#4fa3b9] font-medium lg:pr-2">Collection</span>
+            <span className="italic text-[#4fa3b9] font-medium lg:pr-2">Categories</span>
           </h2>
 
           <Link 
@@ -197,7 +197,7 @@ export default function ShopByCollection() {
 
           {/* Custom Navigation Controls */}
           {/* Pulled down safely on mobile (-bottom-12) */}
-          <div className="absolute -bottom-12 lg:-bottom-6 left-0 lg:left-4 right-0 lg:right-auto w-full lg:w-[340px] flex items-center gap-6 px-4 lg:px-0 z-50">
+          <div className="absolute -bottom-12 lg:-bottom-6 left-0 lg:left-4 right-0 lg:right-auto w-full lg:w-[340px] flex items-center gap-6 px-4 lg:px-0 z-49">
             <button 
               onClick={handlePrev} 
               disabled={activeIndex === 0}

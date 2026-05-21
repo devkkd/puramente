@@ -162,7 +162,7 @@ export default function OurStoryPage() {
               <button
                 key={item.year}
                 onClick={() => setActiveIndex(index)}
-                className={`text-5xl md:text-7xl lg:text-8xl font-bold transition-colors duration-300 shrink-0 ${
+                className={`text-5xl md:text-6xl lg:text-7xl font-bold transition-colors duration-300 shrink-0 ${
                   activeIndex === index
                     ? "text-gray-900"
                     : "text-[#dceef2] hover:text-[#bde0e8]"
@@ -181,7 +181,7 @@ export default function OurStoryPage() {
               <h3 className="font-playfair text-xl md:text-2xl lg:text-3xl font-bold text-gray-900 mb-3">
                 {journeyData[activeIndex].title}
               </h3>
-              <p className="text-gray-700 text-sm font-normal leading-relaxed">
+              <p className="text-gray-700 text-md font-normal leading-relaxed">
                 {journeyData[activeIndex].description}
               </p>
             </div>
@@ -337,7 +337,7 @@ export default function OurStoryPage() {
         </div>
 
         {/* 4 Cards Grid */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
           <div className="border border-[#4fa3b9]/50 p-6 flex flex-col hover:bg-[#F4f9fa] transition-colors rounded-sm">
             <h3 className="text-[#4fa3b9] font-bold text-xl mb-3">Artisan Crafted</h3>
             <p className="text-gray-700 text-sm font-normal leading-relaxed">
@@ -345,12 +345,7 @@ export default function OurStoryPage() {
             </p>
           </div>
           
-          <div className="border border-[#4fa3b9]/50 p-6 flex flex-col hover:bg-[#F4f9fa] transition-colors rounded-sm">
-            <h3 className="text-[#4fa3b9] font-bold text-xl mb-3">BIS Hallmarked</h3>
-            <p className="text-gray-700 text-sm font-normal leading-relaxed">
-              Certified 925 sterling silver, guaranteed purity with every piece
-            </p>
-          </div>
+
           
           <div className="border border-[#4fa3b9]/50 p-6 flex flex-col hover:bg-[#F4f9fa] transition-colors rounded-sm">
             <h3 className="text-[#4fa3b9] font-bold text-xl mb-3">Fair Trade</h3>

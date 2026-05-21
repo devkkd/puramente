@@ -87,3 +87,17 @@ body {
   border: none !important;
   box-shadow: none !important;
 }
+
+@keyframes infinite-scroll {
+  from { transform: translateX(0); }
+  to { transform: translateX(-50%); }
+}
+
+.animate-infinite-scroll {
+  animation: infinite-scroll 12s linear infinite;
+}
+
+/* Pause when user hovers over the slider */
+.group:hover .animate-infinite-scroll {
+  animation-play-state: paused;
+}

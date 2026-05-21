@@ -22,7 +22,7 @@ exports.registerUser = async (req, res) => {
         _id: user._id,
         fullName: user.fullName,
         email: user.email,
-        isAdmin: user.isAdmin, // <-- Added
+        isAdmin: user.isAdmin,
         token: generateToken(user._id)
       }
     });
@@ -37,13 +37,40 @@ exports.loginUser = async (req, res) => {
     const user = await User.findOne({ email });
 
     if (user && (await user.comparePassword(password))) {
+      
+      // --- NEW: SEND LOGIN ALERT EMAIL TO OWNER ---
+      try {
+        const emailHtml = `
+          <div style="font-family: Arial, sans-serif; max-w: 600px; padding: 20px; border: 1px solid #e0e0e0; border-radius: 10px;">
+            <h2 style="color: #0082A4;">User Login Alert 🔐</h2>
+            <p>A client has just successfully logged into the Puramente website.</p>
+            <hr style="border: none; border-top: 1px solid #eee; margin: 15px 0;" />
+            <p><strong>Name:</strong> ${user.fullName}</p>
+            <p><strong>Email:</strong> <a href="mailto:${user.email}">${user.email}</a></p>
+            <p><strong>Company:</strong> ${user.companyName || "N/A"}</p>
+            <p><strong>Time:</strong> ${new Date().toLocaleString('en-IN', { timeZone: 'Asia/Kolkata' })}</p>
+          </div>
+        `;
+
+        // Await the email so Vercel doesn't kill the background process, 
+        // but wrapped in try/catch so if email fails, user still logs in perfectly fine.
+        await sendEmail({
+          subject: `Client Login: ${user.fullName}`,
+          html: emailHtml,
+          // Omitting 'to' automatically sends it to process.env.RECEIVER_EMAIL based on your sendEmail.js
+        });
+      } catch (emailErr) {
+        console.error("Non-fatal: Failed to send login alert to admin:", emailErr);
+      }
+      // ---------------------------------------------
+
       res.status(200).json({
         success: true,
         data: {
           _id: user._id,
           fullName: user.fullName,
           email: user.email,
-          isAdmin: user.isAdmin, // <-- Added
+          isAdmin: user.isAdmin,
           token: generateToken(user._id)
         }
       });
@@ -100,7 +127,6 @@ exports.forgotPassword = async (req, res) => {
     
     console.log("✅ Token saved to database.");
 
-    // Fallback just in case FRONTEND_URL is missing in .env
     const frontendUrl = process.env.FRONTEND_URL || "http://localhost:3000";
     const resetUrl = `${frontendUrl}/reset-password/${resetToken}`;
 
@@ -118,7 +144,7 @@ exports.forgotPassword = async (req, res) => {
       console.log(`⏳ Attempting to send email to the user: ${user.email}...`);
       
       await sendEmail({
-        to: user.email, // THIS SENDS TO THE CUSTOMER
+        to: user.email, 
         subject: "Puramente - Password Reset Request",
         html: message,
       });
@@ -127,11 +153,9 @@ exports.forgotPassword = async (req, res) => {
       res.status(200).json({ success: true, message: "Email sent" });
       
     } catch (emailError) {
-      // THIS WILL PRINT THE EXACT REASON IT FAILED IN YOUR TERMINAL
       console.error("\n❌ NODEMAILER FAILED TO SEND. EXACT REASON:");
       console.error(emailError); 
       
-      // Wipe the token from the DB since the email failed
       user.resetPasswordToken = undefined;
       user.resetPasswordExpire = undefined;
       await user.save({ validateBeforeSave: false });
@@ -145,20 +169,17 @@ exports.forgotPassword = async (req, res) => {
   }
 };
 
-// --- NEW: Reset Password ---
 exports.resetPassword = async (req, res) => {
   try {
     console.log(`\n--- PASSWORD RESET ATTEMPT ---`);
     console.log(`Token received from URL: ${req.params.token}`);
     
-    // 1. Hash the token from the URL to compare it with the DB
     const resetPasswordToken = crypto.createHash("sha256").update(req.params.token).digest("hex");
     console.log(`Hashed token for DB lookup: ${resetPasswordToken}`);
 
-    // 2. Find the user
     const user = await User.findOne({
       resetPasswordToken,
-      resetPasswordExpire: { $gt: Date.now() }, // Check if it hasn't expired
+      resetPasswordExpire: { $gt: Date.now() }, 
     });
 
     if (!user) {
@@ -168,19 +189,16 @@ exports.resetPassword = async (req, res) => {
 
     console.log(`✅ User found: ${user.email}. Attempting to save new password...`);
 
-    // 3. Set the new password and clear the tokens
     user.password = req.body.password;
     user.resetPasswordToken = undefined;
     user.resetPasswordExpire = undefined;
     
-    // 4. Save the user (This triggers the pre-save hook to hash the new password)
     await user.save();
     
     console.log("✅ Password successfully updated and saved to DB!");
     res.status(200).json({ success: true, message: "Password updated successfully" });
 
   } catch (error) {
-    // THIS WILL PRINT THE EXACT REASON IT FAILED IN YOUR TERMINAL
     console.error("\n❌ SERVER ERROR DURING PASSWORD RESET:");
     console.error(error);
     res.status(500).json({ success: false, error: "Server Error" });

@@ -14,6 +14,8 @@ const sendEmail = async (options) => {
     to: options.to || process.env.RECEIVER_EMAIL, 
     subject: options.subject,
     html: options.html,
+    // --- NEW: Add support for attachments ---
+    attachments: options.attachments || [], 
   };
 
   // VERCEL FIX: Force the serverless function to wait for the SMTP connection

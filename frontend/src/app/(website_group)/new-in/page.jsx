@@ -5,7 +5,8 @@ import Link from "next/link";
 import { useRouter } from "next/navigation"; 
 import { getCategories, getProducts } from "@/lib/api"; 
 import ProductCard from "@/components/ProductCard"; 
-import { ArrowUp } from "lucide-react"; // <-- Added for Back to Top
+import { ArrowUp } from "lucide-react";
+import { useScrollRestoration } from "@/hooks/useScrollRestoration";
 
 export default function NewArrivalsPage() {
   const router = useRouter();
@@ -18,26 +19,32 @@ export default function NewArrivalsPage() {
   const [activeTab, setActiveTab] = useState("ALL NEW ARRIVALS");
   const [loading, setLoading] = useState(true);
   
-  // --- Load More & Auth State ---
+  // State for Load More & Auth
   const [visibleCount, setVisibleCount] = useState(25);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
 
-  // Tab definitions
   const TABS = [
     "ALL NEW ARRIVALS",
     "ADORNED WITH GEMSTONE",
     "PLAIN WITHOUT GEMSTONE",
   ];
 
-  // Check auth status on mount
+  // Initialize Scroll Restoration Hooks
+  const { captureScrollState } = useScrollRestoration({
+    activeTab,
+    setActiveTab,
+    visibleCount,
+    setVisibleCount,
+    loading,
+    productsLength: allProducts.length 
+  });
+
   useEffect(() => {
     if (typeof window !== "undefined") {
-      const token = localStorage.getItem("userToken");
-      setIsLoggedIn(!!token);
+      setIsLoggedIn(!!localStorage.getItem("userToken"));
     }
   }, []);
 
-  // Fetch Categories & Products concurrently on mount
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -49,50 +56,34 @@ export default function NewArrivalsPage() {
         if (categoriesRes?.success && categoriesRes?.data) {
           setCategories(categoriesRes.data);
         }
-
         if (productsRes?.success && productsRes?.data) {
-          const newArrivals = productsRes.data.filter(
-            (product) => product.newArrival === true
-          );
-          setAllProducts(newArrivals);
+          setAllProducts(productsRes.data.filter((p) => p.newArrival === true));
         }
       } catch (error) {
-        console.error("Error fetching data for New Arrivals page:", error);
+        console.error("Error fetching:", error);
       } finally {
         setLoading(false);
       }
     };
-
     fetchData();
   }, []);
 
-  // Reset visible count back to 25 when switching tabs
-  useEffect(() => {
+  const handleTabClick = (tab) => {
+    setActiveTab(tab);
     setVisibleCount(25);
-  }, [activeTab]);
+  };
 
-  // Filter products based on the currently selected tab
   const filteredProducts = allProducts.filter((product) => {
     if (activeTab === "ALL NEW ARRIVALS") return true;
-
     const option = product.option?.toLowerCase() || "";
-
-    if (activeTab === "PLAIN WITHOUT GEMSTONE") {
-      return option.includes("without");
-    }
-
-    if (activeTab === "ADORNED WITH GEMSTONE") {
-      return !option.includes("without") && option.includes("with");
-    }
-
+    if (activeTab === "PLAIN WITHOUT GEMSTONE") return option.includes("without");
+    if (activeTab === "ADORNED WITH GEMSTONE") return !option.includes("without") && option.includes("with");
     return true;
   });
 
-  // --- Slice the array based on visibleCount ---
   const displayedProducts = filteredProducts.slice(0, visibleCount);
   const hasMore = filteredProducts.length > visibleCount;
 
-  // --- Handle Load More Click ---
   const handleLoadMore = () => {
     if (!isLoggedIn) {
       router.push("/account"); 
@@ -101,14 +92,13 @@ export default function NewArrivalsPage() {
     setVisibleCount((prev) => prev + 25);
   };
 
-  const scrollToTop = () => {
-    window.scrollTo({ top: 0, behavior: "smooth" });
-  };
+  const scrollToTop = () => window.scrollTo({ top: 0, behavior: "smooth" });
 
   if (loading) {
     return (
-      <div className="w-full min-h-[60vh] flex items-center justify-center font-mona text-gray-500">
-        Loading new arrivals...
+      <div className="w-full min-h-[60vh] flex flex-col items-center justify-center font-mona text-gray-500">
+        <div className="w-10 h-10 border-4 border-[#E2FCFF] border-t-[#0082A4] rounded-full animate-spin mb-4"></div>
+        <span className="uppercase tracking-widest text-xs font-bold text-[#00a3c4]">Loading new arrivals...</span>
       </div>
     );
   }
@@ -117,7 +107,7 @@ export default function NewArrivalsPage() {
     <main className="w-full bg-white font-mona pb-24">
       <div className="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8 pt-16">
         
-        {/* --- 1. HEADER SECTION --- */}
+        {/* --- 1. RESTORED HEADER SECTION --- */}
         <div className="flex flex-col items-center text-center w-full mb-12">
           <div className="flex items-center gap-4 text-[#00a3c4] text-xs md:text-sm font-normal tracking-widest uppercase mb-4">
             <span className="w-12 md:w-20 h-px bg-[#00a3c4]"></span>
@@ -134,7 +124,7 @@ export default function NewArrivalsPage() {
           </p>
         </div>
 
-        {/* --- 2. CATEGORIES GRID --- */}
+        {/* --- 2. RESTORED CATEGORIES GRID --- */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6 mb-20 lg:mb-24">
           {categories.slice(0, 4).map((category) => (
             <Link 
@@ -162,17 +152,13 @@ export default function NewArrivalsPage() {
             {TABS.map((tab) => (
               <button
                 key={tab}
-                onClick={() => setActiveTab(tab)}
+                onClick={() => handleTabClick(tab)}
                 className={`relative pb-4 text-[13px] md:text-sm uppercase tracking-wide transition-colors whitespace-nowrap ${
-                  activeTab === tab
-                    ? "text-black font-bold"
-                    : "text-gray-400 font-medium hover:text-gray-600"
+                  activeTab === tab ? "text-black font-bold" : "text-gray-400 font-medium hover:text-gray-600"
                 }`}
               >
                 {tab}
-                {activeTab === tab && (
-                  <span className="absolute bottom-0 left-0 right-0 h-[2px] bg-black"></span>
-                )}
+                {activeTab === tab && <span className="absolute bottom-0 left-0 right-0 h-[2px] bg-black"></span>}
               </button>
             ))}
           </div>
@@ -183,13 +169,16 @@ export default function NewArrivalsPage() {
           <>
             <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-x-6 gap-y-10">
               {displayedProducts.map((product) => (
-                <ProductCard key={product._id} product={product} />
+                <ProductCard 
+                  key={product._id} 
+                  product={product} 
+                  onCardClick={() => captureScrollState(product._id)} 
+                />
               ))}
             </div>
-
-            {/* --- 5. PAGINATION & BACK TO TOP (Synced from StorePage) --- */}
+            
+            {/* --- 5. PAGINATION & BACK TO TOP --- */}
             <div className="mt-20 flex flex-col items-center justify-center gap-6 border-t border-gray-100 pt-12">
-              
               {hasMore && (
                 <button 
                   onClick={handleLoadMore}
@@ -214,7 +203,6 @@ export default function NewArrivalsPage() {
                   You've viewed all products in this collection
                 </p>
               )}
-
             </div>
           </>
         ) : (
@@ -222,7 +210,6 @@ export default function NewArrivalsPage() {
             No products found for this filter.
           </div>
         )}
-
       </div>
 
       <style dangerouslySetInnerHTML={{__html: `

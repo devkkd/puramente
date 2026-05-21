@@ -1,39 +1,31 @@
 "use client";
 
-import React, { useState, useEffect, Suspense } from "react";
+import React, { useState, useEffect, Suspense, useRef } from "react";
 import { useParams, useSearchParams, useRouter } from "next/navigation";
-import { getCategories, getProducts } from "@/lib/api"; 
-import ProductCard from "@/components/ProductCard"; 
-import { ArrowUp } from "lucide-react"; 
+import { getCategories, getProducts } from "@/lib/api";
+import ProductCard from "@/components/ProductCard";
+import { ArrowUp } from "lucide-react";
+import { useScrollRestoration } from "@/hooks/useScrollRestoration";
 
 function StoreContent() {
   const params = useParams();
   const searchParams = useSearchParams();
   const router = useRouter();
-  const categorySlug = params.category; 
+  const categorySlug = params.category;
 
   const [categoryData, setCategoryData] = useState(null);
   const [allProducts, setAllProducts] = useState([]);
-  
-  // --- AUTH & PAGINATION STATE ---
   const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const [visibleCount, setVisibleCount] = useState(25); 
+  const [visibleCount, setVisibleCount] = useState(25);
+  const [loading, setLoading] = useState(true);
 
-  // Fixed auth status check on mount
-  useEffect(() => {
-    if (typeof window !== "undefined") {
-      const token = localStorage.getItem("userToken");
-      setIsLoggedIn(!!token);
-    }
-  }, []);
-
+  // 1. Initial State Setup
   const tabParam = searchParams.get("tab");
   let initialTab = "ALL COLLECTION";
   if (tabParam === "plain") initialTab = "PLAIN WITHOUT GEMSTONE";
   if (tabParam === "gemstone") initialTab = "ADORNED WITH GEMSTONE";
-    
+  
   const [activeTab, setActiveTab] = useState(initialTab);
-  const [loading, setLoading] = useState(true);
 
   const TABS = [
     "ALL COLLECTION",
@@ -41,20 +33,45 @@ function StoreContent() {
     "PLAIN WITHOUT GEMSTONE",
   ];
 
-  // Sync the active tab whenever the URL parameters change
+  // 2. Initialize Restoration Hook
+  const { captureScrollState } = useScrollRestoration({
+    activeTab,
+    setActiveTab,
+    visibleCount,
+    setVisibleCount,
+    loading,
+    productsLength: allProducts.length,
+  });
+
+  // 3. Auth Check
   useEffect(() => {
-    const currentTabParam = searchParams.get("tab");
-    if (currentTabParam === "plain") {
-      setActiveTab("PLAIN WITHOUT GEMSTONE");
-    } else if (currentTabParam === "gemstone") {
-      setActiveTab("ADORNED WITH GEMSTONE");
-    } else {
-      setActiveTab("ALL COLLECTION");
+    if (typeof window !== "undefined") {
+      setIsLoggedIn(!!localStorage.getItem("userToken"));
     }
-    // Reset pagination when tab changes
-    setVisibleCount(25);
+  }, []);
+
+  // --- CRITICAL FIX: URL SYNC LOCK ---
+  const isFirstMount = useRef(true);
+
+  useEffect(() => {
+    const hasSavedState = sessionStorage.getItem(`scroll_${window.location.pathname}`);
+
+    if (isFirstMount.current) {
+      isFirstMount.current = false;
+      if (hasSavedState) return; 
+    }
+
+    const currentTabParam = searchParams.get("tab");
+    if (currentTabParam === "plain") setActiveTab("PLAIN WITHOUT GEMSTONE");
+    else if (currentTabParam === "gemstone") setActiveTab("ADORNED WITH GEMSTONE");
+    else setActiveTab("ALL COLLECTION");
+
+    if (!hasSavedState) {
+      setVisibleCount(25);
+    }
   }, [searchParams]);
 
+  // 4. Data Fetching
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -62,72 +79,63 @@ function StoreContent() {
           getCategories(),
           getProducts(),
         ]);
-
         if (categoriesRes?.success && categoriesRes?.data) {
-          const matchedCategory = categoriesRes.data.find(
+          const found = categoriesRes.data.find(
             (c) => c.name.toLowerCase() === categorySlug.toLowerCase()
           );
-          setCategoryData(matchedCategory || null);
+          setCategoryData(found || null);
         }
-
         if (productsRes?.success && productsRes?.data) {
-          const categoryProducts = productsRes.data.filter(
-            (product) => product.category?.name.toLowerCase() === categorySlug.toLowerCase()
+          const filtered = productsRes.data.filter(
+            (p) => p.category?.name.toLowerCase() === categorySlug.toLowerCase()
           );
-          setAllProducts(categoryProducts);
+          setAllProducts(filtered);
         }
       } catch (error) {
-        console.error("Error fetching data for Store page:", error);
+        console.error("Error fetching store data:", error);
       } finally {
         setLoading(false);
       }
     };
-
-    if (categorySlug) {
-      fetchData();
-    }
+    if (categorySlug) fetchData();
   }, [categorySlug]);
 
-  // Filter products based on the currently selected tab
-  const filteredProducts = allProducts.filter((product) => {
-    if (activeTab === "ALL COLLECTION") return true;
-
-    const option = product.option?.toLowerCase() || "";
-
-    if (activeTab === "PLAIN WITHOUT GEMSTONE") {
-      return option.includes("without");
-    }
-
-    if (activeTab === "ADORNED WITH GEMSTONE") {
-      return !option.includes("without") && option.includes("with");
-    }
-
-    return true;
-  });
-
-  // --- PAGINATION LOGIC ---
-  const displayedProducts = filteredProducts.slice(0, visibleCount);
-  const hasMore = filteredProducts.length > visibleCount;
+  // 5. Handlers
+  const handleTabClick = (tab) => {
+    setActiveTab(tab);
+    setVisibleCount(25);
+    const slug = tab === "PLAIN WITHOUT GEMSTONE" ? "plain" : tab === "ADORNED WITH GEMSTONE" ? "gemstone" : null;
+    const newPath = slug ? `/store/${categorySlug}?tab=${slug}` : `/store/${categorySlug}`;
+    router.push(newPath, { scroll: false });
+  };
 
   const handleLoadMore = () => {
     if (!isLoggedIn) {
-      // Direct redirect without alert
-      router.push("/account"); 
+      router.push("/account");
       return;
     }
-    // If logged in, load 25 more
     setVisibleCount((prev) => prev + 25);
   };
 
-  const scrollToTop = () => {
-    window.scrollTo({ top: 0, behavior: "smooth" });
-  };
+  const scrollToTop = () => window.scrollTo({ top: 0, behavior: "smooth" });
+
+  // 6. Filter Logic
+  const filteredProducts = allProducts.filter((product) => {
+    if (activeTab === "ALL COLLECTION") return true;
+    const option = product.option?.toLowerCase() || "";
+    if (activeTab === "PLAIN WITHOUT GEMSTONE") return option.includes("without");
+    if (activeTab === "ADORNED WITH GEMSTONE") return !option.includes("without") && option.includes("with");
+    return true;
+  });
+
+  const displayedProducts = filteredProducts.slice(0, visibleCount);
+  const hasMore = filteredProducts.length > visibleCount;
 
   if (loading) {
     return (
       <div className="w-full min-h-[60vh] flex flex-col items-center justify-center font-mona text-gray-500">
         <div className="w-10 h-10 border-4 border-[#E2FCFF] border-t-[#0082A4] rounded-full animate-spin mb-4"></div>
-        <span className="uppercase tracking-widest text-xs font-bold text-[#00a3c4]">Loading collection...</span>
+        <span className="uppercase tracking-widest text-xs font-bold text-[#00a3c4]">Loading Collection...</span>
       </div>
     );
   }
@@ -137,7 +145,7 @@ function StoreContent() {
   return (
     <main className="w-full bg-white font-mona pb-24">
       
-      {/* --- 1. HEADER SECTION --- */}
+      {/* --- RESTORED HEADER SECTION --- */}
       <div className="flex flex-col items-center text-center w-full pt-16 mb-10 px-4">
         <div className="flex items-center gap-4 text-[#00a3c4] text-xs md:text-sm font-normal tracking-widest uppercase mb-4">
           <span className="w-12 md:w-20 h-px bg-[#00a3c4]/50"></span>
@@ -154,7 +162,7 @@ function StoreContent() {
         </p>
       </div>
 
-      {/* --- 2. CATEGORY BANNER (Using storeBannerUrl) --- */}
+      {/* --- RESTORED CATEGORY BANNER --- */}
       {categoryData?.storeBannerUrl && (
         <div className="w-full h-[30vh] md:h-[40vh] lg:h-[50vh] relative mb-16 bg-gray-100">
           <img 
@@ -166,43 +174,41 @@ function StoreContent() {
       )}
 
       <div className="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8">
-        
-        {/* --- 3. SUB-CATEGORIES / TABS --- */}
+        {/* TABS */}
         <div className="w-full flex justify-center mb-10 border-b border-gray-200">
           <div className="flex items-center space-x-6 md:space-x-12 overflow-x-auto hide-scrollbar">
             {TABS.map((tab) => (
               <button
                 key={tab}
-                onClick={() => setActiveTab(tab)}
+                onClick={() => handleTabClick(tab)}
                 className={`relative pb-4 text-[13px] md:text-sm uppercase tracking-wide transition-colors whitespace-nowrap ${
-                  activeTab === tab
-                    ? "text-black font-bold"
-                    : "text-gray-400 font-medium hover:text-gray-600"
+                  activeTab === tab ? "text-black font-bold" : "text-gray-400 font-medium hover:text-gray-600"
                 }`}
               >
                 {tab}
-                {activeTab === tab && (
-                  <span className="absolute bottom-0 left-0 right-0 h-[2px] bg-black"></span>
-                )}
+                {activeTab === tab && <span className="absolute bottom-0 left-0 right-0 h-[2px] bg-black"></span>}
               </button>
             ))}
           </div>
         </div>
 
-        {/* --- 4. PRODUCTS GRID --- */}
+        {/* GRID */}
         {displayedProducts.length > 0 ? (
           <>
             <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-x-6 gap-y-10">
               {displayedProducts.map((product) => (
-                <ProductCard key={product._id} product={product} />
+                <ProductCard
+                  key={product._id}
+                  product={product}
+                  onCardClick={() => captureScrollState(product._id)}
+                />
               ))}
             </div>
 
-            {/* --- 5. PAGINATION & BACK TO TOP --- */}
+            {/* PAGINATION */}
             <div className="mt-20 flex flex-col items-center justify-center gap-6 border-t border-gray-100 pt-12">
-              
               {hasMore && (
-                <button 
+                <button
                   onClick={handleLoadMore}
                   className="bg-[#0082A4] text-white px-10 py-3.5 text-sm font-bold uppercase tracking-widest hover:bg-[#006a85] transition-colors shadow-sm rounded-sm"
                 >
@@ -210,9 +216,8 @@ function StoreContent() {
                 </button>
               )}
 
-              {/* Show Back To Top if user has loaded past the first 25 items or reached the end */}
               {(visibleCount > 25 || !hasMore) && displayedProducts.length > 10 && (
-                <button 
+                <button
                   onClick={scrollToTop}
                   className="flex items-center gap-2 text-gray-500 hover:text-[#0082A4] text-sm font-medium transition-colors uppercase tracking-widest"
                 >
@@ -220,13 +225,6 @@ function StoreContent() {
                   Back to Top
                 </button>
               )}
-
-              {!hasMore && displayedProducts.length > 25 && (
-                <p className="text-gray-400 text-xs uppercase tracking-widest mt-2">
-                  You've viewed all products in this collection
-                </p>
-              )}
-
             </div>
           </>
         ) : (
@@ -238,11 +236,7 @@ function StoreContent() {
         )}
       </div>
 
-      <style dangerouslySetInnerHTML={{__html: `
-        .hide-scrollbar::-webkit-scrollbar {
-          display: none;
-        }
-      `}} />
+      <style dangerouslySetInnerHTML={{ __html: `.hide-scrollbar::-webkit-scrollbar { display: none; }` }} />
     </main>
   );
 }

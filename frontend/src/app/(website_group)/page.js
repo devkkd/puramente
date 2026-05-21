@@ -6,6 +6,7 @@ import Certifications from '@/components/Certifications'
 import Curated from '@/components/Curated'
 import DelhiFair from '@/components/DelhiFair'
 import ExhibitionMail from '@/components/ExhibitionMail'
+import ExploreMore from '@/components/ExploreMore'
 import HeroSection from '@/components/HeroSection'
 import InstagramFeed from '@/components/InstagramFeed'
 import NewArrivals from '@/components/NewArrivals'
@@ -27,12 +28,13 @@ export default function page() {
       <Curated />
       <BestSellers />
       <OurStory />
+      <InstagramFeed/>
       <Bespoke />
       <DelhiFair />
       <ExhibitionMail />
       <VideoPlayer/>
       <Testimonials/>
-      <InstagramFeed/>
+      <ExploreMore/>
       <Blog/>
     </div>
   )

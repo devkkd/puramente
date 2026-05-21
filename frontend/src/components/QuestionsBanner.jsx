@@ -31,7 +31,6 @@ export default function QuestionsBanner() {
           </div>
 
           {/* Right: Action Button */}
-          {/* Added mt-2 for slight mobile spacing, full width button on mobile */}
           <div className="w-full md:w-auto flex flex-col items-start md:items-center shrink-0 mt-2 md:mt-0">
             <Link 
               href="/contact" 
@@ -47,19 +46,25 @@ export default function QuestionsBanner() {
         </div>
 
         {/* --- BOTTOM ROW: Contact Information --- */}
-        <div className="flex flex-col lg:flex-row items-center justify-center gap-3 sm:gap-6 lg:gap-12 w-full text-center">
+        <div className="text-md sm:text-lg md:text-xl lg:text-2xl flex flex-col items-center justify-center gap-4 sm:gap-6 lg:gap-8 w-full text-center">
           
-          {/* Phone */}
-          <h3 className="text-lg sm:text-2xl md:text-3xl font-bold text-black tracking-wide">
-            CALL: +91 9314 346 148
-          </h3>
-          
-          {/* Vertical Divider (Hidden on mobile, visible on large screens) */}
-          <div className="hidden lg:block h-10 w-px bg-gray-400/60"></div>
+          {/* Numbers Row */}
+          <div className="flex flex-col lg:flex-row items-center gap-3 sm:gap-4 lg:gap-6">
+            {/* Pehla Number (Naya) */}
+            <h3 className=" font-bold text-black tracking-wide">
+              CALL & WHATSAPP: <span className="ml-6">+91 97991 68300</span>
+            </h3>
+            
+            <div className="hidden lg:block h-10 w-px bg-gray-400/60"></div>
+            
+            {/* Dusra Number */}
+            <h3 className="font-bold text-black tracking-wide">
+              +91 9314 346 148
+            </h3>
+          </div>
           
           {/* Email */}
-          {/* Added break-all for narrow phones so the email doesn't stretch the screen */}
-          <h3 className="text-lg sm:text-2xl md:text-3xl font-bold text-black tracking-wide break-all sm:break-normal">
+          <h3 className="font-bold text-black tracking-wide break-all sm:break-normal">
             EMAIL: info@puramentejewel.com
           </h3>
           

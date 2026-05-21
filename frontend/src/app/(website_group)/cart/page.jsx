@@ -94,6 +94,9 @@ export default function CartPage() {
       
       if (res.success) {
         setIsSuccess(true);
+        // --- ADDED: Scroll to top of the page smoothly ---
+        window.scrollTo({ top: 0, behavior: "smooth" });
+        
         if (clearCart) {
           clearCart(); // Completely clear UI cart immediately
         } else {
@@ -131,7 +134,7 @@ export default function CartPage() {
             Thank you for your inquiry. Our team will review your request and get back to you shortly.
           </p>
           <Link 
-            href="/store/new-arrivals" 
+            href="/new-in" 
             className="bg-[#0082A4] text-white px-8 lg:px-10 py-3.5 text-xs lg:text-sm font-bold tracking-widest uppercase rounded-3xl hover:bg-[#006a85] transition-colors shadow-sm w-full sm:w-auto"
           >
             Explore More Collections
@@ -249,8 +252,8 @@ export default function CartPage() {
                           onChange={(e) => updateQuantity(item._id, e.target.value)}
                           className="appearance-none w-full sm:w-auto border border-gray-300 text-gray-900 font-medium text-[13px] sm:text-sm pl-3 sm:pl-4 pr-8 sm:pr-10 py-2.5 sm:py-3 bg-white focus:outline-none focus:border-[#00a3c4] cursor-pointer sm:min-w-[160px]"
                         >
-                          <option value="1-10 Pieces">QTY : 1-10 Pieces</option>
-                          <option value="20-50 Pieces">QTY : 20-50 Pieces</option>
+                          <option value="10-25 Pieces">QTY : 10-25 Pieces</option>
+                          <option value="25-50 Pieces">QTY : 25-50 Pieces</option>
                           <option value="50-100 Pieces">QTY : 50-100 Pieces</option>
                           <option value="100+ Pieces">QTY : 100+ Pieces</option>
                         </select>

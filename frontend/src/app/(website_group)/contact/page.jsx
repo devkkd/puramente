@@ -107,7 +107,7 @@ export default function ContactUsPage() {
 
           <div className="p-5 lg:p-8 flex flex-col bg-white">
             <span className="text-xs lg:text-sm font-normal text-gray-700 mb-2 lg:mb-3">Visit Our Atelier</span>
-            <span className="text-[#00a3c4] font-bold text-base lg:text-xl mb-2 lg:mb-3">Sanganer, Jaipur</span>
+            <span className="text-[#00a3c4] font-bold text-base lg:text-xl mb-2 lg:mb-3">Jaipur</span>
             <span className="text-[11px] lg:text-xs font-normal text-gray-500">By appointment - factory visits welcome</span>
           </div>
 

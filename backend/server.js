@@ -38,6 +38,7 @@ const orderRoutes = require("./routes/orderRoutes");
 const customRequestRoutes = require("./routes/customRequestRoutes");
 const contactRoutes = require("./routes/contactRoutes");
 const blogRoutes = require("./routes/blogRoutes");
+const instaRoutes = require("./routes/instaRoutes");
 
 // ✅ MOUNT ROUTES
 app.use("/api/categories", categoryRoutes);
@@ -48,6 +49,7 @@ app.use("/api/orders", orderRoutes);
 app.use("/api/custom-requests", customRequestRoutes);
 app.use("/api/contact", contactRoutes);
 app.use("/api/blogs", blogRoutes);
+app.use("/api/insta", instaRoutes);
 
 app.get("/", (req, res) => {
   res.send("Puramente API running");
