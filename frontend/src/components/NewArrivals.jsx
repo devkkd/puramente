@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect, useRef } from "react";
 import ProductCard from "./ProductCard";
+import { getProducts } from "@/lib/api";
 
 export default function NewArrivals() {
   const [products, setProducts] = useState([]);
@@ -15,17 +16,15 @@ export default function NewArrivals() {
   useEffect(() => {
     const fetchProducts = async () => {
       try {
-        const response = await fetch("http://localhost:5000/api/products/");
-        const json = await response.json();
-        
-        if (json.success && json.data) {
-          // 1. Filter only new arrivals
-          const newArrivalsData = json.data.filter(item => item.newArrival === true);
-          
-          // 2. Randomize the array
+        const response = await getProducts();
+
+        if (response.success && response.data) {
+          const newArrivalsData = response.data.filter(
+            (item) => item.newArrival === true
+          );
+
           const shuffled = newArrivalsData.sort(() => 0.5 - Math.random());
-          
-          // 3. Keep max 10 products
+
           setProducts(shuffled.slice(0, 10));
         }
       } catch (error) {
@@ -65,7 +64,7 @@ export default function NewArrivals() {
     if (scrollContainerRef.current) {
       const { scrollLeft, scrollWidth, clientWidth } = scrollContainerRef.current;
       const totalScroll = scrollWidth - clientWidth;
-      
+
       if (totalScroll > 0) {
         const progress = (scrollLeft / totalScroll) * 100;
         setScrollProgress(progress);
@@ -79,10 +78,10 @@ export default function NewArrivals() {
   const scroll = (direction) => {
     if (scrollContainerRef.current) {
       const container = scrollContainerRef.current;
-      
+
       // Scroll by the full visible width of the container, revealing all new cards
-      const scrollAmount = container.clientWidth; 
-      
+      const scrollAmount = container.clientWidth;
+
       if (direction === "left") {
         container.scrollBy({ left: -scrollAmount, behavior: "smooth" });
       } else {
@@ -94,7 +93,7 @@ export default function NewArrivals() {
   return (
     <section className="w-full py-10 lg:py-16 bg-white font-mona overflow-hidden" ref={sectionRef}>
       <div className="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8 flex flex-col items-center">
-        
+
         {/* --- HEADER SECTION --- */}
         <div className={`flex flex-col items-center transform transition-all duration-1000 w-full px-2 ${isVisible ? 'translate-y-0 opacity-100' : 'translate-y-10 opacity-0'}`}>
           {/* Top Subheading */}
@@ -122,9 +121,9 @@ export default function NewArrivals() {
           </div>
         ) : (
           <div className="w-full flex flex-col items-center">
-            
+
             {/* Scrollable Products Track */}
-            <div 
+            <div
               ref={scrollContainerRef}
               onScroll={handleScroll}
               className="w-full flex overflow-x-auto gap-4 lg:gap-6 pb-6 lg:pb-12 snap-x snap-mandatory hide-scrollbar pt-2 lg:pt-4"
@@ -136,8 +135,8 @@ export default function NewArrivals() {
                   const animationDelay = `${index * 100}ms`;
 
                   return (
-                    <div 
-                      key={product._id} 
+                    <div
+                      key={product._id}
                       className={`snap-start shrink-0 w-[220px] sm:w-[240px] md:w-[250px] lg:w-[calc(20%-19.2px)] transform transition-all duration-1000 ease-out
                         ${isVisible ? 'translate-y-0 opacity-100' : 'translate-y-16 opacity-0'}
                       `}
@@ -156,8 +155,8 @@ export default function NewArrivals() {
             {products.length > 0 && (
               <div className={`flex items-center gap-4 lg:gap-6 mt-2 lg:mt-4 w-full max-w-xl px-2 lg:px-4 transform transition-all duration-1000 delay-500 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}>
                 {/* Left Arrow */}
-                <button 
-                  onClick={() => scroll('left')} 
+                <button
+                  onClick={() => scroll('left')}
                   className="text-[#00a3c4] hover:opacity-70 transition-opacity p-2"
                   aria-label="Scroll left"
                 >
@@ -169,18 +168,18 @@ export default function NewArrivals() {
 
                 {/* Progress Bar */}
                 <div className="flex-grow h-px bg-[#dceef2] relative overflow-hidden">
-                  <div 
+                  <div
                     className="absolute left-0 top-0 bottom-0 bg-[#00a3c4] transition-all duration-150 ease-out"
-                    style={{ 
+                    style={{
                       width: '20%', // Size of the progress thumb
-                      transform: `translateX(${(scrollProgress / 100) * (100 / 0.2 - 100)}%)` 
+                      transform: `translateX(${(scrollProgress / 100) * (100 / 0.2 - 100)}%)`
                     }}
                   ></div>
                 </div>
 
                 {/* Right Arrow */}
-                <button 
-                  onClick={() => scroll('right')} 
+                <button
+                  onClick={() => scroll('right')}
                   className="text-[#00a3c4] hover:opacity-70 transition-opacity p-2"
                   aria-label="Scroll right"
                 >
@@ -197,7 +196,8 @@ export default function NewArrivals() {
       </div>
 
       {/* Global style to hide default scrollbar for the carousel */}
-      <style dangerouslySetInnerHTML={{__html: `
+      <style dangerouslySetInnerHTML={{
+        __html: `
         .hide-scrollbar::-webkit-scrollbar {
           display: none;
         }
