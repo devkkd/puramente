@@ -24,17 +24,17 @@ export default function Footer() {
 
           <div className="flex items-center gap-3">
             {/* Instagram */}
-            <a href="#" className="w-9 h-9 md:w-10 md:h-10 rounded-full border border-gray-200 flex items-center justify-center hover:shadow-md transition-shadow">
+            <a href="https://instagram.com/puramenteinternational" className="w-9 h-9 md:w-10 md:h-10 rounded-full border border-gray-200 flex items-center justify-center hover:shadow-md transition-shadow">
               <img src="https://upload.wikimedia.org/wikipedia/commons/9/95/Instagram_logo_2022.svg" alt="Instagram" className="w-4 h-4" />
             </a>
             {/* Facebook */}
-            <a href="#" className="w-9 h-9 md:w-10 md:h-10 rounded-full border border-gray-200 flex items-center justify-center hover:shadow-md transition-shadow">
+            <a href="https://facebook.com/puramenteinternational1" className="w-9 h-9 md:w-10 md:h-10 rounded-full border border-gray-200 flex items-center justify-center hover:shadow-md transition-shadow">
               <svg width="16" height="16" className="md:w-[18px] md:h-[18px]" viewBox="0 0 24 24" fill="#1877F2" xmlns="http://www.w3.org/2000/svg">
                 <path d="M24 12.073C24 5.405 18.627 0 12 0C5.373 0 0 5.405 0 12.073C0 18.1 4.388 23.094 10.125 24V15.562H7.078V12.073H10.125V9.412C10.125 6.407 11.916 4.75 14.657 4.75C15.97 4.75 17.343 4.984 17.343 4.984V7.937H15.83C14.341 7.937 13.875 8.861 13.875 9.814V12.073H17.203L16.671 15.562H13.875V24C19.612 23.094 24 18.1 24 12.073Z" />
               </svg>
             </a>
             {/* YouTube */}
-            <a href="#" className="w-9 h-9 md:w-10 md:h-10 rounded-full border border-gray-200 flex items-center justify-center hover:shadow-md transition-shadow">
+            <a href="https://www.youtube.com/@PuramenteInternational" className="w-9 h-9 md:w-10 md:h-10 rounded-full border border-gray-200 flex items-center justify-center hover:shadow-md transition-shadow">
               <svg width="16" height="16" className="md:w-[18px] md:h-[18px]" viewBox="0 0 24 24" fill="#FF0000" xmlns="http://www.w3.org/2000/svg">
                 <path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z" />
               </svg>
@@ -96,11 +96,11 @@ export default function Footer() {
             
             <div className="flex flex-col gap-1 md:gap-1.5">
               <h4 className="font-bold text-xs md:text-sm text-black mb-1">Collections</h4>
-              <Link href="/rings" className="text-xs md:text-[13px] font-normal text-gray-700 hover:text-[#0082A4]">Rings</Link>
-              <Link href="/earrings" className="text-xs md:text-[13px] font-normal text-gray-700 hover:text-[#0082A4]">Earrings</Link>
-              <Link href="/necklaces" className="text-xs md:text-[13px] font-normal text-gray-700 hover:text-[#0082A4]">Necklaces</Link>
-              <Link href="/bracelets" className="text-xs md:text-[13px] font-normal text-gray-700 hover:text-[#0082A4]">Bracelets</Link>
-              <Link href="/new-arrivals" className="text-xs md:text-[13px] font-normal text-gray-700 hover:text-[#0082A4]">New Arrivals</Link>
+              <Link href="/ring" className="text-xs md:text-[13px] font-normal text-gray-700 hover:text-[#0082A4]">Rings</Link>
+              <Link href="/earring" className="text-xs md:text-[13px] font-normal text-gray-700 hover:text-[#0082A4]">Earrings</Link>
+              <Link href="/necklace" className="text-xs md:text-[13px] font-normal text-gray-700 hover:text-[#0082A4]">Necklaces</Link>
+              <Link href="/bracelet" className="text-xs md:text-[13px] font-normal text-gray-700 hover:text-[#0082A4]">Bracelets</Link>
+              <Link href="/new-in" className="text-xs md:text-[13px] font-normal text-gray-700 hover:text-[#0082A4]">New Arrivals</Link>
             </div>
 
             <div className="flex flex-col gap-1 md:gap-1.5">
@@ -109,12 +109,12 @@ export default function Footer() {
               <Link href="/craftsmanship" className="text-xs md:text-[13px] font-normal text-gray-700 hover:text-[#0082A4]">Craftsmanship</Link>
               <Link href="/sustainability" className="text-xs md:text-[13px] font-normal text-gray-700 hover:text-[#0082A4]">Sustainability</Link>
               <Link href="/visit-studio" className="text-xs md:text-[13px] font-normal text-gray-700 hover:text-[#0082A4]">Visit Jaipur Studio</Link>
-              <Link href="/blogs" className="text-xs md:text-[13px] font-normal text-gray-700 hover:text-[#0082A4]">Blogs</Link>
+              <Link href="/blog" className="text-xs md:text-[13px] font-normal text-gray-700 hover:text-[#0082A4]">Blogs</Link>
             </div>
 
             <div className="flex flex-col gap-1 md:gap-1.5 mt-2 sm:mt-0">
               <h4 className="font-bold text-xs md:text-sm text-black mb-1">Support</h4>
-              <Link href="/custom-jewelry" className="text-xs md:text-[13px] font-normal text-gray-700 hover:text-[#0082A4]">Custom Jewelry</Link>
+              <Link href="/custom" className="text-xs md:text-[13px] font-normal text-gray-700 hover:text-[#0082A4]">Make your Design</Link>
               <Link href="/contact" className="text-xs md:text-[13px] font-normal text-gray-700 hover:text-[#0082A4]">Contact Us</Link>
               <Link href="/faqs" className="text-xs md:text-[13px] font-normal text-gray-700 hover:text-[#0082A4]">FAQ&apos;s</Link>
               <Link href="/privacy-policy" className="text-xs md:text-[13px] font-normal text-gray-700 hover:text-[#0082A4]">Privacy Policy</Link>

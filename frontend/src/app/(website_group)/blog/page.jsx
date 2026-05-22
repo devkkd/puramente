@@ -55,7 +55,7 @@ export default function BlogsPage() {
                 
                 {/* Image */}
                 {/* Added rounded-xl for mobile, keeping sharp edges on desktop */}
-                <Link href={`/blogs/${blog.slug}`} className="w-full aspect-[4/3] overflow-hidden mb-4 lg:mb-6 bg-gray-100 rounded-xl lg:rounded-none shadow-sm lg:shadow-none">
+                <Link href={`/blog/${blog.slug}`} className="w-full aspect-[4/3] overflow-hidden mb-4 lg:mb-6 bg-gray-100 rounded-xl lg:rounded-none shadow-sm lg:shadow-none">
                   <img 
                     src={blog.imageUrl} 
                     alt={blog.title} 
@@ -66,7 +66,7 @@ export default function BlogsPage() {
                 </Link>
 
                 {/* Content */}
-                <Link href={`/blogs/${blog.slug}`}>
+                <Link href={`/blog/${blog.slug}`}>
                   <h3 className="font-bold text-gray-900 text-lg md:text-xl mb-2 lg:mb-4 leading-snug group-hover:text-[#00a3c4] transition-colors">
                     {blog.title}
                   </h3>
@@ -77,7 +77,7 @@ export default function BlogsPage() {
                 </p>
 
                 <Link 
-                  href={`/blogs/${blog.slug}`} 
+                  href={`/blog/${blog.slug}`} 
                   className="text-[#00a3c4] text-xs sm:text-sm font-medium hover:text-[#0082a4] flex items-center gap-1 w-fit pb-0.5 lg:pb-1 border-b border-[#00a3c4]/30 hover:border-[#0082a4] transition-colors uppercase tracking-widest lg:tracking-normal lg:capitalize"
                 >
                   Read Full Blog →

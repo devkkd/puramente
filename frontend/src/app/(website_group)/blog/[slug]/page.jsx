@@ -49,9 +49,6 @@ export default function BlogDetailPage() {
               <span className="text-gray-500 text-sm">
                 {new Date(blog.createdAt).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}
               </span>
-              <button className="flex items-center gap-2 text-gray-600 hover:text-[#00a3c4] text-sm font-medium transition-colors">
-                <Share2 size={16} /> SHARE
-              </button>
             </div>
 
             {/* Title */}
@@ -74,10 +71,10 @@ export default function BlogDetailPage() {
             <div className="space-y-12">
               {recentBlogs.length > 0 ? recentBlogs.map(recent => (
                 <div key={recent._id} className="flex flex-col group">
-                  <Link href={`/blogs/${recent.slug}`} className="w-full aspect-[4/3] bg-gray-100 mb-4 overflow-hidden">
+                  <Link href={`/blog/${recent.slug}`} className="w-full aspect-[4/3] bg-gray-100 mb-4 overflow-hidden">
                     <img src={recent.imageUrl} alt={recent.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
                   </Link>
-                  <Link href={`/blogs/${recent.slug}`}>
+                  <Link href={`/blog/${recent.slug}`}>
                     <h4 className="font-bold text-gray-900 text-lg mb-2 leading-snug group-hover:text-[#00a3c4] transition-colors">
                       {recent.title}
                     </h4>
@@ -85,7 +82,7 @@ export default function BlogDetailPage() {
                   <p className="text-sm text-gray-600 line-clamp-2 mb-4">
                     {recent.excerpt}
                   </p>
-                  <Link href={`/blogs/${recent.slug}`} className="text-[#00a3c4] text-sm font-medium hover:underline border-b border-[#00a3c4]/30 pb-0.5 w-fit">
+                  <Link href={`/blog/${recent.slug}`} className="text-[#00a3c4] text-sm font-medium hover:underline border-b border-[#00a3c4]/30 pb-0.5 w-fit">
                     Read Full Blog →
                   </Link>
                 </div>

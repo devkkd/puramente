@@ -445,15 +445,31 @@ export default function Header() {
           <div className="flex items-center justify-end space-x-4 lg:space-x-6 shrink-0">
             {/* Desktop Language */}
             <div className="relative hidden lg:block notranslate">
-              <button onClick={() => setIsLangOpen(!isLangOpen)} className="flex items-center space-x-1.5 hover:text-white/80 transition-colors py-2">
+              <button
+                onClick={() => setIsLangOpen(!isLangOpen)}
+                className="flex items-center space-x-1.5 hover:text-white/80 transition-colors py-2"
+              >
                 <Globe size={16} />
                 <span className="text-sm font-medium">{currentLang}</span>
                 <ChevronDown size={14} className={`transition-transform ${isLangOpen ? "rotate-180" : ""}`} />
               </button>
+
               {isLangOpen && (
-                <div className="absolute right-0 top-full mt-2 w-36 bg-white rounded-xl shadow-xl py-2 z-50 border border-gray-100 overflow-hidden">
+                <div
+                  // Added max-h-56 (limits height) and overflow-y-auto (adds scrollbar)
+                  // Reduced top/bottom padding to py-1.5
+                  className="absolute right-0 top-full mt-2 w-36 bg-white rounded-xl shadow-xl py-1.5 z-50 border border-gray-100 max-h-56 overflow-y-auto scrollbar-thin scrollbar-thumb-gray-200 scrollbar-track-transparent"
+                >
                   {LANGUAGES.map((lang) => (
-                    <button key={lang.code} onClick={() => handleLanguageChange(lang.code, lang.name)} className={`w-full text-left px-4 py-2.5 text-sm transition-colors ${currentLang === lang.name ? "bg-[#E2FCFF] text-[#0082A4] font-bold" : "text-gray-700 hover:bg-gray-50"}`}>
+                    <button
+                      key={lang.code}
+                      onClick={() => handleLanguageChange(lang.code, lang.name)}
+                      // Reduced padding from py-2.5 to py-1.5 for a tighter list
+                      className={`w-full text-left px-4 py-1.5 text-sm transition-colors ${currentLang === lang.name
+                          ? "bg-[#E2FCFF] text-[#0082A4] font-bold"
+                          : "text-gray-700 hover:bg-gray-50"
+                        }`}
+                    >
                       {lang.name}
                     </button>
                   ))}
@@ -570,7 +586,7 @@ export default function Header() {
               <Link href="https://instagram.com/puramenteinternational" target="_blank" className="hover:text-white/70 transition-colors">
                 <svg className="w-5 h-5 fill-current" viewBox="0 0 24 24"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 1.366.062 2.633.332 3.608 1.308.975.975 1.245 2.242 1.308 3.608.058 1.266.07 1.646.07 4.85s-.012 3.584-.07 4.85c-.063 1.366-.333 2.633-1.308 3.608-.975.975-2.242 1.245-3.608 1.308-1.266.058-1.646.07-4.85.07s-3.584-.012-4.85-.07c-1.366-.063-2.633-.333-3.608-1.308-.975-.975-1.245-2.242-1.308-3.608-.058-1.266-.07-1.646-.07-4.85s.012-3.584.07-4.85c.062-1.366.332-2.633 1.308-3.608.975-.975 2.242-1.245 3.608-1.308 1.266-.058 1.646-.07 4.85-.07zm0-2c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z" /></svg>
               </Link>
-              <Link href="https://www.linkedin.com/company/puramente-international/" target="_blank" className="hover:text-white/70 transition-colors">
+              <Link href="https://www.linkedin.com/company/puramente-international" target="_blank" className="hover:text-white/70 transition-colors">
                 <svg className="w-5 h-5 fill-current" viewBox="0 0 24 24"><path d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z" /></svg>
               </Link>
               <Link href="https://www.youtube.com/@PuramenteInternational" target="_blank" className="hover:text-white/70 transition-colors">

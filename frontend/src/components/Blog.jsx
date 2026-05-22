@@ -50,26 +50,26 @@ export default function Blog() {
   }, []);
 
   return (
-    <section className="w-full py-10 lg:py-16 bg-white font-mona overflow-hidden" ref={sectionRef}>
+    <section className="w-full py-12 md:py-16 bg-white font-mona overflow-hidden" ref={sectionRef}>
       <div className="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8 flex flex-col items-center">
         
         {/* --- HEADER SECTION --- */}
         <div className={`flex flex-col items-center transform transition-all duration-1000 w-full px-2 ${isVisible ? 'translate-y-0 opacity-100' : 'translate-y-10 opacity-0'}`}>
           {/* Top Subheading */}
-          <div className="flex items-center gap-3 lg:gap-4 text-[#00a3c4] text-xs sm:text-sm lg:text-base font-normal tracking-widest uppercase mb-4 lg:mb-6">
-            <span className="w-12 sm:w-16 lg:w-24 h-px bg-[#00a3c4]"></span>
+          <div className="flex items-center gap-2 md:gap-4 text-[#00a3c4] text-[10px] sm:text-xs md:text-sm font-normal tracking-widest uppercase mb-4 lg:mb-6">
+            <span className="w-10 sm:w-16 lg:w-24 h-px bg-[#00a3c4]"></span>
             <span>Blogs</span>
-            <span className="w-12 sm:w-16 lg:w-24 h-px bg-[#00a3c4]"></span>
+            <span className="w-10 sm:w-16 lg:w-24 h-px bg-[#00a3c4]"></span>
           </div>
 
           {/* Main Heading */}
-          <h2 className="font-playfair text-3xl md:text-3xl lg:text-4xl font-bold text-gray-900 mb-4 lg:mb-5 text-center leading-tight">
+          <h2 className="font-playfair text-2xl md:text-3xl lg:text-4xl font-bold text-gray-900 mb-4 lg:mb-5 text-center leading-tight">
             <span className="italic text-[#00a3c4] font-medium pr-1.5">Timeless</span> 
             Jewelry Trends & Style Inspiration
           </h2>
 
           {/* Content Text */}
-          <p className="text-sm font-normal text-gray-600 lg:text-gray-800 mb-8 lg:mb-16 max-w-3xl text-center leading-relaxed">
+          <p className="text-sm md:text-base font-normal text-gray-600 mb-10 lg:mb-16 max-w-2xl text-center leading-relaxed">
             Explore expert tips, latest jewelry trends, care guides, and styling ideas to help you choose pieces that reflect your elegance and personality.
           </p>
         </div>
@@ -80,7 +80,13 @@ export default function Blog() {
             Loading recent blogs...
           </div>
         ) : blogs.length > 0 ? (
-          <div className="w-full grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 lg:gap-10 items-stretch">
+          /* 
+            UPDATED RESPONSIVE GRID:
+            grid-cols-1 -> Mobile (1 item per row)
+            md:grid-cols-2 -> Tablet / "Little Big Screens" (2 items per row)
+            lg:grid-cols-3 -> Desktop (3 items per row)
+          */
+          <div className="w-full grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8 lg:gap-10 items-stretch">
             {blogs.map((blog, index) => {
               // Map backend data format to the format BlogCard expects
               const mappedPost = {
@@ -88,7 +94,7 @@ export default function Blog() {
                 title: blog.title,
                 excerpt: blog.excerpt,
                 image: blog.imageUrl,
-                link: `/blogs/${blog.slug}`,
+                link: `/blog/${blog.slug}`,
               };
 
               // Calculate staggered animation delay

@@ -42,7 +42,7 @@ export default function Curated() {
         {/* Kept desktop absolute positioning exactly the same, fixed mobile alignment */}
         <div className="mt-8 md:mt-0 flex justify-start md:justify-end md:absolute md:bottom-5 md:right-8 lg:right-8">
           <Link 
-            href="/products" 
+            href="/new-in" 
             className="inline-flex items-center justify-center bg-[#111111] text-white text-xs sm:text-sm font-medium px-8 py-3.5 rounded-xl hover:bg-black hover:scale-105 transition-all duration-300 shadow-xl"
           >
             See All Products <span className="ml-2">&rarr;</span>
