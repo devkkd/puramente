@@ -82,11 +82,11 @@ export default function CraftsmanshipPage() {
 
       {/* --- LARGE IMAGE SECTION --- */}
       <section className="w-full bg-gray-100 mb-20">
-        <div className="w-full h-[40vh] md:h-[60vh] lg:h-[70vh] relative">
+        <div className="w-full  relative">
           <img 
             src="/images/New folder/craft.png" 
             alt="Jewelry tools and gemstones on a workbench" 
-            className="w-full h-full object-cover"
+            className="w-full h-full object-contain"
           />
         </div>
       </section>

@@ -4,7 +4,6 @@ import React, { useState, useEffect } from "react";
 import { useParams } from "next/navigation";
 import Link from "next/link";
 import { getBlogBySlug } from "@/lib/api";
-import { Share2 } from "lucide-react";
 
 export default function BlogDetailPage() {
   const { slug } = useParams();
@@ -51,21 +50,27 @@ export default function BlogDetailPage() {
               </span>
             </div>
 
-            {/* Title */}
-            <h1 className="font-playfair text-3xl md:text-4xl lg:text-5xl font-bold text-gray-900 mb-10 leading-snug">
-              {blog.title}
-            </h1>
+            {/* Render Raw HTML safely with beautiful custom CSS styling */}
+            <div 
+              className="text-gray-800 text-base md:text-lg leading-relaxed 
+                         [&_h1]:text-3xl [&_h1]:md:text-4xl [&_h1]:lg:text-5xl [&_h1]:font-playfair [&_h1]:font-bold [&_h1]:text-gray-900 [&_h1]:mb-8 [&_h1]:leading-snug
+                         [&_h2]:text-2xl [&_h2]:md:text-3xl [&_h2]:font-playfair [&_h2]:font-bold [&_h2]:text-gray-900 [&_h2]:mt-12 [&_h2]:mb-6
+                         [&_h3]:text-xl [&_h3]:md:text-2xl [&_h3]:font-bold [&_h3]:text-gray-900 [&_h3]:mt-10 [&_h3]:mb-4
+                         [&_p]:mb-6
+                         [&_ul]:list-disc [&_ul]:pl-6 [&_ul]:mb-8 [&_li]:mb-3
+                         [&_ol]:list-decimal [&_ol]:pl-6 [&_ol]:mb-8
+                         [&_a]:text-[#00a3c4] [&_a]:underline hover:[&_a]:text-[#0082a4]
+                         [&_blockquote]:border-l-4 [&_blockquote]:border-[#00a3c4] [&_blockquote]:pl-6 [&_blockquote]:italic [&_blockquote]:text-gray-600 [&_blockquote]:my-8
+                         [&_strong]:font-bold [&_strong]:text-gray-900"
+              dangerouslySetInnerHTML={{ __html: blog.content }}
+            />
 
-            {/* Content - Using whitespace-pre-wrap to respect newlines from textarea */}
-            <div className="text-gray-700 text-sm md:text-base leading-relaxed whitespace-pre-wrap">
-              {blog.content}
-            </div>
           </div>
 
           {/* SIDEBAR: RECENT BLOGS (Right side) */}
           <div className="lg:col-span-4">
             <h3 className="font-playfair text-2xl font-bold text-gray-900 mb-8 pb-4 border-b border-gray-100">
-              Recent
+              Recent Post
             </h3>
             
             <div className="space-y-12">

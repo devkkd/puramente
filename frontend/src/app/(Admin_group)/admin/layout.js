@@ -14,6 +14,7 @@ import {
   Wand2,
   Mail,
   FileText,
+  Clapperboard, // <-- IMPORTED CLAPPERBOARD FOR INSTA VIDEOS
   Menu, 
   X     
 } from "lucide-react";
@@ -88,7 +89,8 @@ export default function AdminLayout({ children }) {
     { name: "Custom Requests", href: "/admin/custom-requests", icon: Wand2, badge: pendingRequestsCount },
     { name: "Contact Enquiries", href: "/admin/contact", icon: Mail, badge: unreadContactCount },
     { name: "Users", href: "/admin/users", icon: Users },
-    { name: "Blogs", href: "/admin/blog", icon: FileText }
+    { name: "Insta Videos", href: "/admin/insta", icon: Clapperboard },
+    { name: "Blog", href: "/admin/blog", icon: FileText }
   ];
 
   // Show a loading spinner while checking the token so the admin panel doesn't flash

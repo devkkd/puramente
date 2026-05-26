@@ -34,6 +34,9 @@ const journeyData = [
 export default function OurStoryPage() {
   // State for the interactive timeline
   const [activeIndex, setActiveIndex] = useState(0);
+  
+  // State for the video player
+  const [isPlaying, setIsPlaying] = useState(false);
 
   const handleNext = () => {
     if (activeIndex < journeyData.length - 1) {
@@ -68,11 +71,11 @@ export default function OurStoryPage() {
       </section>
 
       {/* --- HERO IMAGE --- */}
-      <section className="w-full h-[40vh] md:h-[60vh] lg:h-[70vh] bg-gray-100">
+      <section className="w-full bg-gray-100">
         <img
-          src="/images/New folder/ourstory.svg"
+          src="/images/New folder/our story.png"
           alt="Fashion jewelry modeled on neck"
-          className="w-full h-full object-cover"
+          className="w-full h-full object-contain"
         />
       </section>
 
@@ -222,21 +225,58 @@ export default function OurStoryPage() {
       </section>
 
       {/* --- VIDEO / WORKSHOP IMAGE SECTION --- */}
-      <section className="w-full h-[50vh] md:h-[70vh] relative bg-gray-100">
-        <img
-          src="/images/home/video.png"
-          alt="Hands working on jewelry"
-          className="w-full h-full object-cover"
-        />
-        
-        {/* Centered Play Button Overlay */}
-        <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-          <button className="w-16 h-16 md:w-20 md:h-20 bg-white/30 backdrop-blur-sm rounded-full flex items-center justify-center pointer-events-auto hover:bg-white/40 transition-colors border border-white/50 shadow-lg">
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="white" xmlns="http://www.w3.org/2000/svg" className="ml-1 md:ml-2 w-8 h-8 md:w-10 md:h-10">
-              <path d="M5 3L19 12L5 21V3Z" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-            </svg>
-          </button>
-        </div>
+      <section className="w-full h-[50vh] md:h-[70vh] relative bg-gray-100 overflow-hidden">
+        {!isPlaying ? (
+          /* --- CUSTOM THUMBNAIL FACADE --- */
+          <div 
+            className="absolute inset-0 w-full h-full group cursor-pointer"
+            onClick={() => setIsPlaying(true)}
+          >
+            {/* Thumbnail Image */}
+            <img 
+              src="/images/home/video.png" 
+              alt="Hands working on jewelry" 
+              className="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-105"
+            />
+
+            {/* Subtle Overlay */}
+            <div className="absolute inset-0 bg-black/10 group-hover:bg-black/30 transition-colors duration-500"></div>
+
+            {/* Centered Play Button */}
+            <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+              <button 
+                className="w-16 h-16 md:w-20 md:h-20 bg-white/30 backdrop-blur-md rounded-full flex items-center justify-center border border-white/40 pointer-events-auto group-hover:bg-white/40 group-hover:scale-110 transition-all duration-300 shadow-lg"
+                aria-label="Play Video"
+              >
+                {/* Play Triangle Icon */}
+                <svg 
+                  className="w-6 h-6 md:w-8 md:h-8 ml-1 md:ml-1.5" 
+                  viewBox="0 0 24 24" 
+                  fill="white" 
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <path 
+                    d="M5 3L19 12L5 21V3Z" 
+                    stroke="white" 
+                    strokeWidth="2" 
+                    strokeLinecap="round" 
+                    strokeLinejoin="round"
+                  />
+                </svg>
+              </button>
+            </div>
+          </div>
+        ) : (
+          /* --- YOUTUBE IFRAME --- */
+          <iframe 
+            className="absolute inset-0 w-full h-full"
+            src="https://www.youtube.com/embed/VQ0yrr-pPhE?autoplay=1&rel=0" 
+            title="YouTube video player" 
+            frameBorder="0" 
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+            allowFullScreen
+          ></iframe>
+        )}
       </section>
 
       {/* --- OUR PILLARS SECTION --- */}
@@ -344,8 +384,6 @@ export default function OurStoryPage() {
               Hand-finished by master craftspeople in our Jaipur atelier
             </p>
           </div>
-          
-
           
           <div className="border border-[#4fa3b9]/50 p-6 flex flex-col hover:bg-[#F4f9fa] transition-colors rounded-sm">
             <h3 className="text-[#4fa3b9] font-bold text-xl mb-3">Fair Trade</h3>

@@ -8,7 +8,9 @@ const PORT = process.env.PORT || 5000;
 
 const allowedOrigins = [
   "http://localhost:3000",
-  process.env.FRONTEND_URL 
+  "https://kontentkraftdigital.tech",
+  "https://www.kontentkraftdigital.tech",
+  process.env.FRONTEND_URL
 ];
 
 app.use(cors({
@@ -30,7 +32,7 @@ app.use(express.urlencoded({ extended: true }));
 const categoryRoutes = require("./routes/categoryRoutes");
 const productRoutes = require("./routes/productRoutes");
 const cartRoutes = require("./routes/cartRoutes");
-const authRoutes = require("./routes/authRoutes"); 
+const authRoutes = require("./routes/authRoutes");
 const orderRoutes = require("./routes/orderRoutes");
 const customRequestRoutes = require("./routes/customRequestRoutes");
 const contactRoutes = require("./routes/contactRoutes");
@@ -41,8 +43,8 @@ const instaRoutes = require("./routes/instaRoutes");
 app.use("/api/categories", categoryRoutes);
 app.use("/api/products", productRoutes);
 app.use("/api/cart", cartRoutes);
-app.use("/api/auth", authRoutes); 
-app.use("/api/orders", orderRoutes); 
+app.use("/api/auth", authRoutes);
+app.use("/api/orders", orderRoutes);
 app.use("/api/custom-requests", customRequestRoutes);
 app.use("/api/contact", contactRoutes);
 app.use("/api/blogs", blogRoutes);

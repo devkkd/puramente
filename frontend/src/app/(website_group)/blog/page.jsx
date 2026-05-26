@@ -54,15 +54,18 @@ export default function BlogsPage() {
               <div key={blog._id} className="flex flex-col group">
                 
                 {/* Image */}
-                {/* Added rounded-xl for mobile, keeping sharp edges on desktop */}
-                <Link href={`/blog/${blog.slug}`} className="w-full aspect-[4/3] overflow-hidden mb-4 lg:mb-6 bg-gray-100 rounded-xl lg:rounded-none shadow-sm lg:shadow-none">
+                {/* FIX: Added "relative block" here so the absolute overlay stays contained */}
+                <Link 
+                  href={`/blog/${blog.slug}`} 
+                  className="relative block w-full aspect-[4/3] overflow-hidden mb-4 lg:mb-6 bg-gray-100 rounded-xl lg:rounded-none shadow-sm lg:shadow-none"
+                >
                   <img 
                     src={blog.imageUrl} 
                     alt={blog.title} 
                     className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" 
                   />
-                  {/* Subtle Dark Overlay on Hover to match homepage */}
-                  <div className="absolute inset-0 bg-black/0 group-hover:bg-black/5 transition-colors duration-500"></div>
+                  {/* Subtle Dark Overlay on Hover */}
+                  <div className="absolute inset-0 bg-black/0 group-hover:bg-black/5 transition-colors duration-500 z-10 pointer-events-none"></div>
                 </Link>
 
                 {/* Content */}

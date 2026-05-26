@@ -42,11 +42,7 @@ export default function AdminEditBlogPage() {
     e.preventDefault();
     setSaving(true);
     
-    // FormData automatically captures inputs with a 'name' attribute inside the form
     const formData = new FormData(e.target);
-    
-    // If user didn't upload a new file, remove the empty file object from formData 
-    // so the backend doesn't try to process an empty file.
     const imageFile = formData.get("image");
     if (imageFile && imageFile.size === 0) {
       formData.delete("image");
@@ -125,14 +121,14 @@ export default function AdminEditBlogPage() {
           </div>
 
           <div>
-            <label className="block text-sm font-bold text-gray-700 mb-2">Full Content <span className="text-red-500">*</span></label>
-            <p className="text-xs text-gray-500 mb-2">Write your full article here. Line breaks will be preserved.</p>
+            <label className="block text-sm font-bold text-gray-700 mb-2">Full Content (HTML Supported) <span className="text-red-500">*</span></label>
+            <p className="text-xs text-gray-500 mb-2">You can paste raw HTML here (e.g. &lt;h1&gt;, &lt;p&gt;, &lt;ul&gt;). It will be rendered beautifully on the site.</p>
             <textarea 
               name="content" 
               defaultValue={blogData.content}
               required 
               rows="15" 
-              className="w-full bg-gray-50 border border-gray-200 p-4 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#0082A4]/20 focus:border-[#0082A4] transition-all text-sm text-gray-900 whitespace-pre-wrap leading-relaxed"
+              className="w-full bg-gray-50 border border-gray-200 p-4 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#0082A4]/20 focus:border-[#0082A4] transition-all text-sm text-gray-900 whitespace-pre-wrap leading-relaxed font-mono"
             ></textarea>
           </div>
 

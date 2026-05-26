@@ -96,10 +96,10 @@ export default function Footer() {
             
             <div className="flex flex-col gap-1 md:gap-1.5">
               <h4 className="font-bold text-xs md:text-sm text-black mb-1">Collections</h4>
-              <Link href="/ring" className="text-xs md:text-[13px] font-normal text-gray-700 hover:text-[#0082A4]">Rings</Link>
-              <Link href="/earring" className="text-xs md:text-[13px] font-normal text-gray-700 hover:text-[#0082A4]">Earrings</Link>
-              <Link href="/necklace" className="text-xs md:text-[13px] font-normal text-gray-700 hover:text-[#0082A4]">Necklaces</Link>
-              <Link href="/bracelet" className="text-xs md:text-[13px] font-normal text-gray-700 hover:text-[#0082A4]">Bracelets</Link>
+              <Link href="store/ring" className="text-xs md:text-[13px] font-normal text-gray-700 hover:text-[#0082A4]">Rings</Link>
+              <Link href="store/earring" className="text-xs md:text-[13px] font-normal text-gray-700 hover:text-[#0082A4]">Earrings</Link>
+              <Link href="store/necklace" className="text-xs md:text-[13px] font-normal text-gray-700 hover:text-[#0082A4]">Necklaces</Link>
+              <Link href="store/bracelet" className="text-xs md:text-[13px] font-normal text-gray-700 hover:text-[#0082A4]">Bracelets</Link>
               <Link href="/new-in" className="text-xs md:text-[13px] font-normal text-gray-700 hover:text-[#0082A4]">New Arrivals</Link>
             </div>
 
@@ -128,7 +128,7 @@ export default function Footer() {
                 Jaipur, Rajasthan 302033
               </p>
               <p className="text-xs md:text-[13px] font-normal text-gray-700 mt-1">
-                +91 9314 346 148
+               +91 97991 68300 , +91 9314 346 148 
               </p>
               <p className="text-xs md:text-[13px] font-normal text-gray-700 mt-0.5">
                 info@puramentejewel.com

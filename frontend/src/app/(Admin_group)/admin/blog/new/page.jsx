@@ -24,7 +24,7 @@ export default function AdminNewBlogPage() {
     try {
       const res = await createBlog(formData);
       if (res.success) {
-        router.push("/admin/blogs"); // Redirect to the blogs list
+        router.push("/admin/blogs"); 
       } else {
         alert(res.error || "Failed to create blog.");
       }
@@ -52,7 +52,7 @@ export default function AdminNewBlogPage() {
           </div>
           <div>
             <h1 className="text-2xl font-bold text-gray-900 mb-1">Post New Blog</h1>
-            <p className="text-sm text-gray-500">Create a new article or news post.</p>
+            <p className="text-sm text-gray-500">Create a new article. Raw HTML is supported.</p>
           </div>
         </div>
 
@@ -81,13 +81,13 @@ export default function AdminNewBlogPage() {
           </div>
 
           <div>
-            <label className="block text-sm font-bold text-gray-700 mb-2">Full Content <span className="text-red-500">*</span></label>
-            <p className="text-xs text-gray-500 mb-2">Write your full article here. Line breaks will be preserved.</p>
+            <label className="block text-sm font-bold text-gray-700 mb-2">Full Content (HTML Supported) <span className="text-red-500">*</span></label>
+            <p className="text-xs text-gray-500 mb-2">You can paste raw HTML here (e.g. &lt;h1&gt;, &lt;p&gt;, &lt;ul&gt;). It will be rendered beautifully on the site.</p>
             <textarea 
               name="content" 
               required 
               rows="15" 
-              className="w-full bg-gray-50 border border-gray-200 p-4 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#0082A4]/20 focus:border-[#0082A4] transition-all text-sm text-gray-900 whitespace-pre-wrap leading-relaxed"
+              className="w-full bg-gray-50 border border-gray-200 p-4 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#0082A4]/20 focus:border-[#0082A4] transition-all text-sm text-gray-900 whitespace-pre-wrap leading-relaxed font-mono"
             ></textarea>
           </div>
 
