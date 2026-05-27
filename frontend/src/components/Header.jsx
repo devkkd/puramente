@@ -339,7 +339,7 @@ export default function Header() {
       <header className="w-full bg-[linear-gradient(0deg,#0082A4_0%,#00CEF3_100%)] text-white relative z-50 sticky top-0 shadow-md">
         
         {/* TOP ROW: Logo, Slider, Search, Actions */}
-        <div className="max-w-[1400px] mx-auto px-4 lg:px-6 py-4 flex items-center justify-between lg:grid lg:grid-cols-3 gap-4">
+        <div className="max-w-[1400px] mx-auto px-4 lg:px-6 py-3 flex items-center justify-between lg:grid lg:grid-cols-3 gap-4">
           
           <button className="lg:hidden p-1 -ml-1 text-white hover:text-white/80" onClick={() => setIsMobileMenuOpen(true)}>
             <Menu size={28} />
@@ -352,10 +352,10 @@ export default function Header() {
             </Link>
             
             {/* Trust Slider moved here */}
-            <div className="hidden xl:block w-36 overflow-hidden relative group shrink-0 border-l border-r border-white/20 pl-4">
-              <div className="flex items-center gap-6 animate-infinite-scroll w-max">
+            <div className="hidden xl:block w-52 overflow-hidden relative group shrink-0 border-l border-r border-white/20 pl-4">
+              <div className="flex items-center gap-3 animate-infinite-scroll w-max">
                 {[...trustIcons, ...trustIcons].map((src, i) => (
-                  <img key={i} src={src} alt="Certification" className="h-10 w-auto opacity-90 hover:opacity-100 transition-opacity" />
+                  <img key={i} src={src} alt="Certification" className="h-12 w-auto opacity-90 hover:opacity-100 transition-opacity" />
                 ))}
               </div>
             </div>
@@ -442,7 +442,7 @@ export default function Header() {
 
         {/* BOTTOM ROW: Desktop Nav + Socials */}
         <div className="hidden lg:block border-t border-white/20 w-full">
-          <div className="max-w-[1400px] mx-auto px-6 flex items-center justify-between">
+          <div className="max-w-[1400px] mx-auto px-6 py-1 flex items-center justify-between">
             
             {/* Empty space for alignment since slider moved up */}
             <div className="w-48 hidden lg:block"></div>

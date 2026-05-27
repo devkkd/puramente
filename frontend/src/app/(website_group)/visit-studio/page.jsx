@@ -74,7 +74,7 @@ export default function StudioVisitPage() {
         <div className="w-full h-[40vh] md:h-[60vh] lg:h-[70vh] bg-gray-100 mb-16 rounded-sm overflow-hidden shadow-sm">
           {/* Note: Update the src to match where you save your Hawa Mahal image */}
           <img 
-            src="/images/New folder/hawa.png" 
+            src="/images/New folder/hawa3.png" 
             alt="Hawa Mahal Jaipur" 
             className="w-full h-full object-cover"
             onError={(e) => { e.target.src = "https://images.unsplash.com/photo-1477587458883-47145ed94245?q=80&w=2070&auto=format&fit=crop"; }} // Fallback if image not yet added

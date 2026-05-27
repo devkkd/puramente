@@ -68,7 +68,7 @@ export default function SustainabilityPage() {
         {/* Large Image */}
         <div className="w-full h-[40vh] md:h-[60vh] lg:h-[70vh] bg-gray-100 mb-16 rounded-sm overflow-hidden shadow-sm">
           <img 
-            src="/images/New folder/sust.png" 
+            src="/images/New folder/hawa1.png" 
             alt="Hand sketching jewelry designs alongside finished gold pieces" 
             className="w-full h-full object-cover"
           />
