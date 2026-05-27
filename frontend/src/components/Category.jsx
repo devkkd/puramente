@@ -86,9 +86,9 @@ export default function Category() {
             From Everyday Elegance To Statement Jewels, Every Piece Tells A Story Of Indian Craft Meeting Global Taste.
           </p>
 
-          <Link href="/store/all?tab=plain" className="text-[#4fa3b9] text-xs sm:text-sm md:text-base font-medium tracking-widest uppercase mb-10 md:mb-16 hover:text-[#3d8395] transition-colors pb-1 border-b border-transparent hover:border-[#3d8395]">
+          <div className="text-[#4fa3b9] text-xs sm:text-sm md:text-base font-medium tracking-widest uppercase mb-10 md:mb-16 hover:text-[#3d8395] transition-colors pb-1 border-b border-transparent hover:border-[#3d8395]">
             Plain Without Gemstone
-          </Link>
+          </div>
         </div>
 
         {/* --- GRID SECTION --- */}

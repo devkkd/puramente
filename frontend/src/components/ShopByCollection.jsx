@@ -144,12 +144,11 @@ export default function ShopByCollection() {
             <span className="italic text-[#4fa3b9] font-medium lg:pr-2">Categories</span>
           </h2>
 
-          <Link 
-            href={activeLinkUrl} 
+          <div  
             className="text-[#4fa3b9] text-sm md:text-md font-normal tracking-widest uppercase hover:text-[#3d8395] transition-colors"
           >
             Adorned With Gemstone
-          </Link>
+          </div>
         </div>
 
         {/* --- RIGHT COLUMN: SHOWCASE --- */}
