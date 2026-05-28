@@ -24,6 +24,40 @@ export default function BlogDetailPage() {
     if (slug) fetchBlog();
   }, [slug]);
 
+  // Inject meta title & description dynamically once blog data is loaded
+  useEffect(() => {
+    if (!data.blog) return;
+    const { blog } = data;
+
+    // Title
+    const resolvedTitle = blog.metaTitle || blog.title;
+    document.title = resolvedTitle;
+
+    // Meta description
+    const resolvedDesc = blog.metaDescription || blog.excerpt;
+    let metaDesc = document.querySelector('meta[name="description"]');
+    if (!metaDesc) {
+      metaDesc = document.createElement("meta");
+      metaDesc.setAttribute("name", "description");
+      document.head.appendChild(metaDesc);
+    }
+    metaDesc.setAttribute("content", resolvedDesc);
+
+    // OG tags
+    const setOg = (property, content) => {
+      let tag = document.querySelector(`meta[property="${property}"]`);
+      if (!tag) {
+        tag = document.createElement("meta");
+        tag.setAttribute("property", property);
+        document.head.appendChild(tag);
+      }
+      tag.setAttribute("content", content);
+    };
+    setOg("og:title", resolvedTitle);
+    setOg("og:description", resolvedDesc);
+    if (blog.imageUrl) setOg("og:image", blog.imageUrl);
+  }, [data.blog]);
+
   if (loading) return <div className="min-h-screen flex items-center justify-center text-gray-400">Loading blog...</div>;
   if (!data.blog) return <div className="min-h-screen flex items-center justify-center text-red-500">Blog not found.</div>;
 

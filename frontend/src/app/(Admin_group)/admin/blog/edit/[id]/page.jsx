@@ -132,6 +132,44 @@ export default function AdminEditBlogPage() {
             ></textarea>
           </div>
 
+          {/* SEO Meta Fields */}
+          <div className="border border-gray-100 rounded-xl p-5 bg-gray-50/50 space-y-4">
+            <p className="text-sm font-bold text-gray-700 flex items-center gap-2">
+              <span className="w-2 h-2 rounded-full bg-[#0082A4] inline-block"></span>
+              SEO Meta (Optional)
+            </p>
+
+            <div>
+              <label className="block text-sm font-semibold text-gray-600 mb-1">
+                Meta Title
+                <span className="ml-2 text-xs font-normal text-gray-400">max 60 characters</span>
+              </label>
+              <input
+                type="text"
+                name="metaTitle"
+                maxLength={60}
+                defaultValue={blogData.metaTitle || ""}
+                placeholder="Leave blank to use blog title"
+                className="w-full bg-white border border-gray-200 p-3.5 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#0082A4]/20 focus:border-[#0082A4] transition-all text-sm text-gray-900"
+              />
+            </div>
+
+            <div>
+              <label className="block text-sm font-semibold text-gray-600 mb-1">
+                Meta Description
+                <span className="ml-2 text-xs font-normal text-gray-400">max 160 characters</span>
+              </label>
+              <textarea
+                name="metaDescription"
+                maxLength={160}
+                rows="3"
+                defaultValue={blogData.metaDescription || ""}
+                placeholder="Leave blank to use excerpt"
+                className="w-full bg-white border border-gray-200 p-3.5 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#0082A4]/20 focus:border-[#0082A4] transition-all text-sm text-gray-900 resize-none"
+              ></textarea>
+            </div>
+          </div>
+
           <div>
             <label className="block text-sm font-bold text-gray-700 mb-2">Cover Image</label>
             <p className="text-xs text-gray-500 mb-2">Leave this blank to keep the current image.</p>

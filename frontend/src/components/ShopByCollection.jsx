@@ -70,7 +70,7 @@ export default function ShopByCollection() {
   // Card Click Handler
   const handleCardClick = (index, categoryName) => {
     if (index === activeIndex) {
-      router.push(`/store/${categoryName.toLowerCase()}?tab=gemstone`);
+      router.push(`/store/${categoryName.toLowerCase()}`);
     } else {
       setActiveIndex(index);
     }
@@ -123,8 +123,8 @@ export default function ShopByCollection() {
     : 0;
 
   const activeCategory = categories[activeIndex];
-  const activeLinkUrl = activeCategory 
-    ? `/store/${activeCategory.name.toLowerCase()}?tab=gemstone` 
+  const activeLinkUrl = activeCategory
+    ? `/store/${activeCategory.name.toLowerCase()}` 
     : "#";
 
   return (
@@ -144,11 +144,9 @@ export default function ShopByCollection() {
             <span className="italic text-[#4fa3b9] font-medium lg:pr-2">Categories</span>
           </h2>
 
-          <div  
-            className="text-[#4fa3b9] text-sm md:text-md font-normal tracking-widest uppercase hover:text-[#3d8395] transition-colors"
-          >
-            Adorned With Gemstone
-          </div>
+          <p className="text-sm md:text-base font-normal text-gray-700 mb-6 md:mb-8 max-w-2xl text-center lg:text-start leading-relaxed">
+            From Everyday Elegance To Statement Jewels, Every Piece Tells A Story Of Indian Craft Meeting Global Taste.
+          </p>
         </div>
 
         {/* --- RIGHT COLUMN: SHOWCASE --- */}

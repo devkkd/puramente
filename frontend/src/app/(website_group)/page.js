@@ -23,7 +23,7 @@ export default function page() {
       <HeroSection />
       <ShopByCollection />
       <Certifications />
-      <Category />
+      {/* <Category /> */}
       <NewArrivals />
       <Curated />
       <BestSellers />

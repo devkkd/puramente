@@ -6,7 +6,7 @@ const slugify = (text) => text.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace
 
 exports.createBlog = async (req, res) => {
   try {
-    const { title, excerpt, content } = req.body;
+    const { title, excerpt, content, metaTitle, metaDescription } = req.body;
     if (!req.file) return res.status(400).json({ error: "Blog image is required." });
 
     const imageUrl = await uploadToCloudflare(req.file);
@@ -20,7 +20,7 @@ exports.createBlog = async (req, res) => {
       counter++;
     }
 
-    const newBlog = new Blog({ title, slug, excerpt, content, imageUrl });
+    const newBlog = new Blog({ title, slug, excerpt, content, imageUrl, metaTitle, metaDescription });
     await newBlog.save();
 
     res.status(201).json({ success: true, data: newBlog });
@@ -68,12 +68,12 @@ exports.getBlogById = async (req, res) => {
 // --- NEW: Update Blog ---
 exports.updateBlog = async (req, res) => {
   try {
-    const { title, excerpt, content } = req.body;
+    const { title, excerpt, content, metaTitle, metaDescription } = req.body;
     let blog = await Blog.findById(req.params.id);
     
     if (!blog) return res.status(404).json({ error: "Blog not found" });
 
-    const updates = { title, excerpt, content };
+    const updates = { title, excerpt, content, metaTitle, metaDescription };
 
     // If a new image was uploaded, process it
     if (req.file) {
