@@ -18,6 +18,11 @@ const playfair = Playfair_Display({
 export const metadata = {
   title: "Puramente Jewel",
   description: "A Legacy Built On Craftsmanship",
+  icons: {
+    icon: "/images/logo/puramente fav icon.png",
+    shortcut: "/images/logo/puramente fav icon.png",
+    apple: "/images/logo/puramente fav icon.png",
+  },
 };
 
 export default function RootLayout({ children }) {
