@@ -1,11 +1,17 @@
 import { defineConfig, globalIgnores } from "eslint/config";
-import nextVitals from "eslint-config-next/core-web-vitals.js";
+
+let vitalsConfig = [];
+try {
+  const nextVitals = await import("eslint-config-next/core-web-vitals.js");
+  const mod = nextVitals.default ?? nextVitals;
+  vitalsConfig = Array.isArray(mod) ? mod : [mod];
+} catch {
+  // eslint-config-next not available, skip
+}
 
 const eslintConfig = defineConfig([
-  ...nextVitals,
-  // Override default ignores of eslint-config-next.
+  ...vitalsConfig,
   globalIgnores([
-    // Default ignores of eslint-config-next:
     ".next/**",
     "out/**",
     "build/**",

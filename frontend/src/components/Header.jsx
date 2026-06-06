@@ -20,6 +20,7 @@ import {
 } from "lucide-react";
 import { getCategories, getProducts } from "@/lib/api";
 import { useCart } from "@/context/CartContext";
+import LocaleSwitcher from "@/components/LocaleSwitcher";
 
 const LANGUAGES = [
   { code: "hi", name: "Hindi" },
@@ -419,6 +420,7 @@ export default function Header() {
               <span className="hidden sm:inline">Cart ({cartCount})</span>
               <span className="sm:hidden font-bold">{cartCount}</span>
             </Link>
+            <LocaleSwitcher />
           </div>
         </div>
 
