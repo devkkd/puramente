@@ -26,7 +26,7 @@ const nextConfig = {
 
   // Experimental: faster builds
   experimental: {
-    optimizeCss: true,
+    optimizeCss: false,
   },
 };
 
