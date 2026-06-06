@@ -2,6 +2,7 @@
 
 import React from "react";
 import Link from "next/link";
+import Image from "next/image";
 import AddToCartButton from "./AddToCartButton";
 
 export default function ProductCard({ product, onCardClick }) {
@@ -20,13 +21,15 @@ export default function ProductCard({ product, onCardClick }) {
         href={`/product/${product._id}`} 
         className="flex flex-col"
         onClick={handleNavigationIntercept}
-        scroll={false} // <-- CRUCIAL: Prevents App Router top-reset
+        scroll={false}
       >
         <div className="relative w-full aspect-square mb-5 bg-white flex items-center justify-center h-[320px]">
-          <img 
-            src={product.imageUrl} 
-            alt={product.productName} 
-            className="w-full h-full object-contain"
+          <Image
+            src={product.imageUrl}
+            alt={product.productName}
+            fill
+            sizes="(max-width: 640px) 220px, (max-width: 768px) 240px, (max-width: 1024px) 250px, 20vw"
+            className="object-contain"
             loading="lazy"
           />
         </div>

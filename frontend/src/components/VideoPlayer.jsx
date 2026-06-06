@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
+import Image from "next/image";
 
 export default function VideoSection() {
   const [isPlaying, setIsPlaying] = useState(false);
@@ -19,10 +20,12 @@ export default function VideoSection() {
               onClick={() => setIsPlaying(true)}
             >
               {/* Thumbnail Image */}
-              <img 
-                src="/images/home/video.png" 
-                alt="Jewelry making process - Behind the scenes" 
-                className="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-105"
+              <Image
+                src="/images/home/video.png"
+                alt="Jewelry making process - Behind the scenes"
+                fill
+                className="object-cover transition-transform duration-1000 group-hover:scale-105"
+                sizes="(max-width: 768px) 100vw, 1100px"
               />
 
               {/* Subtle Overlay */}
@@ -34,7 +37,6 @@ export default function VideoSection() {
                   className="w-16 h-16 md:w-20 md:h-20 bg-white/30 backdrop-blur-md rounded-full flex items-center justify-center border border-white/40 pointer-events-auto group-hover:bg-white/40 group-hover:scale-110 transition-all duration-300"
                   aria-label="Play Video"
                 >
-                  {/* Play Triangle Icon */}
                   <svg 
                     className="w-6 h-6 md:w-8 md:h-8 ml-1 md:ml-1.5" 
                     viewBox="0 0 24 24" 

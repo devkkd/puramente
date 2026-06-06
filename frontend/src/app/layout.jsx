@@ -1,18 +1,21 @@
 import { Mona_Sans, Playfair_Display } from "next/font/google";
 import "./globals.css";
 
-// Configure Mona Sans
+// Configure Mona Sans — only load weights actually used in the design
 const monaSans = Mona_Sans({
   subsets: ["latin"],
   variable: "--font-mona-sans",
-  weight: ["200", "300", "400", "500", "600", "700", "800", "900"],
+  weight: ["400", "500", "700"],
+  display: "swap",
 });
 
 // Configure Playfair Display
 const playfair = Playfair_Display({
   subsets: ["latin"],
   variable: "--font-playfair-display",
-  style: ["normal", "italic"], 
+  style: ["normal", "italic"],
+  weight: ["400", "700"],
+  display: "swap",
 });
 
 export const metadata = {

@@ -110,9 +110,11 @@ function InstaItem({ post, className = "", profileUrl }) {
           className="w-full h-full object-cover transition-all duration-700 blur-0 lg:blur-[2px] lg:group-hover:blur-0 group-hover:scale-105"
         />
       ) : (
+        // eslint-disable-next-line @next/next/no-img-element
         <img 
           src={post.mediaUrl} 
           alt="Instagram post from @puramentejewel" 
+          loading="lazy"
           className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
         />
       )}

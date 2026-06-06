@@ -2,40 +2,24 @@
 
 import React, { useState, useEffect, useRef } from "react";
 import ProductCard from "./ProductCard";
-import { getProducts } from "@/lib/api";
+import { useProducts } from "@/context/ProductsContext";
 
 export default function NewArrivals() {
+  const { products: allProducts, loading } = useProducts();
   const [products, setProducts] = useState([]);
-  const [loading, setLoading] = useState(true);
   const [scrollProgress, setScrollProgress] = useState(0);
-  const [isVisible, setIsVisible] = useState(false); // For scroll animation
+  const [isVisible, setIsVisible] = useState(false);
   const scrollContainerRef = useRef(null);
-  const sectionRef = useRef(null); // Ref for intersection observer
+  const sectionRef = useRef(null);
 
-  // Fetch, filter for New Arrivals, randomize, and limit to 10
+  // Filter & randomize from shared context — no extra API call
   useEffect(() => {
-    const fetchProducts = async () => {
-      try {
-        const response = await getProducts();
-
-        if (response.success && response.data) {
-          const newArrivalsData = response.data.filter(
-            (item) => item.newArrival === true
-          );
-
-          const shuffled = newArrivalsData.sort(() => 0.5 - Math.random());
-
-          setProducts(shuffled.slice(0, 10));
-        }
-      } catch (error) {
-        console.error("Error fetching products:", error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchProducts();
-  }, []);
+    if (allProducts.length > 0) {
+      const newArrivalsData = allProducts.filter((item) => item.newArrival === true);
+      const shuffled = [...newArrivalsData].sort(() => 0.5 - Math.random());
+      setProducts(shuffled.slice(0, 10));
+    }
+  }, [allProducts]);
 
   // Intersection Observer to trigger the pop-up animation on scroll
   useEffect(() => {
