@@ -58,7 +58,7 @@ export default function HeroSection() {
   const banners = [
     {
       id: 1,
-      desktopImage: "/images/home/banner-1.png",
+      desktopImage: "      /images/home/banner-1.png",
       mobileImage: "/images/home/mobilebanner2.png",
       altText: "Puramente International New Collection 1",
     },
