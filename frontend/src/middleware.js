@@ -22,11 +22,6 @@ const COUNTRY_TO_LOCALE = {
   FR: "en-fr",
 };
 
-function getLocaleFromPath(pathname) {
-  const segment = pathname.split("/")[1]?.toLowerCase();
-  return LOCALES.includes(segment) ? segment : null;
-}
-
 function countryToLocale(code) {
   if (!code) return DEFAULT_LOCALE;
   return COUNTRY_TO_LOCALE[code.toUpperCase()] || DEFAULT_LOCALE;
@@ -35,39 +30,16 @@ function countryToLocale(code) {
 export function middleware(request) {
   const { pathname } = request.nextUrl;
 
-  // Skip internals
-  if (
-    pathname.startsWith("/admin") ||
-    pathname.startsWith("/adminlogin") ||
-    pathname.startsWith("/forgot-password") ||
-    pathname.startsWith("/reset-password") ||
-    pathname.startsWith("/_next/") ||
-    pathname.startsWith("/api/") ||
-    pathname.includes(".")
-  ) {
+  // ── Only redirect the exact homepage "/" ──────────────────────────────────
+  // All other pages (/product/, /store/, /blog/ etc.) are untouched
+  if (pathname !== "/") {
     return NextResponse.next();
   }
 
-  // Already has locale
-  const pathnameLocale = getLocaleFromPath(pathname);
-  if (pathnameLocale) {
-    const res = NextResponse.next();
-    res.cookies.set("NEXT_LOCALE", pathnameLocale, {
-      maxAge: 60 * 60 * 24 * 365,
-      path: "/",
-      sameSite: "lax",
-    });
-    return res;
-  }
-
-  // Detect locale
-  // Priority 1: saved cookie
+  // ── Detect locale from cookie → Nginx geoip2 header → default ────────────
   let locale = request.cookies.get("NEXT_LOCALE")?.value;
 
   if (!locale || !LOCALES.includes(locale)) {
-    // Priority 2: Nginx geoip2 header (set via nginx module — zero latency, most reliable)
-    // Priority 3: Cloudflare header (if behind CF)
-    // Priority 4: Default
     const countryCode =
       request.headers.get("x-country-code") ||      // Nginx geoip2
       request.headers.get("cf-ipcountry") ||         // Cloudflare
@@ -76,20 +48,21 @@ export function middleware(request) {
     locale = countryToLocale(countryCode);
   }
 
-  // Redirect
+  // ── Redirect "/" → "/en-in/" (or detected locale) ────────────────────────
   const url = request.nextUrl.clone();
-  url.pathname = `/${locale}${pathname === "/" ? "" : pathname}`;
+  url.pathname = `/${locale}`;
 
-  const res = NextResponse.redirect(url, { status: 302 });
-  res.cookies.set("NEXT_LOCALE", locale, {
+  const response = NextResponse.redirect(url, { status: 302 });
+  response.cookies.set("NEXT_LOCALE", locale, {
     maxAge: 60 * 60 * 24 * 365,
     path: "/",
     sameSite: "lax",
   });
 
-  return res;
+  return response;
 }
 
 export const config = {
-  matcher: ["/((?!_next/static|_next/image|favicon.ico).*)"],
+  // Only run on homepage
+  matcher: ["/"],
 };
