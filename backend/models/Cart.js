@@ -16,8 +16,8 @@ const cartItemSchema = new mongoose.Schema({
   },
   quantityBand: {
     type: String,
-    enum: ["10-25 Pieces", "25-50 Pieces", "50-100 Pieces", "100+ Pieces"],
-    default: "10-25 Pieces"
+    enum: ["1-10 Pieces", "10-25 Pieces", "25-50 Pieces", "50-100 Pieces", "100+ Pieces"],
+    default: "1-10 Pieces"
   }
 });
 

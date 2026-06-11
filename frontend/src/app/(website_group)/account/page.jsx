@@ -57,7 +57,13 @@ export default function AccountPage() {
     e.preventDefault();
     setErrorMsg("");
     try {
-      const res = await registerUser(regData);
+      // Normalize website URL — add https:// if missing
+      let website = regData.companyWebsite.trim();
+      if (website && !website.match(/^https?:\/\//i)) {
+        website = "https://" + website;
+      }
+
+      const res = await registerUser({ ...regData, companyWebsite: website });
       if (res.success) {
         localStorage.setItem("userToken", res.data.token);
         localStorage.setItem("userId", res.data._id);
@@ -318,10 +324,10 @@ export default function AccountPage() {
                 <div className="flex flex-col gap-1">
                   <label className="text-xs sm:text-sm text-gray-900 font-medium">Company/Business Website (Optional)</label>
                   <input
-                    type="url"
+                    type="text"
                     value={regData.companyWebsite}
                     onChange={(e) => setRegData({ ...regData, companyWebsite: e.target.value })}
-                    placeholder="Enter the link of company website (e.g., https://...)"
+                    placeholder="e.g., www.example.com or https://example.com"
                     className="w-full border-b border-gray-300 py-2.5 md:py-3 text-[13px] md:text-sm text-gray-900 placeholder-gray-400 bg-transparent focus:outline-none focus:border-[#00a3c4]"
                   />
                 </div>
