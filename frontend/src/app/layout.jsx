@@ -1,4 +1,5 @@
 import { Mona_Sans, Playfair_Display } from "next/font/google";
+import Script from "next/script";
 import "./globals.css";
 
 // Configure Mona Sans — only load weights actually used in the design
@@ -36,6 +37,20 @@ export default function RootLayout({ children }) {
     >
       <body className="min-h-full">
         {children}
+
+        {/* Google Analytics */}
+        <Script
+          src="https://www.googletagmanager.com/gtag/js?id=G-TWWR88GY5T"
+          strategy="afterInteractive"
+        />
+        <Script id="google-analytics" strategy="afterInteractive">
+          {`
+            window.dataLayer = window.dataLayer || [];
+            function gtag(){dataLayer.push(arguments);}
+            gtag('js', new Date());
+            gtag('config', 'G-TWWR88GY5T');
+          `}
+        </Script>
       </body>
     </html>
   );
