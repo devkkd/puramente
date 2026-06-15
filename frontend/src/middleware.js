@@ -2,24 +2,38 @@ import { NextResponse } from "next/server";
 
 // ─── Supported locales ────────────────────────────────────────────────────────
 export const LOCALES = [
-  "en-in", "en-us", "en-gb", "en-ae", "en-de",
-  "en-es", "en-it", "en-pt", "en-se", "en-dk",
-  "en-no", "en-fi", "en-nl", "en-au", "en-ca", "en-sg", "en-fr",
+  "en-in",  // India (default)
+  "en-gb",  // United Kingdom
+  "en-fr",  // France
+  "en-de",  // Germany
+  "en-es",  // Spain
+  "en-it",  // Italy
+  "en-pt",  // Portugal
+  "en-se",  // Sweden
+  "en-dk",  // Denmark
+  "en-no",  // Norway
+  "en-fi",  // Finland
+  "en-nl",  // Netherlands
 ];
+
 export const DEFAULT_LOCALE = "en-in";
 
-// ISO 3166-1 alpha-2 → locale slug
+// ─── ISO country code → locale ────────────────────────────────────────────────
 const COUNTRY_TO_LOCALE = {
-  IN: "en-in", US: "en-us", GB: "en-gb", IE: "en-gb",
-  AE: "en-ae", SA: "en-ae", QA: "en-ae", KW: "en-ae", BH: "en-ae", OM: "en-ae",
-  DE: "en-de", AT: "en-de", CH: "en-de",
-  ES: "en-es", IT: "en-it", PT: "en-pt",
-  SE: "en-se", DK: "en-dk", NO: "en-no", FI: "en-fi",
-  NL: "en-nl", BE: "en-nl", LU: "en-nl",
-  AU: "en-au", NZ: "en-au",
-  CA: "en-ca", MX: "en-us",
-  SG: "en-sg", MY: "en-sg", PH: "en-sg",
+  // India
+  IN: "en-in",
+  // Europe — each country gets its own slug for SEO
+  GB: "en-gb", IE: "en-gb",
   FR: "en-fr",
+  DE: "en-de", AT: "en-de", CH: "en-de",
+  ES: "en-es",
+  IT: "en-it",
+  PT: "en-pt",
+  SE: "en-se",
+  DK: "en-dk",
+  NO: "en-no",
+  FI: "en-fi",
+  NL: "en-nl", BE: "en-nl", LU: "en-nl",
 };
 
 function countryToLocale(code) {
@@ -30,25 +44,29 @@ function countryToLocale(code) {
 export function middleware(request) {
   const { pathname } = request.nextUrl;
 
-  // ── Only redirect the exact homepage "/" ──────────────────────────────────
-  // All other pages (/product/, /store/, /blog/ etc.) are untouched
+  // Only run on exact homepage
   if (pathname !== "/") {
     return NextResponse.next();
   }
 
-  // ── Detect locale from cookie → Nginx geoip2 header → default ────────────
+  // ── Detect country ────────────────────────────────────────────────────────
+  // Priority 1: Cookie (user already visited — respect their locale)
+  // Priority 2: Nginx geoip2 header (production VPS)
+  // Priority 3: Cloudflare header
+  // Priority 4: Default (India)
+
   let locale = request.cookies.get("NEXT_LOCALE")?.value;
 
   if (!locale || !LOCALES.includes(locale)) {
     const countryCode =
-      request.headers.get("x-country-code") ||      // Nginx geoip2
-      request.headers.get("cf-ipcountry") ||         // Cloudflare
-      request.headers.get("x-vercel-ip-country");    // Vercel
+      request.headers.get("x-country-code") ||     // Nginx geoip2 (VPS)
+      request.headers.get("cf-ipcountry") ||        // Cloudflare
+      request.headers.get("x-vercel-ip-country");   // Vercel
 
     locale = countryToLocale(countryCode);
   }
 
-  // ── Redirect "/" → "/en-in/" (or detected locale) ────────────────────────
+  // ── Redirect / → /{locale} ───────────────────────────────────────────────
   const url = request.nextUrl.clone();
   url.pathname = `/${locale}`;
 
@@ -63,6 +81,5 @@ export function middleware(request) {
 }
 
 export const config = {
-  // Only run on homepage
   matcher: ["/"],
 };
