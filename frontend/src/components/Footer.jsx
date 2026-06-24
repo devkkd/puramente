@@ -105,7 +105,7 @@ export default function Footer() {
 
             <div className="flex flex-col gap-1 md:gap-1.5">
               <h4 className="font-bold text-xs md:text-sm text-black mb-1">Company</h4>
-              <Link href="/our-story" className="text-xs md:text-[13px] font-normal text-gray-700 hover:text-[#0082A4]">Our Story</Link>
+              <Link href="/ourStory" className="text-xs md:text-[13px] font-normal text-gray-700 hover:text-[#0082A4]">Our Story</Link>
               <Link href="/craftsmanship" className="text-xs md:text-[13px] font-normal text-gray-700 hover:text-[#0082A4]">Craftsmanship</Link>
               <Link href="/sustainability" className="text-xs md:text-[13px] font-normal text-gray-700 hover:text-[#0082A4]">Sustainability</Link>
               <Link href="/visit-studio" className="text-xs md:text-[13px] font-normal text-gray-700 hover:text-[#0082A4]">Visit Jaipur Studio</Link>

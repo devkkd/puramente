@@ -97,3 +97,16 @@ exports.updateEnquiryStatus = async (req, res) => {
     res.status(500).json({ success: false, error: "Server error." });
   }
 };
+
+// Admin: Delete enquiry
+exports.deleteEnquiry = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const enquiry = await ContactEnquiry.findByIdAndDelete(id);
+    if (!enquiry) return res.status(404).json({ success: false, error: "Enquiry not found" });
+    res.status(200).json({ success: true, message: "Enquiry deleted successfully" });
+  } catch (error) {
+    console.error("Error deleting enquiry:", error);
+    res.status(500).json({ success: false, error: "Server error deleting enquiry." });
+  }
+};

@@ -30,8 +30,8 @@ export default function LocaleSwitcher() {
     }
     const newPath = segments.join("/") || "/";
 
-    // Set cookie so next visit remembers
-    document.cookie = `NEXT_LOCALE=${newLocale}; path=/; max-age=${60 * 60 * 24 * 365}; samesite=lax`;
+    // Set manual cookie so user's choice persists across visits
+    document.cookie = `NEXT_LOCALE_MANUAL=${newLocale}; path=/; max-age=${60 * 60 * 24 * 365}; samesite=lax`;
 
     router.push(newPath);
     setOpen(false);

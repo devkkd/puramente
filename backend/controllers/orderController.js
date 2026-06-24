@@ -240,3 +240,16 @@ exports.updateOrderStatus = async (req, res) => {
     res.status(200).json({ success: true, data: order });
   } catch (error) { res.status(500).json({ success: false }); }
 };
+
+// Admin: Delete order
+exports.deleteOrder = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const order = await Order.findByIdAndDelete(id);
+    if (!order) return res.status(404).json({ success: false, error: "Order not found" });
+    res.status(200).json({ success: true, message: "Order deleted successfully" });
+  } catch (error) {
+    console.error("Error deleting order:", error);
+    res.status(500).json({ success: false, error: "Server error" });
+  }
+};

@@ -95,14 +95,7 @@ export default function ExhibitionDetailsPage() {
               </p>
             </div>
 
-            <h2 className="font-playfair text-2xl md:text-3xl font-bold text-gray-900 mb-6">Exhibition Highlights</h2>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <div className="border border-[#00a3c4]/50 p-5 text-sm font-normal text-gray-700 bg-white hover:shadow-sm transition-shadow">Global sourcing platform for home & lifestyle products</div>
-              <div className="border border-[#00a3c4]/50 p-5 text-sm font-normal text-gray-700 bg-white hover:shadow-sm transition-shadow">Export-ready handcrafted collections</div>
-              <div className="border border-[#00a3c4]/50 p-5 text-sm font-normal text-gray-700 bg-white hover:shadow-sm transition-shadow">Sustainable & design-led innovations</div>
-              <div className="border border-[#00a3c4]/50 p-5 text-sm font-normal text-gray-700 bg-white hover:shadow-sm transition-shadow">Direct access to Indian manufacturers</div>
-              <div className="border border-[#00a3c4]/50 p-5 text-sm font-normal text-gray-700 bg-white hover:shadow-sm transition-shadow">Networking with international buyers</div>
-            </div>
+           
           </div>
 
           {/* Right Column: Curated By & Tags */}
@@ -123,7 +116,7 @@ export default function ExhibitionDetailsPage() {
             <div className="w-full h-px bg-gray-200"></div>
 
             {/* Tags */}
-            <div>
+            {/* <div>
               <h2 className="font-playfair text-2xl md:text-3xl font-bold text-gray-900 mb-6">Tags</h2>
               <div className="flex flex-wrap gap-3">
                 {["IHGF Delhi Fair", "IHGF Spring 2026", "Indian Handicrafts", "Export Fair", "Indian Craftsmanship", "Home & Lifestyle Expo"].map(tag => (
@@ -132,11 +125,19 @@ export default function ExhibitionDetailsPage() {
                   </span>
                 ))}
               </div>
-            </div>
+            </div> */}
 
           </div>
+          
         </div>
-
+ <h2 className="font-playfair text-2xl  md:text-3xl font-bold text-gray-900 mb-6">Exhibition Highlights</h2>
+            <div className="grid grid-cols-1 w-full flex sm:grid-cols-3 md:grid-cols-5 gap-4">
+              <div className="border border-[#00a3c4]/50 p-5 text-sm font-normal text-gray-700 bg-white hover:shadow-sm transition-shadow">Global sourcing platform for home & lifestyle products</div>
+              <div className="border border-[#00a3c4]/50 p-5 text-sm font-normal text-gray-700 bg-white hover:shadow-sm transition-shadow">Export-ready handcrafted collections</div>
+              <div className="border border-[#00a3c4]/50 p-5 text-sm font-normal text-gray-700 bg-white hover:shadow-sm transition-shadow">Sustainable & design-led innovations</div>
+              <div className="border border-[#00a3c4]/50 p-5 text-sm font-normal text-gray-700 bg-white hover:shadow-sm transition-shadow">Direct access to Indian manufacturers</div>
+              <div className="border border-[#00a3c4]/50 p-5 text-sm font-normal text-gray-700 bg-white hover:shadow-sm transition-shadow">Networking with international buyers</div>
+            </div>
       </div>
     </main>
   );

@@ -3,6 +3,7 @@
 import React, { useState } from "react";
 import { Plane, TrainFront, Car, CheckCircle2 } from "lucide-react";
 import { submitContactEnquiry } from "@/lib/api";
+import { COUNTRIES } from "@/lib/countries";
 
 export default function ContactUsPage() {
   const [loading, setLoading] = useState(false);
@@ -248,11 +249,11 @@ export default function ContactUsPage() {
                   <div className="relative">
                     <select name="country" value={formData.country} onChange={handleChange} className="w-full border border-gray-300 p-3 lg:p-3.5 text-[13px] lg:text-sm text-gray-900 focus:outline-none focus:border-[#00a3c4] bg-white appearance-none cursor-pointer rounded-sm">
                       <option disabled>Select Country</option>
-                      <option>United States</option>
-                      <option>United Kingdom</option>
-                      <option>India</option>
-                      <option>Australia</option>
-                      <option>Europe (Other)</option>
+                      {COUNTRIES.map((country) => (
+                        <option key={country} value={country}>
+                          {country}
+                        </option>
+                      ))}
                     </select>
                     <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-3 text-gray-500">
                       <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M19 9l-7 7-7-7"></path></svg>
@@ -344,7 +345,7 @@ export default function ContactUsPage() {
           {/* Updated Functional Map Embed */}
           <div className="w-full h-[250px] sm:h-[350px] md:h-[450px] bg-gray-100 rounded-lg overflow-hidden shadow-inner border border-gray-200 mt-4 lg:mt-0">
             <iframe
-              src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3561.4018244199923!2d75.81357677521!3d26.804153976711586!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x396dc9aecac14101%3A0x4ae9618d0a763441!2sPuramente%20International!5e0!3m2!1sen!2sin!4v1716720000000!5m2!1sen!2sin"
+              src="https://www.google.com/maps/embed?pb=!1m17!1m12!1m3!1d3584.312016070522!2d75.8137702754357!3d26.80406567671208!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m2!1m1!2zMjbCsDQ4JzE0LjYiTiA3NcKwNDgnNTguOCJF!5e1!3m2!1sen!2sin!4v1782292087775!5m2!1sen!2sin"
               width="100%"
               height="100%"
               style={{ border: 0 }}
@@ -354,7 +355,6 @@ export default function ContactUsPage() {
               title="Puramente International Location Map"
             ></iframe>
           </div>
-
         </div>
       </section>
 

@@ -2,13 +2,18 @@
 
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
-import { Eye, Filter, ClipboardList, Clock, CheckCircle2, Search } from "lucide-react";
-import { getAdminOrders } from "@/lib/api";
+import { Eye, Filter, ClipboardList, Clock, CheckCircle2, Search, Trash2 } from "lucide-react";
+import { getAdminOrders, deleteAdminOrder } from "@/lib/api";
 
 export default function AdminOrdersPage() {
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
   const [statusFilter, setStatusFilter] = useState("All");
+
+  // Filter States
+  const [searchQuery, setSearchQuery] = useState("");
+  const [startDate, setStartDate] = useState("");
+  const [endDate, setEndDate] = useState("");
 
   useEffect(() => {
     fetchOrders();
@@ -22,6 +27,18 @@ export default function AdminOrdersPage() {
       console.error("Failed to fetch orders", error);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleDelete = async (id) => {
+    if (!window.confirm("Are you sure you want to delete this price request?")) return;
+    try {
+      const res = await deleteAdminOrder(id);
+      if (res.success) {
+        setOrders(prev => prev.filter(order => order._id !== id));
+      }
+    } catch (error) {
+      alert("Failed to delete order.");
     }
   };
 
@@ -41,8 +58,34 @@ export default function AdminOrdersPage() {
 
   // Apply Filter
   const filteredOrders = orders.filter(order => {
-    if (statusFilter === "All") return true;
-    return (order.status || "Pending") === statusFilter;
+    // 1. Status Filter
+    if (statusFilter !== "All" && (order.status || "Pending") !== statusFilter) {
+      return false;
+    }
+    
+    // 2. Search Query
+    const matchesSearch = 
+      order.contactDetails?.fullName?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      order.contactDetails?.email?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      order.contactDetails?.companyName?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      order._id?.toLowerCase().includes(searchQuery.toLowerCase());
+    
+    // 3. Date Range
+    let matchesDate = true;
+    if (startDate) {
+      const sDate = new Date(startDate);
+      sDate.setHours(0, 0, 0, 0);
+      const orderDate = new Date(order.createdAt);
+      if (orderDate < sDate) matchesDate = false;
+    }
+    if (endDate) {
+      const eDate = new Date(endDate);
+      eDate.setHours(23, 59, 59, 999);
+      const orderDate = new Date(order.createdAt);
+      if (orderDate > eDate) matchesDate = false;
+    }
+
+    return matchesSearch && matchesDate;
   });
 
   const pendingCount = orders.filter(o => (o.status || "Pending") === "Pending").length;
@@ -90,6 +133,59 @@ export default function AdminOrdersPage() {
         </div>
       </div>
 
+      {/* Filter Bar */}
+      {!loading && orders.length > 0 && (
+        <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 mb-8 flex flex-col md:flex-row gap-4 items-center justify-between">
+          {/* Text Search */}
+          <div className="relative w-full md:w-72">
+            <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400" size={18} />
+            <input
+              type="text"
+              placeholder="Search customer, email, company..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="w-full pl-10 pr-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#0082A4]/20 focus:border-[#0082A4] transition-all text-gray-900"
+            />
+          </div>
+
+          {/* Date Filters */}
+          <div className="flex flex-wrap items-center gap-3 w-full md:w-auto justify-end">
+            <div className="flex items-center gap-2">
+              <span className="text-xs font-semibold text-gray-500">From:</span>
+              <input
+                type="date"
+                value={startDate}
+                onChange={(e) => setStartDate(e.target.value)}
+                className="px-3 py-2 bg-gray-50 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#0082A4]/20 focus:border-[#0082A4] text-gray-900"
+              />
+            </div>
+            <div className="flex items-center gap-2">
+              <span className="text-xs font-semibold text-gray-500">To:</span>
+              <input
+                type="date"
+                value={endDate}
+                onChange={(e) => setEndDate(e.target.value)}
+                className="px-3 py-2 bg-gray-50 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#0082A4]/20 focus:border-[#0082A4] text-gray-900"
+              />
+            </div>
+
+            {(searchQuery || startDate || endDate || statusFilter !== "All") && (
+              <button
+                onClick={() => {
+                  setSearchQuery("");
+                  setStartDate("");
+                  setEndDate("");
+                  setStatusFilter("All");
+                }}
+                className="px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 font-bold rounded-xl text-xs uppercase tracking-wider transition-colors"
+              >
+                Clear
+              </button>
+            )}
+          </div>
+        </div>
+      )}
+
       {/* --- MAIN CONTENT --- */}
       {loading ? (
         <div className="flex flex-col items-center justify-center min-h-[40vh] bg-white rounded-2xl shadow-sm border border-gray-100">
@@ -109,15 +205,20 @@ export default function AdminOrdersPage() {
           <div className="w-16 h-16 bg-gray-50 rounded-full flex items-center justify-center mb-4">
             <Search size={24} className="text-gray-400" />
           </div>
-          <h2 className="text-lg font-bold text-gray-900 mb-2">No Matches Found</h2>
+          <h2 className="text-lg font-bold text-gray-900 mb-2">No Requests Found</h2>
           <p className="text-gray-500 text-sm mb-4">
-            There are no requests matching the '{statusFilter}' status.
+            There are no requests matching your search filters.
           </p>
           <button 
-            onClick={() => setStatusFilter("All")}
+            onClick={() => {
+              setSearchQuery("");
+              setStartDate("");
+              setEndDate("");
+              setStatusFilter("All");
+            }}
             className="text-[#0082A4] font-semibold text-sm hover:underline"
           >
-            Clear Filter
+            Clear Filters
           </button>
         </div>
       ) : (
@@ -158,12 +259,21 @@ export default function AdminOrdersPage() {
                         {getStatusBadge(order.status)}
                       </td>
                       <td className="p-5 align-middle text-right">
-                        <Link 
-                          href={`/admin/orders/${order._id}`}
-                          className="inline-flex items-center gap-1.5 px-4 py-2 bg-gray-50 text-gray-700 hover:text-[#0082A4] hover:bg-[#E2FCFF] rounded-lg transition-colors font-semibold text-xs uppercase tracking-wider"
-                        >
-                          <Eye size={14} /> Review
-                        </Link>
+                        <div className="flex justify-end items-center gap-2">
+                          <Link 
+                            href={`/admin/orders/${order._id}`}
+                            className="inline-flex items-center gap-1.5 px-4 py-2 bg-gray-50 text-gray-700 hover:text-[#0082A4] hover:bg-[#E2FCFF] rounded-lg transition-colors font-semibold text-xs uppercase tracking-wider"
+                          >
+                            <Eye size={14} /> Review
+                          </Link>
+                          <button 
+                            onClick={() => handleDelete(order._id)}
+                            className="p-2 bg-red-50 text-red-600 rounded-lg hover:bg-red-100 transition-colors"
+                            title="Delete Order"
+                          >
+                            <Trash2 size={14} />
+                          </button>
+                        </div>
                       </td>
                     </tr>
                   );

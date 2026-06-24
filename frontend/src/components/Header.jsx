@@ -415,12 +415,12 @@ export default function Header() {
 
             {!isLoggedIn && <Link href="/account" className="lg:hidden hover:text-white/80 transition-colors notranslate"><User size={24} strokeWidth={1.5} /></Link>}
 
-            <Link href="/cart" className="flex items-center space-x-2 bg-white text-black px-3 py-2 lg:px-5 lg:py-2.5 rounded-xl lg:rounded-2xl text-sm font-medium hover:bg-gray-50 transition-colors shadow-sm notranslate">
+            <Link href="/cart" className="flex items-center space-x-1 bg-white text-black px-2 py-2 lg:px-3 lg:py-2.5 rounded-xl lg:rounded-2xl text-sm font-medium hover:bg-gray-50 transition-colors shadow-sm notranslate">
               <ShoppingBag size={18} strokeWidth={1.5} />
               <span className="hidden sm:inline">Cart ({cartCount})</span>
               <span className="sm:hidden font-bold">{cartCount}</span>
             </Link>
-            <LocaleSwitcher />
+            {/* <LocaleSwitcher /> */}
           </div>
         </div>
 

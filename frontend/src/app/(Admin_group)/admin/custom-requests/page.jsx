@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { getAdminCustomRequests, updateCustomRequestStatus } from "@/lib/api";
+import { getAdminCustomRequests, updateCustomRequestStatus, deleteAdminCustomRequest } from "@/lib/api";
 import { 
   Wand2, 
   ChevronDown, 
@@ -12,13 +12,19 @@ import {
   Mail,
   Phone,
   MapPin,
-  Ruler
+  Ruler,
+  Trash2
 } from "lucide-react";
 
 export default function AdminCustomRequestsPage() {
   const [requests, setRequests] = useState([]);
   const [loading, setLoading] = useState(true);
   const [expandedId, setExpandedId] = useState(null);
+
+  // Filter States
+  const [searchQuery, setSearchQuery] = useState("");
+  const [startDate, setStartDate] = useState("");
+  const [endDate, setEndDate] = useState("");
 
   useEffect(() => {
     fetchRequests();
@@ -47,9 +53,47 @@ export default function AdminCustomRequestsPage() {
     }
   };
 
+  const handleDelete = async (id) => {
+    if (!window.confirm("Are you sure you want to delete this custom request?")) return;
+    try {
+      const res = await deleteAdminCustomRequest(id);
+      if (res.success) {
+        setRequests(prev => prev.filter(req => req._id !== id));
+        if (expandedId === id) setExpandedId(null);
+      }
+    } catch (error) {
+      alert("Failed to delete request.");
+    }
+  };
+
   const toggleExpand = (id) => {
     setExpandedId(expandedId === id ? null : id);
   };
+
+  const filteredRequests = requests.filter(req => {
+    const matchesSearch = 
+      req.clientInfo?.fullName?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      req.clientInfo?.email?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      req.category?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      req.metal?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      req.designNotes?.toLowerCase().includes(searchQuery.toLowerCase());
+
+    let matchesDate = true;
+    if (startDate) {
+      const sDate = new Date(startDate);
+      sDate.setHours(0, 0, 0, 0);
+      const reqDate = new Date(req.createdAt);
+      if (reqDate < sDate) matchesDate = false;
+    }
+    if (endDate) {
+      const eDate = new Date(endDate);
+      eDate.setHours(23, 59, 59, 999);
+      const reqDate = new Date(req.createdAt);
+      if (reqDate > eDate) matchesDate = false;
+    }
+
+    return matchesSearch && matchesDate;
+  });
 
   const getStatusBadge = (status) => {
     switch(status) {
@@ -91,19 +135,81 @@ export default function AdminCustomRequestsPage() {
         </div>
       </div>
 
+      {/* Filter Bar */}
+      {!loading && requests.length > 0 && (
+        <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 mb-8 flex flex-col md:flex-row gap-4 items-center justify-between">
+          {/* Text Search */}
+          <div className="relative w-full md:w-72">
+            <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400" size={18} />
+            <input
+              type="text"
+              placeholder="Search client, category, metal..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="w-full pl-10 pr-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#0082A4]/20 focus:border-[#0082A4] transition-all text-gray-900"
+            />
+          </div>
+
+          {/* Date Filters */}
+          <div className="flex flex-wrap items-center gap-3 w-full md:w-auto justify-end">
+            <div className="flex items-center gap-2">
+              <span className="text-xs font-semibold text-gray-500">From:</span>
+              <input
+                type="date"
+                value={startDate}
+                onChange={(e) => setStartDate(e.target.value)}
+                className="px-3 py-2 bg-gray-50 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#0082A4]/20 focus:border-[#0082A4] text-gray-900"
+              />
+            </div>
+            <div className="flex items-center gap-2">
+              <span className="text-xs font-semibold text-gray-500">To:</span>
+              <input
+                type="date"
+                value={endDate}
+                onChange={(e) => setEndDate(e.target.value)}
+                className="px-3 py-2 bg-gray-50 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#0082A4]/20 focus:border-[#0082A4] text-gray-900"
+              />
+            </div>
+
+            {(searchQuery || startDate || endDate) && (
+              <button
+                onClick={() => {
+                  setSearchQuery("");
+                  setStartDate("");
+                  setEndDate("");
+                }}
+                className="px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 font-bold rounded-xl text-xs uppercase tracking-wider transition-colors"
+              >
+                Clear
+              </button>
+            )}
+          </div>
+        </div>
+      )}
+
       {/* Main Content */}
       {loading ? (
         <div className="flex flex-col items-center justify-center min-h-[40vh] bg-white rounded-2xl shadow-sm border border-gray-100">
           <div className="w-10 h-10 border-4 border-[#E2FCFF] border-t-[#0082A4] rounded-full animate-spin mb-4"></div>
           <p className="text-[#0082A4] font-medium tracking-widest animate-pulse text-sm uppercase">Loading Requests...</p>
         </div>
-      ) : requests.length === 0 ? (
+      ) : filteredRequests.length === 0 ? (
         <div className="flex flex-col items-center justify-center min-h-[40vh] bg-white rounded-2xl shadow-sm border border-gray-100 p-8 text-center">
           <div className="w-20 h-20 bg-gray-50 rounded-full flex items-center justify-center mb-4">
             <Search size={32} className="text-gray-300" />
           </div>
-          <h2 className="text-xl font-bold text-gray-900 mb-2">No Custom Requests Yet</h2>
-          <p className="text-gray-500 max-w-md">When clients submit the bespoke form on the website, they will appear here.</p>
+          <h2 className="text-xl font-bold text-gray-900 mb-2">No Requests Found</h2>
+          <p className="text-gray-500 max-w-md mb-4">No custom requests match your search filters.</p>
+          <button
+            onClick={() => {
+              setSearchQuery("");
+              setStartDate("");
+              setEndDate("");
+            }}
+            className="text-[#0082A4] font-semibold text-sm hover:underline"
+          >
+            Clear Filters
+          </button>
         </div>
       ) : (
         <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
@@ -119,7 +225,7 @@ export default function AdminCustomRequestsPage() {
                 </tr>
               </thead>
               <tbody className="text-sm divide-y divide-gray-50">
-                {requests.map((req) => (
+                {filteredRequests.map((req) => (
                   <React.Fragment key={req._id}>
                     {/* VISIBLE ROW */}
                     <tr 
@@ -153,14 +259,20 @@ export default function AdminCustomRequestsPage() {
                           <div className="p-6 md:p-8 animate-in slide-in-from-top-2 fade-in duration-200">
                             
                             {/* Action Bar */}
-                            <div className="flex justify-between items-center bg-white p-4 rounded-xl border border-[#0082A4]/20 mb-6 shadow-sm">
-                              <span className="text-sm font-bold text-gray-900">Update Request Status:</span>
-                              <div className="flex gap-2">
+                            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center bg-white p-4 rounded-xl border border-[#0082A4]/20 mb-6 shadow-sm gap-4">
+                              <div className="flex flex-wrap items-center gap-2">
+                                <span className="text-sm font-bold text-gray-900 mr-2">Update Request Status:</span>
                                 <button onClick={() => handleStatusChange(req._id, "Pending")} className={`px-4 py-2 text-xs font-bold rounded-lg transition-colors ${req.status === "Pending" ? "bg-red-100 text-red-700" : "bg-gray-100 text-gray-600 hover:bg-gray-200"}`}>Mark Unread</button>
                                 <button onClick={() => handleStatusChange(req._id, "Reviewed")} className={`px-4 py-2 text-xs font-bold rounded-lg transition-colors ${req.status === "Reviewed" ? "bg-blue-100 text-blue-700" : "bg-gray-100 text-gray-600 hover:bg-gray-200"}`}>Mark Reviewed</button>
                                 <button onClick={() => handleStatusChange(req._id, "In Production")} className={`px-4 py-2 text-xs font-bold rounded-lg transition-colors ${req.status === "In Production" ? "bg-yellow-100 text-yellow-700" : "bg-gray-100 text-gray-600 hover:bg-gray-200"}`}>In Production</button>
                                 <button onClick={() => handleStatusChange(req._id, "Fulfilled")} className={`px-4 py-2 text-xs font-bold rounded-lg transition-colors ${req.status === "Fulfilled" ? "bg-green-100 text-green-700" : "bg-gray-100 text-gray-600 hover:bg-gray-200"}`}>Fulfilled</button>
                               </div>
+                              <button 
+                                onClick={() => handleDelete(req._id)} 
+                                className="px-4 py-2 text-xs font-bold rounded-lg bg-red-50 text-red-600 border border-red-100 hover:bg-red-100 flex items-center gap-1.5 ml-auto sm:ml-0"
+                              >
+                                <Trash2 size={12}/> Delete Request
+                              </button>
                             </div>
 
                             <div className="grid grid-cols-1 md:grid-cols-3 gap-8">

@@ -66,6 +66,7 @@ export const submitOrderRequest = (data) => api.post('/orders/submit', data);
 export const getAdminOrders = () => api.get('/orders/admin/all');
 export const getAdminOrderById = (id) => api.get(`/orders/admin/${id}`);
 export const updateOrderStatus = (id, status) => api.put(`/orders/admin/${id}/status`, { status });
+export const deleteAdminOrder = (id) => api.delete(`/orders/admin/${id}`);
 export const getAdminUsers = () => api.get('/auth/admin/users');
 
 // --- Custom Requests ---
@@ -74,11 +75,13 @@ export const submitCustomRequest = (formData) => api.post('/custom-requests/subm
 });
 export const getAdminCustomRequests = () => api.get('/custom-requests/admin/all');
 export const updateCustomRequestStatus = (id, status) => api.put(`/custom-requests/admin/${id}/status`, { status });
+export const deleteAdminCustomRequest = (id) => api.delete(`/custom-requests/admin/${id}`);
 
 // --- Contact Enquiries ---
 export const submitContactEnquiry = (data) => api.post('/contact/submit', data);
 export const getAdminContactEnquiries = () => api.get('/contact/admin/all');
 export const updateContactEnquiryStatus = (id, status) => api.put(`/contact/admin/${id}/status`, { status });
+export const deleteAdminContactEnquiry = (id) => api.delete(`/contact/admin/${id}`);
 
 // --- Blogs ---
 export const getBlogs = () => api.get('/blogs');

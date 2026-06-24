@@ -11,6 +11,30 @@ export default function BulkUploadPage() {
   const [loading, setLoading] = useState(false);
   const [logs, setLogs] = useState([]);
 
+  const downloadTemplate = () => {
+    const headers = ["Product Code", "Product Name", "Description", "Category", "Sub - Category", "New Arrival", "Best Seller", "Image Name"];
+    const rows = [
+      ["NK-101", "Classic Pearl Necklace", "A beautiful handcrafted pearl necklace with silver finish.", "Necklaces", "with gemstone", "yes", "no", "NK-101.jpg"],
+      ["BR-202", "Minimalist Silver Bracelet", "Sleek silver bracelet for daily wear.", "Bracelets", "without gemstone", "yes", "yes", "BR-202.png"]
+    ];
+
+    // Build CSV content
+    const csvContent = [
+      headers.join(","),
+      ...rows.map(row => row.map(val => `"${val.toString().replace(/"/g, '""')}"`).join(","))
+    ].join("\n");
+
+    const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.setAttribute("href", url);
+    link.setAttribute("download", "product_bulk_upload_template.csv");
+    link.style.visibility = "hidden";
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+
 const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
@@ -67,9 +91,17 @@ const handleSubmit = async (e) => {
             <h2 className="text-2xl font-bold text-gray-900 mb-2">
               Bulk Upload Products
             </h2>
-            <p className="text-gray-500 text-sm leading-relaxed max-w-2xl">
+            <p className="text-gray-500 text-sm leading-relaxed max-w-2xl mb-4">
               <strong>Instructions:</strong> Put all your category image folders (Necklaces, Bracelets, etc.) into ONE main folder on your computer. Upload the Excel file, then select that MAIN image folder below.
             </p>
+            <button 
+              type="button"
+              onClick={downloadTemplate}
+              className="inline-flex items-center gap-2 text-xs font-bold text-[#0082A4] bg-[#E2FCFF] px-3.5 py-2.5 rounded-xl hover:bg-[#c9f8fc] transition-colors"
+            >
+              <FileSpreadsheet size={14} />
+              Download Dummy Template (.csv)
+            </button>
           </div>
         </div>
         

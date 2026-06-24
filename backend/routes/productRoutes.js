@@ -19,9 +19,21 @@ router.get("/:id", getProductById);
 router.get("/slug/:slug", getProductBySlug);
 
 // --- PROTECTED ADMIN ROUTES (Requires valid Token + Admin status) ---
-router.post("/bulk-upload", protect, admin, upload.any(), bulkUploadProducts);
-router.post("/", protect, admin, upload.single("image"), createProduct);
-router.put("/:id", protect, admin, upload.single("image"), updateProduct);
+const handleUpload = (multerMiddleware) => {
+  return (req, res, next) => {
+    multerMiddleware(req, res, (err) => {
+      if (err) {
+        console.error("Multer upload error:", err);
+        return res.status(400).json({ error: err.message });
+      }
+      next();
+    });
+  };
+};
+
+router.post("/bulk-upload", protect, admin, handleUpload(upload.any()), bulkUploadProducts);
+router.post("/", protect, admin, handleUpload(upload.single("image")), createProduct);
+router.put("/:id", protect, admin, handleUpload(upload.single("image")), updateProduct);
 router.delete("/:id", protect, admin, deleteProduct);
 
 module.exports = router;

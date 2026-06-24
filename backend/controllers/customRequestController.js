@@ -114,3 +114,16 @@ exports.updateCustomRequestStatus = async (req, res) => {
     res.status(500).json({ success: false, error: "Server error" });
   }
 };
+
+// Admin: Delete custom request
+exports.deleteCustomRequest = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const request = await CustomRequest.findByIdAndDelete(id);
+    if (!request) return res.status(404).json({ success: false, error: "Custom request not found" });
+    res.status(200).json({ success: true, message: "Custom request deleted successfully" });
+  } catch (error) {
+    console.error("Error deleting custom request:", error);
+    res.status(500).json({ success: false, error: "Server error" });
+  }
+};

@@ -11,11 +11,18 @@ const upload = multer({
     fileSize: 50 * 1024 * 1024, // Absolute limit: 50MB
   },
   fileFilter: (req, file, cb) => {
-    // Only allow images and videos
-    if (file.mimetype.startsWith('image/') || file.mimetype.startsWith('video/')) {
+    // Allow images, videos, and Excel/CSV files
+    const isSpreadsheet = 
+      file.mimetype === "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" ||
+      file.mimetype === "application/vnd.ms-excel" ||
+      file.mimetype === "text/csv" ||
+      file.mimetype === "application/csv" ||
+      file.originalname.match(/\.(xlsx|xls|csv)$/i);
+
+    if (file.mimetype.startsWith('image/') || file.mimetype.startsWith('video/') || isSpreadsheet) {
       cb(null, true);
     } else {
-      cb(new Error("Invalid file type. Only images and videos are allowed."), false);
+      cb(new Error("Invalid file type. Only images, videos, and Excel/CSV files are allowed."), false);
     }
   }
 });

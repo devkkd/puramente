@@ -50,14 +50,17 @@ export function middleware(request) {
   }
 
   // ── Detect country ────────────────────────────────────────────────────────
-  // Priority 1: Cookie (user already visited — respect their locale)
-  // Priority 2: Nginx geoip2 header (production VPS)
-  // Priority 3: Cloudflare header
-  // Priority 4: Default (India)
+  // Always detect from IP first (Nginx geoip2 header)
+  // Cookie only used if user manually switched locale via LocaleSwitcher
+  const manualLocale = request.cookies.get("NEXT_LOCALE_MANUAL")?.value;
 
-  let locale = request.cookies.get("NEXT_LOCALE")?.value;
+  let locale;
 
-  if (!locale || !LOCALES.includes(locale)) {
+  if (manualLocale && LOCALES.includes(manualLocale)) {
+    // User manually selected a locale — respect it
+    locale = manualLocale;
+  } else {
+    // Auto-detect from IP via Nginx geoip2
     const countryCode =
       request.headers.get("x-country-code") ||     // Nginx geoip2 (VPS)
       request.headers.get("cf-ipcountry") ||        // Cloudflare
@@ -71,12 +74,7 @@ export function middleware(request) {
   url.pathname = `/${locale}`;
 
   const response = NextResponse.redirect(url, { status: 302 });
-  response.cookies.set("NEXT_LOCALE", locale, {
-    maxAge: 60 * 60 * 24 * 365,
-    path: "/",
-    sameSite: "lax",
-  });
-
+  // Don't set auto cookie — only manual switches set NEXT_LOCALE_MANUAL
   return response;
 }
 

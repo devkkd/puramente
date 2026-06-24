@@ -225,6 +225,13 @@ exports.bulkUploadProducts = async (req, res) => {
         const rows = xlsx.utils.sheet_to_json(workbook.Sheets[sheetName]);
 
         const categoriesDB = await Category.find();
+        const existingProducts = await Product.find({}, { designCode: 1, slug: 1 });
+        const existingDesignCodes = new Set(existingProducts.map(p => p.designCode.toUpperCase()));
+        const existingSlugs = new Set(existingProducts.map(p => p.slug.toLowerCase()));
+
+        const insertedDesignCodesInBatch = new Set();
+        const insertedSlugsInBatch = new Set();
+
         const productsToInsert = [];
         let successCount = 0;
         let skipCount = 0;
@@ -236,45 +243,103 @@ exports.bulkUploadProducts = async (req, res) => {
           const row = rows[i];
           const code = row['Product Code'] ? row['Product Code'].toString().trim() : null;
           const name = row['Product Name'];
-          const desc = row['Description'];
+          const desc = row['Description'] ? row['Description'].toString().trim() : "No description provided.";
           const catName = row['Category'] ? row['Category'].toString().trim() : null;
           const subCat = row['Sub - Category'] ? row['Sub - Category'].toString().trim() : "";
+          const newArrivalVal = row['New Arrival'];
+          const bestSellerVal = row['Best Seller'];
+          const imgName = row['Image Name'] ? row['Image Name'].toString().trim() : null;
+          const imgUrl = row['Image URL'] ? row['Image URL'].toString().trim() : null;
 
-          if (!code || !name) continue; 
-
-          // SMART EXACT IMAGE MATCHING (Fixes "RS10" matching "RS100.jpg")
-          const matchedImage = images.find(img => {
-            const fileName = img.originalname.split('/').pop().split('\\').pop();
-            const nameWithoutExt = fileName.substring(0, fileName.lastIndexOf('.')); // Removes .jpg
-            return nameWithoutExt.toUpperCase() === code.toUpperCase();
-          });
-
-          if (!matchedImage) {
-            skipCount++;
-            continue; 
-          }
-
-          let categoryId = null;
-          if (catName) {
-            const normalizedExcelCat = catName.toLowerCase();
-            const match = categoriesDB.find(c => 
-              c.name.toLowerCase() === normalizedExcelCat || 
-              c.name.toLowerCase() === `${normalizedExcelCat}s`
-            );
-            if (match) categoryId = match._id;
-          }
-
-          if (!categoryId) {
+          if (!code || !name) {
+            console.log(`⚠️ Row ${i + 1}: Missing product code or product name. Skipping.`);
             skipCount++;
             continue;
           }
 
-          // Upload to Cloudflare
-          const imageUrl = await uploadToCloudflare(matchedImage);
+          // 1. Resolve Category
+          if (!catName) {
+            console.log(`⚠️ Row ${i + 1}: Category is missing for product "${name}" (${code}). Skipping.`);
+            skipCount++;
+            continue;
+          }
 
+          const matchedCategory = categoriesDB.find(
+            (c) => c.name.toLowerCase() === catName.toLowerCase()
+          );
+
+          if (!matchedCategory) {
+            console.log(`⚠️ Row ${i + 1}: Category "${catName}" not found in database for product "${name}" (${code}). Skipping.`);
+            skipCount++;
+            continue;
+          }
+
+          const categoryId = matchedCategory._id;
+
+          // 2. Generate slug
           const baseSlug = name.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)+/g, "");
           const generatedSlug = `${baseSlug}-${code.toLowerCase()}`;
+
+          // 3. Prevent duplicate designCode / slug
+          if (existingDesignCodes.has(code.toUpperCase()) || insertedDesignCodesInBatch.has(code.toUpperCase())) {
+            console.log(`⚠️ Row ${i + 1}: Design Code "${code}" already exists in DB or current batch. Skipping.`);
+            skipCount++;
+            continue;
+          }
+
+          if (existingSlugs.has(generatedSlug.toLowerCase()) || insertedSlugsInBatch.has(generatedSlug.toLowerCase())) {
+            console.log(`⚠️ Row ${i + 1}: Generated Slug "${generatedSlug}" already exists in DB or current batch. Skipping.`);
+            skipCount++;
+            continue;
+          }
+
+          let imageUrl = "";
+
+          // 4. Resolve Image
+          // If Image URL is specified, use it directly. Otherwise, do local file matching and upload.
+          if (imgUrl && imgUrl.toLowerCase().startsWith("http")) {
+            imageUrl = imgUrl;
+          } else {
+            // SMART IMAGE MATCHING (By custom Image Name column first, then by Product Code filename match)
+            const matchedImage = images.find(img => {
+              const fileName = img.originalname.split('/').pop().split('\\').pop();
+              if (imgName) {
+                return fileName.toLowerCase() === imgName.toLowerCase();
+              }
+              const nameWithoutExt = fileName.substring(0, fileName.lastIndexOf('.')); // Removes .jpg
+              return nameWithoutExt.toUpperCase() === code.toUpperCase();
+            });
+
+            if (!matchedImage) {
+              console.log(`⚠️ Row ${i + 1}: Image file not found (searched for custom name: "${imgName || 'N/A'}" and code: "${code}"). Skipping.`);
+              skipCount++;
+              continue;
+            }
+
+            try {
+              // Upload to Cloudflare
+              imageUrl = await uploadToCloudflare(matchedImage);
+            } catch (uploadError) {
+              console.error(`❌ Row ${i + 1}: Cloudflare upload failed for image "${matchedImage.originalname}":`, uploadError.message);
+              skipCount++;
+              continue;
+            }
+          }
+
           const optionEnum = subCat.toLowerCase() === "with gemstone" ? "with gem" : "without gem";
+
+          // Parse boolean options
+          let isNewArrival = true;
+          if (newArrivalVal !== undefined && newArrivalVal !== null) {
+            const lowerVal = newArrivalVal.toString().toLowerCase().trim();
+            isNewArrival = lowerVal === "true" || lowerVal === "yes" || lowerVal === "1";
+          }
+
+          let isBestSeller = false;
+          if (bestSellerVal !== undefined && bestSellerVal !== null) {
+            const lowerVal = bestSellerVal.toString().toLowerCase().trim();
+            isBestSeller = lowerVal === "true" || lowerVal === "yes" || lowerVal === "1";
+          }
 
           productsToInsert.push({
             productName: name,
@@ -282,11 +347,15 @@ exports.bulkUploadProducts = async (req, res) => {
             designCode: code,
             description: desc,
             imageUrl: imageUrl,
-            newArrival: true,
-            bestSeller: false,
+            newArrival: isNewArrival,
+            bestSeller: isBestSeller,
             option: optionEnum,
             category: categoryId
           });
+
+          // Add to batch tracking Sets to prevent duplicates within the same upload file
+          insertedDesignCodesInBatch.add(code.toUpperCase());
+          insertedSlugsInBatch.add(generatedSlug.toLowerCase());
 
           successCount++;
 
@@ -314,5 +383,40 @@ exports.bulkUploadProducts = async (req, res) => {
     if (!res.headersSent) {
       res.status(500).json({ error: "Server error initializing bulk upload." });
     }
+  }
+};
+
+// Admin: Upload multiple media files to Cloudflare and return their public URLs
+exports.uploadMedia = async (req, res) => {
+  try {
+    if (!req.files || req.files.length === 0) {
+      return res.status(400).json({ success: false, error: "No media files uploaded." });
+    }
+
+    const uploadedFiles = [];
+    for (const file of req.files) {
+      try {
+        const publicUrl = await uploadToCloudflare(file);
+        uploadedFiles.push({
+          originalName: file.originalname,
+          publicUrl
+        });
+      } catch (uploadError) {
+        console.error(`Error uploading file ${file.originalname}:`, uploadError);
+        uploadedFiles.push({
+          originalName: file.originalname,
+          error: uploadError.message || "Failed to upload"
+        });
+      }
+    }
+
+    res.status(200).json({
+      success: true,
+      message: "Media uploaded successfully",
+      files: uploadedFiles
+    });
+  } catch (error) {
+    console.error("Upload Media Error:", error);
+    res.status(500).json({ success: false, error: "Server error uploading media." });
   }
 };

@@ -3,6 +3,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import { UploadCloud, CheckCircle2 } from "lucide-react";
 import { getUserProfile, submitCustomRequest, getCategories } from "@/lib/api"; 
+import { COUNTRIES } from "@/lib/countries";
 
 export default function CustomJewelryPage() {
   const [loading, setLoading] = useState(false);
@@ -256,10 +257,11 @@ export default function CustomJewelryPage() {
                   <label className="block text-sm text-gray-700 mb-2">Country</label>
                   <select name="country" value={formData.country} onChange={handleChange} className="w-full border border-gray-300 p-3 text-sm text-gray-900 focus:outline-none focus:border-[#4fa3b9] bg-white appearance-none">
                     <option disabled>Select Country</option>
-                    <option>United States</option>
-                    <option>United Kingdom</option>
-                    <option>India</option>
-                    <option>Australia</option>
+                    {COUNTRIES.map((country) => (
+                      <option key={country} value={country}>
+                        {country}
+                      </option>
+                    ))}
                   </select>
                 </div>
                 <div>
