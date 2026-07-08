@@ -58,107 +58,141 @@ exports.submitOrder = async (req, res) => {
       const workbook = new ExcelJS.Workbook();
       const sheet = workbook.addWorksheet(`Quote Request ${orderSerialNumber}`);
 
-      // Setup sheet columns
+      // Column layout (0-indexed): A=sr, B=name, C=code, D=image, E=finish, F=metal, G=qty, H=price, I=total
       sheet.columns = [
-        { header: 'Product Name', key: 'name', width: 25 },
-        { header: 'Design Code', key: 'code', width: 15 },
-        { header: 'Metal Type', key: 'metal', width: 15 },
-        { header: 'Custom Finish', key: 'finish', width: 20 },
-        { header: 'Quantity Range', key: 'qty', width: 18 },
-        { header: 'Product Image', key: 'image', width: 22 }, // Column F
-        { header: 'Unit Price (Fill Here)', key: 'price', width: 25 },
-        { header: 'Total Price (Fill Here)', key: 'total', width: 25 }
+        { key: 'sr',     width: 6  }, // A — Sr. No.
+        { key: 'name',   width: 28 }, // B — Product Name
+        { key: 'code',   width: 16 }, // C — Design Code
+        { key: 'image',  width: 22 }, // D — Product Image
+        { key: 'finish', width: 22 }, // E — Custom Finish
+        { key: 'metal',  width: 16 }, // F — Metal Type
+        { key: 'qty',    width: 18 }, // G — Quantity Range
+        { key: 'price',  width: 25 }, // H — Unit Price (Fill Here)
+        { key: 'total',  width: 25 }, // I — Total Price (Fill Here)
       ];
 
-      // Insert Customer Details
+      // ── Customer Details block (rows 1–9) ──────────────────────────────
       sheet.insertRow(1, ['--- CUSTOMER DETAILS ---']);
       sheet.insertRow(2, ['Order Number:', orderSerialNumber]);
-      sheet.insertRow(3, ['Name:', contactDetails.fullName]);
-      sheet.insertRow(4, ['Email:', contactDetails.email]);
-      sheet.insertRow(5, ['WhatsApp:', contactDetails.whatsappNo]);
-      sheet.insertRow(6, ['Company:', contactDetails.companyName || "N/A"]);
-      sheet.insertRow(7, ['Country:', contactDetails.country]);
-      sheet.insertRow(8, ['Message:', contactDetails.message]);
-      sheet.insertRow(9, []); 
-      sheet.insertRow(10, ['--- PRODUCT DETAILS ---']);
-      
-      // Format headers
-      sheet.getRow(11).font = { bold: true };
-      sheet.getRow(11).height = 24;
-      sheet.getRow(11).eachCell((cell) => {
-        cell.alignment = { vertical: 'middle', horizontal: 'center' };
+      sheet.insertRow(3, ['Name:',         contactDetails.fullName]);
+      sheet.insertRow(4, ['Email:',        contactDetails.email]);
+      sheet.insertRow(5, ['WhatsApp:',     contactDetails.whatsappNo]);
+      sheet.insertRow(6, ['Company:',      contactDetails.companyName || 'N/A']);
+      sheet.insertRow(7, ['Country:',      contactDetails.country]);
+      sheet.insertRow(8, ['Message:',      contactDetails.message]);
+      sheet.insertRow(9, []);
+
+      // ── "PRODUCT DETAILS" heading row (row 10) — merged across all 9 columns ──
+      sheet.insertRow(10, ['PRODUCT DETAILS']);
+      const headingRow = sheet.getRow(10);
+      headingRow.height = 28;
+      headingRow.font = { bold: true, size: 13, color: { argb: 'FFFFFFFF' } };
+      headingRow.getCell(1).alignment = { vertical: 'middle', horizontal: 'center' };
+      headingRow.getCell(1).fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FF0082A4' } };
+      // Merge A10:I10 so the heading spans all 9 columns
+      sheet.mergeCells('A10:I10');
+
+      // ── Product table column headers (row 11) ──────────────────────────
+      const productHeaderRow = sheet.insertRow(11, [
+        'Sr.', 'Product Name', 'Design Code', 'Product Image',
+        'Custom Finish', 'Metal Type', 'Quantity Range',
+        'Unit Price (Fill Here)', 'Total Price (Fill Here)'
+      ]);
+      productHeaderRow.height = 24;
+      productHeaderRow.font = { bold: true };
+      productHeaderRow.eachCell((cell) => {
+        cell.alignment = { vertical: 'middle', horizontal: 'center', wrapText: true };
+        cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFD9EAD3' } };
+        cell.border = {
+          top:    { style: 'thin' }, bottom: { style: 'thin' },
+          left:   { style: 'thin' }, right:  { style: 'thin' }
+        };
       });
 
-      // Loop through items and add rows dynamically
-      for (const item of orderItems) {
-        // Add text data first
+      // ── Product data rows (row 11 onwards) ────────────────────────────
+      for (let i = 0; i < orderItems.length; i++) {
+        const item = orderItems[i];
+
+        // Image column (D) is left empty for text — image overlaid separately
         const addedRow = sheet.addRow({
-          name: item.productName,
-          code: item.designCode,
-          metal: item.metalType,
+          sr:     i + 1,
+          name:   item.productName,
+          code:   item.designCode,
+          image:  '',            // D — filled by addImage below
           finish: item.customFinish,
-          qty: item.quantityBand,
-          price: '', 
-          total: ''  
+          metal:  item.metalType,
+          qty:    item.quantityBand,
+          price:  '',
+          total:  ''
         });
 
-        const currentRowNumber = addedRow.number; 
+        const currentRowNumber = addedRow.number;
+        addedRow.height = 100; // ~133px — enough room for the image
 
-        // FIX 1: Increase Row height strictly to 100 points (~133 pixels)
-        addedRow.height = 100; 
         addedRow.eachCell((cell) => {
           cell.alignment = { vertical: 'middle', horizontal: 'center', wrapText: true };
+          cell.border = {
+            top:    { style: 'thin' }, bottom: { style: 'thin' },
+            left:   { style: 'thin' }, right:  { style: 'thin' }
+          };
         });
+        // Product Name left-aligned for readability
         addedRow.getCell('name').alignment = { vertical: 'middle', horizontal: 'left', wrapText: true };
 
-        // Fetch and inject Image with Aspect Ratio Preservation
+        // ── Inline image in column D (index 3) ─────────────────────────
         if (item.imageUrl) {
           try {
             const imageFetchResponse = await fetch(item.imageUrl);
-            
+
             if (imageFetchResponse.ok) {
               const arrayBuffer = await imageFetchResponse.arrayBuffer();
               const binaryBuffer = Buffer.from(arrayBuffer);
 
-              // 1. Get exact dimensions of the fetched image
               let dimensions;
               try {
                 dimensions = sizeOf(binaryBuffer);
-              } catch (e) {
-                dimensions = { width: 100, height: 100 }; // Fallback if format is unreadable
+              } catch {
+                dimensions = { width: 100, height: 100 };
               }
 
-              // FIX 2: Restrict Max Image Pixel size to 100x100 to easily fit inside the 133px row
-              const maxWidth = 100;
+              const maxWidth  = 100;
               const maxHeight = 100;
               const ratio = Math.min(maxWidth / dimensions.width, maxHeight / dimensions.height);
-              
-              const scaledWidth = Math.round(dimensions.width * ratio);
+              const scaledWidth  = Math.round(dimensions.width  * ratio);
               const scaledHeight = Math.round(dimensions.height * ratio);
 
-              // 3. Define extension
               let inferredExtension = 'jpeg';
               if (item.imageUrl.toLowerCase().endsWith('.png')) inferredExtension = 'png';
               if (item.imageUrl.toLowerCase().endsWith('.gif')) inferredExtension = 'gif';
 
-              // 4. Register image in the workbook
               const registeredImageId = workbook.addImage({
                 buffer: binaryBuffer,
                 extension: inferredExtension
               });
 
-              // 5. Inject using `ext` (exact pixels)
+              // Center image inside column D cell
+              // Column D width = 22 chars ≈ 165px; row height = 100pt ≈ 133px
+              const colWidthPx  = 22 * 7.5;   // ~165px
+              const rowHeightPx = 100 * 1.33;  // ~133px
+
+              // Fractional offsets so image lands in the middle of the cell
+              const colOffset = (colWidthPx  - scaledWidth)  / 2 / colWidthPx;   // fraction of column width
+              const rowOffset = (rowHeightPx - scaledHeight) / 2 / rowHeightPx;  // fraction of row height
+
               sheet.addImage(registeredImageId, {
-                tl: { col: 5.2, row: currentRowNumber - 0.9 }, // Slight padding to push it down/right into the cell
-                ext: { width: scaledWidth, height: scaledHeight }, // Lock exact pixel aspect ratio
+                tl: {
+                  col: 3 + colOffset,                        // D column (0-indexed) + horizontal centering
+                  row: (currentRowNumber - 1) + rowOffset    // data row (0-indexed) + vertical centering
+                },
+                ext: { width: scaledWidth, height: scaledHeight },
                 editAs: 'oneCell'
               });
             } else {
-              sheet.getCell(`F${currentRowNumber}`).value = "Image Not Found";
+              sheet.getCell(`D${currentRowNumber}`).value = 'Image Not Found';
             }
           } catch (fetchError) {
             console.error(`Failed to compile image for row ${currentRowNumber}:`, fetchError);
-            sheet.getCell(`F${currentRowNumber}`).value = "Image Error";
+            sheet.getCell(`D${currentRowNumber}`).value = 'Image Error';
           }
         }
       }
