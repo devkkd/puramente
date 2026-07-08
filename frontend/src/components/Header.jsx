@@ -409,7 +409,7 @@ export default function Header() {
             ) : (
               <Link href="/account" className="hidden lg:flex items-center space-x-2 bg-white text-black px-5 py-2.5 rounded-2xl text-sm font-medium hover:bg-gray-50 transition-colors shadow-sm notranslate">
                 <User size={18} strokeWidth={1.5} />
-                <span>Account</span>
+                <span>Login / Register</span>
               </Link>
             )}
 
