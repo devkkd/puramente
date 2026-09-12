@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 
 // Timeline Data Structure
 const journeyData = [
@@ -32,6 +32,21 @@ const journeyData = [
 ];
 
 export default function OurStoryPage() {
+  useEffect(() => {
+    document.title = "Best Jewelry Manufacturers in India | Puramente jewel";
+
+    let metaDesc = document.querySelector('meta[name="description"]');
+    if (!metaDesc) {
+      metaDesc = document.createElement("meta");
+      metaDesc.setAttribute("name", "description");
+      document.head.appendChild(metaDesc);
+    }
+    metaDesc.setAttribute(
+      "content",
+      "Discover Puramente Jewel, one of the jewelry manufacturers in India, creating ethical, quality jewelry for retailers and international brands."
+    );
+  }, []);
+
   // State for the interactive timeline
   const [activeIndex, setActiveIndex] = useState(0);
   

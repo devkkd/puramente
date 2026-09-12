@@ -6,6 +6,21 @@ import { getUserProfile, submitCustomRequest, getCategories } from "@/lib/api";
 import { COUNTRIES } from "@/lib/countries";
 
 export default function CustomJewelryPage() {
+  useEffect(() => {
+    document.title = "Custom Jewelry Manufacturers for Global Brands";
+
+    let metaDesc = document.querySelector('meta[name="description"]');
+    if (!metaDesc) {
+      metaDesc = document.createElement("meta");
+      metaDesc.setAttribute("name", "description");
+      document.head.appendChild(metaDesc);
+    }
+    metaDesc.setAttribute(
+      "content",
+      "Work with Puramente Jewel for custom jewelry manufacturing, private label and bespoke designs created for international brands and retailers."
+    );
+  }, []);
+
   const [loading, setLoading] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
   const fileInputRef = useRef(null);

@@ -56,6 +56,32 @@ export default function BlogDetailPage() {
     setOg("og:title", resolvedTitle);
     setOg("og:description", resolvedDesc);
     if (blog.imageUrl) setOg("og:image", blog.imageUrl);
+
+    // JSON-LD schema for SEO
+    if (blog.schema) {
+      const rawSchema = String(blog.schema).trim();
+      if (rawSchema) {
+        let scriptTag = document.querySelector('script[data-blog-schema="true"]');
+        if (!scriptTag) {
+          scriptTag = document.createElement("script");
+          scriptTag.setAttribute("type", "application/ld+json");
+          scriptTag.setAttribute("data-blog-schema", "true");
+          document.head.appendChild(scriptTag);
+        }
+
+        const cleanedSchema = rawSchema
+          .replace(/^<script[^>]*>/i, "")
+          .replace(/<\/script>\s*$/i, "")
+          .trim();
+
+        try {
+          JSON.parse(cleanedSchema);
+          scriptTag.textContent = cleanedSchema;
+        } catch (error) {
+          console.warn("Invalid blog schema JSON-LD skipped:", error.message);
+        }
+      }
+    }
   }, [data.blog]);
 
   if (loading) return <div className="min-h-screen flex items-center justify-center text-gray-400">Loading blog...</div>;

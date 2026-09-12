@@ -4,12 +4,34 @@ const { uploadToCloudflare } = require("../utils/upload");
 // Utility to create a URL-friendly slug
 const slugify = (text) => text.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)+/g, '');
 
+const normalizeSchemaMarkup = (schema) => {
+  if (typeof schema !== "string") return "";
+
+  let cleaned = schema.trim();
+  if (!cleaned) return "";
+
+  cleaned = cleaned
+    .replace(/^<script[^>]*>/i, "")
+    .replace(/<\/script>\s*$/i, "")
+    .trim();
+
+  if (!cleaned) return "";
+
+  try {
+    JSON.parse(cleaned);
+    return cleaned;
+  } catch (error) {
+    throw new Error("Schema markup must be valid JSON-LD.");
+  }
+};
+
 exports.createBlog = async (req, res) => {
   try {
-    const { title, excerpt, content, metaTitle, metaDescription } = req.body;
+    const { title, excerpt, content, metaTitle, metaDescription, schema } = req.body;
     if (!req.file) return res.status(400).json({ error: "Blog image is required." });
 
     const imageUrl = await uploadToCloudflare(req.file);
+    const normalizedSchema = normalizeSchemaMarkup(schema);
     
     // Ensure unique slug
     let baseSlug = slugify(title);
@@ -20,12 +42,15 @@ exports.createBlog = async (req, res) => {
       counter++;
     }
 
-    const newBlog = new Blog({ title, slug, excerpt, content, imageUrl, metaTitle, metaDescription });
+    const newBlog = new Blog({ title, slug, excerpt, content, imageUrl, metaTitle, metaDescription, schema: normalizedSchema });
     await newBlog.save();
 
     res.status(201).json({ success: true, data: newBlog });
   } catch (error) {
     console.error("Error creating blog:", error);
+    if (error.message === "Schema markup must be valid JSON-LD.") {
+      return res.status(400).json({ error: error.message });
+    }
     res.status(500).json({ error: "Server error" });
   }
 };
@@ -68,12 +93,19 @@ exports.getBlogById = async (req, res) => {
 // --- NEW: Update Blog ---
 exports.updateBlog = async (req, res) => {
   try {
-    const { title, excerpt, content, metaTitle, metaDescription } = req.body;
+    const { title, excerpt, content, metaTitle, metaDescription, schema } = req.body;
     let blog = await Blog.findById(req.params.id);
     
     if (!blog) return res.status(404).json({ error: "Blog not found" });
 
-    const updates = { title, excerpt, content, metaTitle, metaDescription };
+    const updates = {
+      title,
+      excerpt,
+      content,
+      metaTitle,
+      metaDescription,
+      schema: normalizeSchemaMarkup(schema)
+    };
 
     // If a new image was uploaded, process it
     if (req.file) {
@@ -96,6 +128,9 @@ exports.updateBlog = async (req, res) => {
     res.status(200).json({ success: true, data: blog });
   } catch (error) {
     console.error("Error updating blog:", error);
+    if (error.message === "Schema markup must be valid JSON-LD.") {
+      return res.status(400).json({ error: error.message });
+    }
     res.status(500).json({ error: "Server error updating blog" });
   }
 };

@@ -33,6 +33,25 @@ function StoreContent() {
     "PLAIN WITHOUT GEMSTONE",
   ];
 
+  const categoryMetaMap = {
+    necklace: {
+      title: "Wholesale Necklaces Manufacturer India | Puramente jewel",
+      description: "Discover wholesale necklaces manufactured in India for retailers, fashion brands, online stores and international jewellery businesses."
+    },
+    ring: {
+      title: "Wholesale Rings Supplier for Retailers | Puramente jewel",
+      description: "Source wholesale rings from Puramente Jewel, a Jaipur jewelry manufacturer serving retailers, online stores and international jewelry brands."
+    },
+    earrings: {
+      title: "Wholesale Earrings Manufacturer India | Puramente jewel",
+      description: "Buy wholesale earrings from an Indian jewelry manufacturer. Explore gemstone, sterling silver and fashion earrings for retailers and brands."
+    },
+    bracelets: {
+      title: "Bracelet Manufacturers Jaipur India | Puramente jewel",
+      description: "Source bracelets from jewelry manufacturers in Jaipur. Puramente offers wholesale and custom jewelry solutions for global retailers and brands."
+    }
+  };
+
   // 2. Initialize Restoration Hook
   const { captureScrollState } = useScrollRestoration({
     activeTab,
@@ -141,6 +160,22 @@ function StoreContent() {
   }
 
   const displayTitle = categoryData?.name || categorySlug;
+  const currentCategoryMeta = categoryMetaMap[categorySlug?.toLowerCase()] || {
+    title: `${displayTitle || "Jewelry Design"} | Puramente jewel`,
+    description: "Wholesale jewelry collections from Puramente Jewel, crafted for retailers and global brands."
+  };
+
+  useEffect(() => {
+    document.title = currentCategoryMeta.title;
+
+    let metaDesc = document.querySelector('meta[name="description"]');
+    if (!metaDesc) {
+      metaDesc = document.createElement("meta");
+      metaDesc.setAttribute("name", "description");
+      document.head.appendChild(metaDesc);
+    }
+    metaDesc.setAttribute("content", currentCategoryMeta.description);
+  }, [currentCategoryMeta.title, currentCategoryMeta.description]);
 
   return (
     <main className="w-full bg-white font-mona pb-24">

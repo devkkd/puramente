@@ -95,7 +95,7 @@ export default function AdminNewBlogPage() {
           <div className="border border-gray-100 rounded-xl p-5 bg-gray-50/50 space-y-4">
             <p className="text-sm font-bold text-gray-700 flex items-center gap-2">
               <span className="w-2 h-2 rounded-full bg-[#0082A4] inline-block"></span>
-              SEO Meta (Optional)
+              SEO Meta & Schema (Optional)
             </p>
 
             <div>
@@ -125,6 +125,18 @@ export default function AdminNewBlogPage() {
                 className="w-full bg-white border border-gray-200 p-3.5 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#0082A4]/20 focus:border-[#0082A4] transition-all text-sm text-gray-900 resize-none"
               ></textarea>
             </div>
+
+            <div>
+              <label className="block text-sm font-semibold text-gray-600 mb-1">
+                JSON-LD Schema
+              </label>
+              <textarea
+                name="schema"
+                rows="8"
+                placeholder='Paste a valid JSON-LD object like {"@context":"https://schema.org","@type":"Article",...} or paste a script tag content.'
+                className="w-full bg-white border border-gray-200 p-3.5 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#0082A4]/20 focus:border-[#0082A4] transition-all text-sm text-gray-900 resize-none font-mono"
+              ></textarea>
+            </div>
           </div>
 
           <div>
@@ -134,7 +146,7 @@ export default function AdminNewBlogPage() {
               <input 
                 type="file" 
                 name="image" 
-                accept="image/*" 
+                accept=".png,.jpg,.jpeg,image/png,image/jpeg,image/jpg" 
                 required 
                 onChange={handleImageChange} 
                 className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10" 

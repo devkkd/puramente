@@ -11,18 +11,21 @@ const upload = multer({
     fileSize: 50 * 1024 * 1024, // Absolute limit: 50MB
   },
   fileFilter: (req, file, cb) => {
-    // Allow images, videos, and Excel/CSV files
+    const ext = file.originalname?.split('.').pop()?.toLowerCase() || "";
+    const mime = file.mimetype || "";
+
+    const isImage = ["jpg", "jpeg", "png", "webp"].includes(ext) || ["image/jpeg", "image/jpg", "image/png", "image/webp"].includes(mime);
     const isSpreadsheet = 
-      file.mimetype === "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" ||
-      file.mimetype === "application/vnd.ms-excel" ||
-      file.mimetype === "text/csv" ||
-      file.mimetype === "application/csv" ||
+      mime === "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" ||
+      mime === "application/vnd.ms-excel" ||
+      mime === "text/csv" ||
+      mime === "application/csv" ||
       file.originalname.match(/\.(xlsx|xls|csv)$/i);
 
-    if (file.mimetype.startsWith('image/') || file.mimetype.startsWith('video/') || isSpreadsheet) {
+    if (isImage || mime.startsWith('video/') || isSpreadsheet) {
       cb(null, true);
     } else {
-      cb(new Error("Invalid file type. Only images, videos, and Excel/CSV files are allowed."), false);
+      cb(new Error("Invalid file type. Only PNG, JPG, JPEG, WebP, videos, and Excel/CSV files are allowed."), false);
     }
   }
 });

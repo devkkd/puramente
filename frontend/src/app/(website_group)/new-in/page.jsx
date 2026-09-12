@@ -9,6 +9,21 @@ import { ArrowUp } from "lucide-react";
 import { useScrollRestoration } from "@/hooks/useScrollRestoration";
 
 export default function NewArrivalsPage() {
+  useEffect(() => {
+    document.title = "New Wholesale Jewelry Collections | Puramente jewel";
+
+    let metaDesc = document.querySelector('meta[name="description"]');
+    if (!metaDesc) {
+      metaDesc = document.createElement("meta");
+      metaDesc.setAttribute("name", "description");
+      document.head.appendChild(metaDesc);
+    }
+    metaDesc.setAttribute(
+      "content",
+      "Discover new wholesale jewelry collections from India, created for global retailers, brands and online stores. Explore the latest designs and enquire now."
+    );
+  }, []);
+
   const router = useRouter();
 
   // State for data

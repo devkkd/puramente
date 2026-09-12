@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { useEffect } from "react";
 import Image from "next/image";
 import { 
   TreeDeciduous, 
@@ -103,6 +103,21 @@ const passions = [
 ];
 
 export default function FairTradePage() {
+  useEffect(() => {
+    document.title = "Ethical Jewelry Manufacturer | Puramente Jewel";
+
+    let metaDesc = document.querySelector('meta[name="description"]');
+    if (!metaDesc) {
+      metaDesc = document.createElement("meta");
+      metaDesc.setAttribute("name", "description");
+      document.head.appendChild(metaDesc);
+    }
+    metaDesc.setAttribute(
+      "content",
+      "Discover ethical jewelry manufacturing at Puramente Jewel, with responsible sourcing, fair trade practices and artisan craftsmanship in Jaipur."
+    );
+  }, []);
+
   return (
     <main className="w-full bg-white font-mona pb-24">
       

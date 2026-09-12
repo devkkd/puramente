@@ -23,6 +23,11 @@ export function generateStaticParams() {
   return LOCALES.map((locale) => ({ locale }));
 }
 
+export const metadata = {
+  title: "Jewelry Manufacturer & Wholesaler | Puramente Jewel",
+  description: "Partner with Puramente Jewel for wholesale, custom & private-label jewelry from India. Serving global brands and retailers with trusted quality."
+};
+
 export default async function LocaleHomePage({ params }) {
   const { locale } = await params;
 

@@ -1,11 +1,26 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import DelhiFair from "@/components/DelhiFair";
 import { Calendar, MapPin, Ticket } from "lucide-react";
 
 export default function ExhibitionsPage() {
+  useEffect(() => {
+    document.title = "Jewelry Exhibitions Worldwide | Puramente Jewel";
+
+    let metaDesc = document.querySelector('meta[name="description"]');
+    if (!metaDesc) {
+      metaDesc = document.createElement("meta");
+      metaDesc.setAttribute("name", "description");
+      document.head.appendChild(metaDesc);
+    }
+    metaDesc.setAttribute(
+      "content",
+      "Meet Puramente Jewel at global jewelry exhibitions and discover wholesale, custom and private-label jewelry from India. Meet our team today."
+    );
+  }, []);
+
   const [activeTab, setActiveTab] = useState("UPCOMING");
 
   return (

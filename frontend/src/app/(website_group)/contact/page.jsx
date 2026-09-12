@@ -1,11 +1,26 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Plane, TrainFront, Car, CheckCircle2 } from "lucide-react";
 import { submitContactEnquiry } from "@/lib/api";
 import { COUNTRIES } from "@/lib/countries";
 
 export default function ContactUsPage() {
+  useEffect(() => {
+    document.title = "Best Jewelry Supplier India | Puramente Jewel";
+
+    let metaDesc = document.querySelector('meta[name="description"]');
+    if (!metaDesc) {
+      metaDesc = document.createElement("meta");
+      metaDesc.setAttribute("name", "description");
+      document.head.appendChild(metaDesc);
+    }
+    metaDesc.setAttribute(
+      "content",
+      "Contact Puramente Jewel for wholesale jewelry, custom manufacturing, private label, OEM and jewelry sourcing from India. Request a quote today."
+    );
+  }, []);
+
   const [loading, setLoading] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
 
