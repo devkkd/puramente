@@ -10,7 +10,7 @@ const DelhiFair = ({ isExhibitionPage = false }) => {
 
   const targetDate = new Date('2026-10-13T09:00:00').getTime();
 
-  const [timeLeft, setTimeLeft] = useState({ months: 0, days: 0, hours: 0, minutes: 0 });
+  const [timeLeft, setTimeLeft] = useState({ days: 0, hours: 0, minutes: 0, seconds: 0 });
 
 
 
@@ -26,19 +26,19 @@ const DelhiFair = ({ isExhibitionPage = false }) => {
 
       return {
 
-        months: Math.floor(totalDays / 30),
-
-        days: totalDays % 30,
+        days: totalDays,
 
         hours: Math.floor((difference % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60)),
 
         minutes: Math.floor((difference % (1000 * 60 * 60)) / (1000 * 60)),
 
+        seconds: Math.floor((difference % (1000 * 60)) / 1000),
+
       };
 
     }
 
-    return { months: 0, days: 0, hours: 0, minutes: 0 };
+    return { days: 0, hours: 0, minutes: 0, seconds: 0 };
 
   };
 
@@ -62,13 +62,13 @@ const DelhiFair = ({ isExhibitionPage = false }) => {
 
   const timeUnits = [
 
-    { label: 'Months', value: timeLeft.months },
-
     { label: 'Days', value: timeLeft.days },
 
     { label: 'Hours', value: timeLeft.hours },
 
     { label: 'Minutes', value: timeLeft.minutes },
+
+    { label: 'Seconds', value: timeLeft.seconds },
 
   ];
 
@@ -138,7 +138,7 @@ const DelhiFair = ({ isExhibitionPage = false }) => {
 
             <img
 
-              src="/images/home/delhiIMG.svg"
+              src="/images/home/exhibhition.jpeg"
 
               alt="Puramente International Exhibition Booth"
 
@@ -256,7 +256,7 @@ const DelhiFair = ({ isExhibitionPage = false }) => {
 
                         { color: '#ff9f39', title: 'Dates', line1: '13 – 17 Oct 2026', line2: 'Autumn Edition' },
 
-                        { color: '#00a3c4', title: 'Hours', line1: '9 AM – 6 PM', line2: 'Daily' },
+                        { color: '#00a3c4', title: 'Booth', line1: 'Hall No. 18', line2: 'Booth No. K-02/14' },
 
                       ].map(({ color, title, line1, line2 }) => (
 
