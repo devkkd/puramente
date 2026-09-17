@@ -150,15 +150,6 @@ function StoreContent() {
   const displayedProducts = filteredProducts.slice(0, visibleCount);
   const hasMore = filteredProducts.length > visibleCount;
 
-  if (loading) {
-    return (
-      <div className="w-full min-h-[60vh] flex flex-col items-center justify-center font-mona text-gray-500">
-        <div className="w-10 h-10 border-4 border-[#E2FCFF] border-t-[#0082A4] rounded-full animate-spin mb-4"></div>
-        <span className="uppercase tracking-widest text-xs font-bold text-[#00a3c4]">Loading Collection...</span>
-      </div>
-    );
-  }
-
   const displayTitle = categoryData?.name || categorySlug;
   const currentCategoryMeta = categoryMetaMap[categorySlug?.toLowerCase()] || {
     title: `${displayTitle || "Jewelry Design"} | Puramente jewel`,
@@ -176,6 +167,15 @@ function StoreContent() {
     }
     metaDesc.setAttribute("content", currentCategoryMeta.description);
   }, [currentCategoryMeta.title, currentCategoryMeta.description]);
+
+  if (loading) {
+    return (
+      <div className="w-full min-h-[60vh] flex flex-col items-center justify-center font-mona text-gray-500">
+        <div className="w-10 h-10 border-4 border-[#E2FCFF] border-t-[#0082A4] rounded-full animate-spin mb-4"></div>
+        <span className="uppercase tracking-widest text-xs font-bold text-[#00a3c4]">Loading Collection...</span>
+      </div>
+    );
+  }
 
   return (
     <main className="w-full bg-white font-mona pb-24">
