@@ -3,6 +3,8 @@ import { NextResponse } from "next/server";
 // ─── Supported locales ────────────────────────────────────────────────────────
 export const LOCALES = [
   "en-in",  // India (default)
+  "en-ae",  // UAE / Middle East
+  "en-ca",  // Canada
   "en-gb",  // United Kingdom
   "en-fr",  // France
   "en-de",  // Germany
