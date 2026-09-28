@@ -15,8 +15,11 @@ const {
 
 // --- PUBLIC ROUTES (No token required) ---
 router.get("/", getProducts);
-router.get("/:id", getProductById);
+
+// IMPORTANT: slug route must come before /:id
 router.get("/slug/:slug", getProductBySlug);
+
+router.get("/:id", getProductById);
 
 // --- PROTECTED ADMIN ROUTES (Requires valid Token + Admin status) ---
 const handleUpload = (multerMiddleware) => {

@@ -27,6 +27,92 @@ const faqs = [
   {
     question: "How can I contact Puramente International for inquiries or orders?",
     answer: "Reach us via our contact form, email at info@puramentejewel.com, or phone at +91 9314 346 148. Our team responds within 24 hours."
+  },
+
+  // New FAQs
+  {
+    question: "Do you offer wholesale jewellery?",
+    answer: "Of course, Puramente International offers to wholesale jewellery retailers, jewellery boutiques, jewellery brands and professional jewellery buyers internationally."
+  },
+  {
+    question: "What is the minimum order quantity (MOQ) for wholesale orders?",
+    answer: "The MOQ for a project will depend on the designs, materials and customization requirements. For wholesale order quantities please contact our team."
+  },
+  {
+    question: "How can I request wholesale pricing?",
+    answer: "Please call Puramente International with your needs, your chosen designs and quantity to receive a bespoke wholesale quotation."
+  },
+  {
+    question: "Do you provide a wholesale jewellery catalogue?",
+    answer: "Absolutely wholesale buyers are welcome to access our jewellery collections and product catalogue for sourcing and bulk orders."
+  },
+  {
+    question: "Can retailers order jewellery in bulk?",
+    answer: "Yes you can order in bulk from our range of collections with retailers, boutiques, online stores and jewellery brands."
+  },
+  {
+    question: "Can I order multiple designs in one wholesale order?",
+    answer: "Yes, wholesale buyers can select multiple jewelry designs according to stock, amount, and the needs of the order."
+  },
+  {
+    question: "How can I become a wholesale buyer?",
+    answer: "Contact your business and ask about wholesale collaboration and ordering with Puramente International."
+  },
+  {
+    question: "Is your jewellery made with 925 sterling silver?",
+    answer: "Yes, Puramente International does have jewellery in high quality 925 sterling silver as well as other chosen jewellery materials."
+  },
+  {
+    question: "Is your sterling silver hallmarked?",
+    answer: "The truth is that Puramente International incorporates stamped 925 sterling silver in its jewellery making and quality."
+  },
+  {
+    question: "What materials are used to make your jewellery?",
+    answer: "Puramente International uses high-quality brass, silver certified 925 and gemstones for its jewellery."
+  },
+  {
+    question: "What types of gemstones do you use?",
+    answer: "We carry a variety of gems including moonstone, labradorite and a selection of other stones which have been hand picked for our jewellery collections."
+  },
+  {
+    question: "Are your gemstones ethically sourced?",
+    answer: "Puramente International states that it works with ethical materials and responsible sourcing in its production of jewellery."
+  },
+  {
+    question: "How many countries do you export to?",
+    answer: "Puramente International ship to over 40 countries and are proud to serve retailers and jewellery buyers worldwide."
+  },
+  {
+    question: "Do you provide export documentation (Certificate of Origin, Invoice, Packing List)?",
+    answer: "With our team, you can discuss export documentation based on your order needs and applicable international shipping regulations based on the destination."
+  },
+  {
+    question: "How is jewellery packaged for international shipping?",
+    answer: "Jewellery is packaged with care to ensure that pieces are safe, and are packaged to ensure a fine presentation."
+  },
+  {
+    question: "What fair-trade or ethical practices does Puramente follow?",
+    answer: "Puramente takes pride in ethical sourcing, fair wages, artisan based production and responsible practices, backed up by its fair-trade commitments."
+  },
+  {
+    question: "Do you provide private label jewellery?",
+    answer: "Yes, Puramente International offers private label jewellery solutions for brands who want to come up with customized jewellery products under their own brand identity."
+  },
+  {
+    question: "Do you provide custom packaging and branding?",
+    answer: "Yes, private label and bespoke jewellery needs can be discussed about custom packaging and branding."
+  },
+  {
+    question: "Is Puramente Jewel a jewellery manufacturer or wholesaler?",
+    answer: "Puramente Jewel is a jewellery manufacturer and wholesaler, offering to jewellery retailers, brands, boutiques and trade buyers."
+  },
+  {
+    question: "What types of jewellery does Puramente Jewel offer?",
+    answer: "Puramente Jewel is an excellent jewellery retailer supplying rings, earrings, necklaces, bracelets, statement jewellery and bespoke rings for jewellery buyers worldwide."
+  },
+  {
+    question: "Can brands order custom jewellery in bulk?",
+    answer: "Yes, brands can order custom jewellery in bulk, where the designs are created based on their needs and brand identity."
   }
 ];
 
