@@ -1,6 +1,7 @@
 import { Mona_Sans, Playfair_Display } from "next/font/google";
 import Script from "next/script";
 import "./globals.css";
+import ExhibitionPopup from "@/components/ExhibitionPopup";
 
 // Configure Mona Sans — only load weights actually used in the design
 const monaSans = Mona_Sans({
@@ -36,6 +37,7 @@ export default function RootLayout({ children }) {
       className={`${monaSans.variable} ${playfair.variable} h-full antialiased`}
     >
       <body className="min-h-full">
+        <ExhibitionPopup />
         {children}
 
         {/* Google Analytics */}
