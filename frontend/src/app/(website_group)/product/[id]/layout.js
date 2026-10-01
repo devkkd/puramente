@@ -6,7 +6,7 @@ export async function generateMetadata({ params }) {
 
   try {
     const res = await fetch(`${API_URL}/products/${id}`, {
-      next: { revalidate: 3600 },
+      cache: "no-store",
     });
     const data = await res.json();
     const product = data?.data;
