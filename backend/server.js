@@ -1,5 +1,6 @@
 ﻿require("dotenv").config();
 // Fix for DNS SRV resolution (required for MongoDB Atlas on some systems)
+// fix dns changes
 // const dns = require("dns");
 // dns.setServers(["8.8.8.8", "8.8.4.4", "1.1.1.1"]);
 
