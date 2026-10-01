@@ -1,4 +1,4 @@
-// utils/seoHelper.js
+﻿// utils/seoHelper.js
 
 /**
  * Generate Product Schema (JSON-LD) for SEO
@@ -6,7 +6,7 @@
  * @param {string} baseUrl - Base URL of the website
  * @returns {Object} Structured schema object
  */
-exports.generateProductSchema = (product, baseUrl = process.env.FRONTEND_URL || 'https://puramente.com') => {
+exports.generateProductSchema = (product, baseUrl = process.env.FRONTEND_URL || 'https://puramentejewel.com') => {
   // Use slug if available, otherwise use product ID
   const productSlug = product.slug || product._id;
   const productUrl = `${baseUrl}/product/${productSlug}`;
@@ -39,7 +39,7 @@ exports.generateProductSchema = (product, baseUrl = process.env.FRONTEND_URL || 
  * @param {string} baseUrl - Base URL of the website
  * @returns {Object} Structured schema object
  */
-exports.generateCategorySchema = (category, baseUrl = process.env.FRONTEND_URL || 'https://puramente.com') => {
+exports.generateCategorySchema = (category, baseUrl = process.env.FRONTEND_URL || 'https://puramentejewel.com') => {
   const categoryUrl = `${baseUrl}/store/${category.name.toLowerCase().replace(/\s+/g, '-')}`;
   
   return {
@@ -62,7 +62,7 @@ exports.generateCategorySchema = (category, baseUrl = process.env.FRONTEND_URL |
  * @param {string} baseUrl - Base URL of the website
  * @returns {Object} Structured schema object
  */
-exports.generateOrganizationSchema = (baseUrl = process.env.FRONTEND_URL || 'https://puramente.com') => {
+exports.generateOrganizationSchema = (baseUrl = process.env.FRONTEND_URL || 'https://puramentejewel.com') => {
   return {
     "@context": "https://schema.org",
     "@type": "Organization",

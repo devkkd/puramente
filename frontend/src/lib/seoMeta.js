@@ -1,10 +1,10 @@
-// lib/seoMeta.js - Utility for rendering SEO meta tags and structured data
+﻿// lib/seoMeta.js - Utility for rendering SEO meta tags and structured data
 
 /**
  * Generate canonical URL for a page
  */
 export const getCanonicalUrl = (path) => {
-  const baseUrl = process.env.NEXT_PUBLIC_FRONTEND_URL || 'https://puramente.com';
+  const baseUrl = process.env.NEXT_PUBLIC_FRONTEND_URL || 'https://puramentejewel.com';
   return `${baseUrl}${path}`;
 };
 
@@ -53,7 +53,7 @@ export const getTwitterTags = (options = {}) => {
 /**
  * Generate structured data for Product schema
  */
-export const getProductSchema = (product, baseUrl = 'https://puramente.com') => {
+export const getProductSchema = (product, baseUrl = 'https://puramentejewel.com') => {
   const productSlug = product.slug || product._id;
   return {
     "@context": "https://schema.org/",
@@ -80,7 +80,7 @@ export const getProductSchema = (product, baseUrl = 'https://puramente.com') => 
 /**
  * Generate structured data for Category schema
  */
-export const getCategorySchema = (category, baseUrl = 'https://puramente.com') => {
+export const getCategorySchema = (category, baseUrl = 'https://puramentejewel.com') => {
   const categoryUrl = `${baseUrl}/store/${category.name?.toLowerCase().replace(/\s+/g, '-') || category._id}`;
   return {
     "@context": "https://schema.org/",
@@ -100,7 +100,7 @@ export const getCategorySchema = (category, baseUrl = 'https://puramente.com') =
 /**
  * Generate structured data for Organization
  */
-export const getOrganizationSchema = (baseUrl = 'https://puramente.com') => {
+export const getOrganizationSchema = (baseUrl = 'https://puramentejewel.com') => {
   return {
     "@context": "https://schema.org",
     "@type": "Organization",
@@ -140,7 +140,7 @@ export const getBreadcrumbSchema = (items = []) => {
  * Parse metadata from product or category object
  */
 export const extractSeoData = (entity, type = 'product', path = '') => {
-  const baseUrl = process.env.NEXT_PUBLIC_FRONTEND_URL || 'https://puramente.com';
+  const baseUrl = process.env.NEXT_PUBLIC_FRONTEND_URL || 'https://puramentejewel.com';
   const canonicalUrl = getCanonicalUrl(path);
 
   const metaTitle = entity?.seo?.metaTitle || 
@@ -170,7 +170,7 @@ export const createMetadata = (options = {}) => {
     title = 'Puramente - Luxury Jewelry & Bespoke Collections',
     description = 'Discover premium jewelry collections and bespoke designs at Puramente',
     image = '/images/og-default.jpg',
-    url = 'https://puramente.com',
+    url = 'https://puramentejewel.com',
     type = 'website',
     keywords = ['jewelry', 'luxury', 'bespoke', 'puramente']
   } = options;
