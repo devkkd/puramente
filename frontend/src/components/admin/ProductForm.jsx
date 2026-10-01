@@ -88,9 +88,12 @@ export default function ProductForm({ initialData = {}, categories = [], onSubmi
     setSeoSaveLoading(true);
     try {
       const token = localStorage.getItem("adminToken") || localStorage.getItem("token");
-      const payload = {
-        metaTitle: seoData.metaTitle,
-        metaDescription: seoData.metaDescription,
+      // Don't save placeholder/default text accidentally
+    const cleanTitle = seoData.metaTitle === "Meta Title (Google page title)" ? "" : seoData.metaTitle;
+    const cleanDesc = seoData.metaDescription === "Meta Description (search snippet)" ? "" : seoData.metaDescription;
+    const payload = {
+        metaTitle: cleanTitle,
+        metaDescription: cleanDesc,
         metaKeywords: seoData.metaKeywords,
         schema: seoData.schema ? JSON.parse(seoData.schema) : null
       };
