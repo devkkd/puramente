@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
 
-    <!-- India English Homepage -->
+    <!-- Homepage -->
     <url>
-        <loc>https://puramentejewel.com/en-in/</loc>
+        <loc>https://puramentejewel.com/</loc>
         <changefreq>weekly</changefreq>
         <priority>1.0</priority>
     </url>
@@ -14,19 +14,16 @@
         <changefreq>weekly</changefreq>
         <priority>0.9</priority>
     </url>
-
     <url>
-        <loc>https://puramentejewel.com/store/earring</loc>
+        <loc>https://puramentejewel.com/store/earrings</loc>
         <changefreq>weekly</changefreq>
         <priority>0.9</priority>
     </url>
-
     <url>
         <loc>https://puramentejewel.com/store/necklace</loc>
         <changefreq>weekly</changefreq>
         <priority>0.9</priority>
     </url>
-
     <url>
         <loc>https://puramentejewel.com/store/bracelet</loc>
         <changefreq>weekly</changefreq>
@@ -46,19 +43,16 @@
         <changefreq>monthly</changefreq>
         <priority>0.8</priority>
     </url>
-
     <url>
         <loc>https://puramentejewel.com/craftsmanship</loc>
         <changefreq>monthly</changefreq>
         <priority>0.8</priority>
     </url>
-
     <url>
         <loc>https://puramentejewel.com/sustainability</loc>
         <changefreq>monthly</changefreq>
         <priority>0.8</priority>
     </url>
-
     <url>
         <loc>https://puramentejewel.com/visit-studio</loc>
         <changefreq>monthly</changefreq>
@@ -67,7 +61,7 @@
 
     <!-- Custom Jewelry -->
     <url>
-        <loc>https://puramentejewel.com/make-your-design</loc>
+        <loc>https://puramentejewel.com/custom</loc>
         <changefreq>monthly</changefreq>
         <priority>0.9</priority>
     </url>
@@ -88,7 +82,7 @@
 
     <!-- Blog -->
     <url>
-        <loc>https://puramentejewel.com/blogs</loc>
+        <loc>https://puramentejewel.com/blog</loc>
         <changefreq>weekly</changefreq>
         <priority>0.8</priority>
     </url>
@@ -102,7 +96,7 @@
 
     <!-- FAQ -->
     <url>
-        <loc>https://puramentejewel.com/faq</loc>
+        <loc>https://puramentejewel.com/faqs</loc>
         <changefreq>monthly</changefreq>
         <priority>0.6</priority>
     </url>

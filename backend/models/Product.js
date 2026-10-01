@@ -56,6 +56,30 @@ const productSchema = new mongoose.Schema(
       type: mongoose.Schema.Types.ObjectId,
       ref: "Category",
       required: true
+    },
+
+    // SEO Fields
+    seo: {
+      metaTitle: {
+        type: String,
+        default: null,
+        trim: true,
+        maxlength: 60
+      },
+      metaDescription: {
+        type: String,
+        default: null,
+        trim: true,
+        maxlength: 160
+      },
+      metaKeywords: {
+        type: [String],
+        default: []
+      },
+      schema: {
+        type: mongoose.Schema.Types.Mixed,
+        default: null
+      }
     }
   },
   { timestamps: true }

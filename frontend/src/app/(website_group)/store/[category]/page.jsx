@@ -1,8 +1,10 @@
-"use client";
+﻿"use client";
 
 import React, { useState, useEffect, Suspense, useRef } from "react";
 import { useParams, useSearchParams, useRouter } from "next/navigation";
 import { getCategories, getProducts } from "@/lib/api";
+import { getCategorySchema, extractSeoData } from "@/lib/seoMeta";
+import StructuredData from "@/components/StructuredData";
 import ProductCard from "@/components/ProductCard";
 import { ArrowUp } from "lucide-react";
 import { useScrollRestoration } from "@/hooks/useScrollRestoration";
@@ -14,6 +16,7 @@ function StoreContent() {
   const categorySlug = params.category;
 
   const [categoryData, setCategoryData] = useState(null);
+  const [categorySchema, setCategorySchema] = useState(null);
   const [allProducts, setAllProducts] = useState([]);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [visibleCount, setVisibleCount] = useState(25);
@@ -103,6 +106,12 @@ function StoreContent() {
             (c) => c.name.toLowerCase() === categorySlug.toLowerCase()
           );
           setCategoryData(found || null);
+          
+          // Generate structured schema for category
+          if (found) {
+            const schema = getCategorySchema(found);
+            setCategorySchema(schema);
+          }
         }
         if (productsRes?.success && productsRes?.data) {
           const filtered = productsRes.data.filter(
@@ -157,6 +166,7 @@ function StoreContent() {
   };
 
   useEffect(() => {
+    // Update document meta tags for SEO
     document.title = currentCategoryMeta.title;
 
     let metaDesc = document.querySelector('meta[name="description"]');
@@ -166,7 +176,33 @@ function StoreContent() {
       document.head.appendChild(metaDesc);
     }
     metaDesc.setAttribute("content", currentCategoryMeta.description);
-  }, [currentCategoryMeta.title, currentCategoryMeta.description]);
+
+    // Update Open Graph tags
+    const createOrUpdateMetaTag = (property, content) => {
+      let tag = document.querySelector(`meta[property="${property}"]`);
+      if (!tag) {
+        tag = document.createElement('meta');
+        tag.setAttribute('property', property);
+        document.head.appendChild(tag);
+      }
+      tag.setAttribute('content', content);
+    };
+
+    createOrUpdateMetaTag('og:title', currentCategoryMeta.title);
+    createOrUpdateMetaTag('og:description', currentCategoryMeta.description);
+    createOrUpdateMetaTag('og:image', categoryData?.imageUrl || '');
+    createOrUpdateMetaTag('og:url', `https://puramente.com/store/${categorySlug}`);
+    createOrUpdateMetaTag('og:type', 'website');
+
+    // Update canonical URL
+    let canonical = document.querySelector('link[rel="canonical"]');
+    if (!canonical) {
+      canonical = document.createElement('link');
+      canonical.setAttribute('rel', 'canonical');
+      document.head.appendChild(canonical);
+    }
+    canonical.setAttribute('href', `https://puramente.com/store/${categorySlug}`);
+  }, [currentCategoryMeta.title, currentCategoryMeta.description, categoryData?.imageUrl, categorySlug]);
 
   if (loading) {
     return (
@@ -179,6 +215,8 @@ function StoreContent() {
 
   return (
     <main className="w-full bg-white font-mona pb-24">
+      {/* Render structured data for search engines */}
+      {categorySchema && <StructuredData schema={categorySchema} />}
       
       {/* --- RESTORED HEADER SECTION --- */}
       <div className="flex flex-col items-center text-center w-full pt-16 mb-10 px-4">

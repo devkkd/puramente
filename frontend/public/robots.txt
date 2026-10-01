@@ -1,4 +1,56 @@
+# Robots.txt for Puramente Jewel
+# Last Updated: 2024
+
+# Allow all search engines
 User-agent: *
 Allow: /
 
-Sitemap: https://puramentejewel.com/sitemap.xml
+# Disallow admin and private pages
+Disallow: /admin/
+Disallow: /account/
+Disallow: /api/
+Disallow: /_next/
+Disallow: /.next/
+Disallow: /private/
+
+# Crawl-delay for respectful crawling
+Crawl-delay: 1
+
+# Request-rate
+Request-rate: 1 requests per 10 seconds
+
+# Specific rules for Google
+User-agent: Googlebot
+Allow: /
+Crawl-delay: 0.5
+
+# Specific rules for Bing
+User-agent: Bingbot
+Allow: /
+Crawl-delay: 1
+
+# Block bad bots
+User-agent: MJ12bot
+Disallow: /
+
+User-agent: DotBot
+Disallow: /
+
+User-agent: SemrushBot
+Disallow: /
+
+# Allow images and media
+User-agent: *
+Allow: /public/images/
+Allow: *.jpg$
+Allow: *.jpeg$
+Allow: *.png$
+Allow: *.gif$
+Allow: *.webp$
+
+# Sitemap
+Sitemap: https://puramente.com/sitemap.xml
+
+# Search engines to notify
+# Google Search Console: https://search.google.com/search-console
+# Bing Webmaster Tools: https://www.bing.com/webmaster

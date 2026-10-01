@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import { useParams, useRouter } from "next/navigation";
 import Link from "next/link";
 import { ArrowLeft, Pencil } from "lucide-react";
-import { getCategoryById, updateCategory } from "@/lib/api";
+import { getCategoryById, updateCategory, updateCategorySeo } from "@/lib/api";
 import CategoryForm from "@/components/admin/CategoryForm";
 
 export default function EditCategoryPage() {

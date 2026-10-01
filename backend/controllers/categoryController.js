@@ -1,5 +1,6 @@
-const Category = require("../models/Category");
+﻿const Category = require("../models/Category");
 const { uploadToCloudflare } = require("../utils/upload");
+const { sanitizeSeoFields, generateCategorySchema } = require("../utils/seoHelper");
 
 // --- EXISTING: Create a new category ---
 exports.createCategory = async (req, res) => {
@@ -79,3 +80,38 @@ exports.updateCategory = async (req, res) => {
     res.status(500).json({ error: "Server error while updating category" });
   }
 };
+
+// --- NEW: Update category SEO fields ---
+exports.updateCategorySeo = async (req, res) => {
+  try {
+    const { metaTitle, metaDescription, metaKeywords } = req.body;
+    
+    let category = await Category.findById(req.params.id);
+    if (!category) {
+      return res.status(404).json({ error: "Category not found" });
+    }
+
+    // Sanitize and validate SEO fields
+    const seoData = sanitizeSeoFields(metaTitle, metaDescription, metaKeywords);
+    
+    // Generate schema if SEO data provided
+    if (seoData.metaTitle || seoData.metaDescription) {
+      seoData.schema = generateCategorySchema(category);
+    }
+
+    category.seo = { ...category.seo, ...seoData };
+    await category.save();
+
+    res.status(200).json({
+      success: true,
+      message: "Category SEO updated successfully",
+      data: category
+    });
+
+  } catch (error) {
+    console.error("Error updating category SEO:", error);
+    res.status(500).json({ error: "Server error while updating category SEO" });
+  }
+};
+
+

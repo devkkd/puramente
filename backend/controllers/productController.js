@@ -1,6 +1,7 @@
-const Product = require("../models/Product");
+﻿const Product = require("../models/Product");
 const Category = require("../models/Category");
 const { uploadToCloudflare } = require("../utils/upload");
+const { sanitizeSeoFields, generateProductSchema } = require("../utils/seoHelper");
 const xlsx = require("xlsx");
 
 // --- EXISTING: Create a new product ---
@@ -171,6 +172,39 @@ exports.updateProduct = async (req, res) => {
   }
 };
 
+// --- NEW: Update product SEO fields ---
+exports.updateProductSeo = async (req, res) => {
+  try {
+    const { metaTitle, metaDescription, metaKeywords } = req.body;
+    
+    let product = await Product.findById(req.params.id).populate("category");
+    if (!product) {
+      return res.status(404).json({ error: "Product not found" });
+    }
+
+    // Sanitize and validate SEO fields
+    const seoData = sanitizeSeoFields(metaTitle, metaDescription, metaKeywords);
+    
+    // Generate schema if SEO data provided
+    if (seoData.metaTitle || seoData.metaDescription) {
+      seoData.schema = generateProductSchema(product);
+    }
+
+    product.seo = { ...product.seo, ...seoData };
+    await product.save();
+
+    res.status(200).json({
+      success: true,
+      message: "Product SEO updated successfully",
+      data: product
+    });
+
+  } catch (error) {
+    console.error("Error updating product SEO:", error);
+    res.status(500).json({ error: "Server error while updating product SEO" });
+  }
+};
+
 // --- NEW: Delete a product ---
 exports.deleteProduct = async (req, res) => {
   try {
@@ -219,7 +253,7 @@ exports.bulkUploadProducts = async (req, res) => {
     // 2. BACKGROUND WORKER (Runs after response is sent)
     (async () => {
       try {
-        console.log("\n🚀 BACKGROUND WORKER STARTED: Parsing Excel File...");
+        console.log("\nðŸš€ BACKGROUND WORKER STARTED: Parsing Excel File...");
         const workbook = xlsx.read(excelFile.buffer, { type: 'buffer' });
         const sheetName = workbook.SheetNames[0]; 
         const rows = xlsx.utils.sheet_to_json(workbook.Sheets[sheetName]);
@@ -236,7 +270,7 @@ exports.bulkUploadProducts = async (req, res) => {
         let successCount = 0;
         let skipCount = 0;
 
-        console.log(`📦 Found ${rows.length} rows in Excel. Starting Cloudflare uploads...`);
+        console.log(`ðŸ“¦ Found ${rows.length} rows in Excel. Starting Cloudflare uploads...`);
 
         // Loop through Excel rows sequentially to prevent Cloudflare rate limits
         for (let i = 0; i < rows.length; i++) {
@@ -252,14 +286,14 @@ exports.bulkUploadProducts = async (req, res) => {
           const imgUrl = row['Image URL'] ? row['Image URL'].toString().trim() : null;
 
           if (!code || !name) {
-            console.log(`⚠️ Row ${i + 1}: Missing product code or product name. Skipping.`);
+            console.log(`âš ï¸ Row ${i + 1}: Missing product code or product name. Skipping.`);
             skipCount++;
             continue;
           }
 
           // 1. Resolve Category
           if (!catName) {
-            console.log(`⚠️ Row ${i + 1}: Category is missing for product "${name}" (${code}). Skipping.`);
+            console.log(`âš ï¸ Row ${i + 1}: Category is missing for product "${name}" (${code}). Skipping.`);
             skipCount++;
             continue;
           }
@@ -269,7 +303,7 @@ exports.bulkUploadProducts = async (req, res) => {
           );
 
           if (!matchedCategory) {
-            console.log(`⚠️ Row ${i + 1}: Category "${catName}" not found in database for product "${name}" (${code}). Skipping.`);
+            console.log(`âš ï¸ Row ${i + 1}: Category "${catName}" not found in database for product "${name}" (${code}). Skipping.`);
             skipCount++;
             continue;
           }
@@ -282,13 +316,13 @@ exports.bulkUploadProducts = async (req, res) => {
 
           // 3. Prevent duplicate designCode / slug
           if (existingDesignCodes.has(code.toUpperCase()) || insertedDesignCodesInBatch.has(code.toUpperCase())) {
-            console.log(`⚠️ Row ${i + 1}: Design Code "${code}" already exists in DB or current batch. Skipping.`);
+            console.log(`âš ï¸ Row ${i + 1}: Design Code "${code}" already exists in DB or current batch. Skipping.`);
             skipCount++;
             continue;
           }
 
           if (existingSlugs.has(generatedSlug.toLowerCase()) || insertedSlugsInBatch.has(generatedSlug.toLowerCase())) {
-            console.log(`⚠️ Row ${i + 1}: Generated Slug "${generatedSlug}" already exists in DB or current batch. Skipping.`);
+            console.log(`âš ï¸ Row ${i + 1}: Generated Slug "${generatedSlug}" already exists in DB or current batch. Skipping.`);
             skipCount++;
             continue;
           }
@@ -311,7 +345,7 @@ exports.bulkUploadProducts = async (req, res) => {
             });
 
             if (!matchedImage) {
-              console.log(`⚠️ Row ${i + 1}: Image file not found (searched for custom name: "${imgName || 'N/A'}" and code: "${code}"). Skipping.`);
+              console.log(`âš ï¸ Row ${i + 1}: Image file not found (searched for custom name: "${imgName || 'N/A'}" and code: "${code}"). Skipping.`);
               skipCount++;
               continue;
             }
@@ -320,7 +354,7 @@ exports.bulkUploadProducts = async (req, res) => {
               // Upload to Cloudflare
               imageUrl = await uploadToCloudflare(matchedImage);
             } catch (uploadError) {
-              console.error(`❌ Row ${i + 1}: Cloudflare upload failed for image "${matchedImage.originalname}":`, uploadError.message);
+              console.error(`âŒ Row ${i + 1}: Cloudflare upload failed for image "${matchedImage.originalname}":`, uploadError.message);
               skipCount++;
               continue;
             }
@@ -361,20 +395,20 @@ exports.bulkUploadProducts = async (req, res) => {
 
           // Log progress every 50 items so you know it's working
           if (successCount % 50 === 0) {
-            console.log(`⏳ Uploaded ${successCount} / ${rows.length} items to Cloudflare...`);
+            console.log(`â³ Uploaded ${successCount} / ${rows.length} items to Cloudflare...`);
           }
         }
 
         // Save everything to MongoDB at the very end
         if (productsToInsert.length > 0) {
-          console.log(`💾 Saving ${productsToInsert.length} products to MongoDB...`);
+          console.log(`ðŸ’¾ Saving ${productsToInsert.length} products to MongoDB...`);
           await Product.insertMany(productsToInsert);
         }
 
-        console.log(`✅ BACKGROUND TASK COMPLETE! Successfully added ${successCount} products. Skipped ${skipCount}.`);
+        console.log(`âœ… BACKGROUND TASK COMPLETE! Successfully added ${successCount} products. Skipped ${skipCount}.`);
 
       } catch (bgError) {
-        console.error("❌ Background Worker Crashed:", bgError);
+        console.error("âŒ Background Worker Crashed:", bgError);
       }
     })();
 
@@ -420,3 +454,5 @@ exports.uploadMedia = async (req, res) => {
     res.status(500).json({ success: false, error: "Server error uploading media." });
   }
 };
+
+

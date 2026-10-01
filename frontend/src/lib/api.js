@@ -1,26 +1,37 @@
-import axios from 'axios';
+﻿import axios from 'axios';
 
+// Write operations (create/update/delete) → local backend
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5001/api';
+// Read operations (products/categories/blogs) → production (has real data)
+const PROD_URL = process.env.NEXT_PUBLIC_PROD_API_URL || 'https://puramentejewel.com/api';
 
 export const api = axios.create({ baseURL: API_URL });
+export const prodApi = axios.create({ baseURL: PROD_URL });
 
-// --- NEW: Request Interceptor for Authentication ---
-// This automatically injects the JWT token into every API request
+// Auth token interceptor for local api
 api.interceptors.request.use(
     (config) => {
         if (typeof window !== "undefined") {
-            // Prioritize the adminToken if it exists, otherwise fall back to the userToken
             const token = localStorage.getItem("adminToken") || localStorage.getItem("userToken") || localStorage.getItem("token");
-            if (token) {
-                config.headers.Authorization = `Bearer ${token}`;
-            }
+            if (token) config.headers.Authorization = `Bearer ${token}`;
         }
         return config;
     },
     (error) => Promise.reject(error)
 );
 
-// Response Interceptor
+// Auth token interceptor for prodApi (admin reads need auth too)
+prodApi.interceptors.request.use(
+    (config) => {
+        if (typeof window !== "undefined") {
+            const token = localStorage.getItem("adminToken") || localStorage.getItem("userToken") || localStorage.getItem("token");
+            if (token) config.headers.Authorization = `Bearer ${token}`;
+        }
+        return config;
+    },
+    (error) => Promise.reject(error)
+);
+
 api.interceptors.response.use(
     (response) => response.data,
     (error) => {
@@ -29,16 +40,25 @@ api.interceptors.response.use(
     }
 );
 
-// --- Products & Categories ---
-export const getCategories = () => api.get('/categories');
-export const createCategory = (data) => api.post('/categories', data);
-export const getCategoryById = (id) => api.get(`/categories/${id}`);
-export const updateCategory = (id, data) => api.put(`/categories/${id}`, data);
+prodApi.interceptors.response.use(
+    (response) => response.data,
+    (error) => Promise.reject(error.response?.data || { error: "Server error" })
+);
 
-export const getProducts = () => api.get('/products');
-export const getProductById = (id) => api.get(`/products/${id}`);
+// --- Products & Categories ---
+// READ → production (real data), WRITE → local backend
+export const getCategories = () => prodApi.get('/categories');
+export const createCategory = (data) => api.post('/categories', data);
+export const getCategoryById = (id) => prodApi.get(`/categories/${id}`);
+export const updateCategory = (id, data) => prodApi.put(`/categories/${id}`, data);
+export const updateCategorySeo = (id, seoData) => prodApi.put(`/categories/${id}/seo`, seoData);
+
+export const getProducts = () => prodApi.get('/products');
+export const getProductById = (id) => prodApi.get(`/products/${id}`);
+export const getProductBySlug = (slug) => prodApi.get(`/products/slug/${slug}`);
 export const createProduct = (data) => api.post('/products', data);
-export const updateProduct = (id, data) => api.put(`/products/${id}`, data);
+export const updateProduct = (id, data) => prodApi.put(`/products/${id}`, data);
+export const updateProductSeo = (id, seoData) => prodApi.put(`/products/${id}/seo`, seoData);
 export const bulkUploadProducts = (data) => api.post('/products/bulk-upload', data);
 
 // --- Cart ---
@@ -51,8 +71,7 @@ export const removeFromCart = (data) => api.post('/cart/remove', data);
 export const registerUser = (data) => api.post('/auth/register', data);
 export const loginUser = (data) => api.post('/auth/login', data);
 export const getAdminUserCart = (id) => api.get(`/auth/admin/users/${id}/cart`);
-export const loginAdminUser = (data) => api.post('/auth/admin-login', data); // Admin login
-// --- NEW: Password Reset ---
+export const loginAdminUser = (data) => api.post('/auth/admin-login', data);
 export const forgotPassword = (data) => api.post('/auth/forgot-password', data);
 export const resetPassword = (token, data) => api.put(`/auth/reset-password/${token}`, data);
 
@@ -62,11 +81,11 @@ export const getUserProfile = (id) => api.get(`/auth/me/${id}`);
 // --- Orders ---
 export const submitOrderRequest = (data) => api.post('/orders/submit', data);
 
-// --- ADMIN ROUTES ---
+// --- ADMIN ROUTES (all on local backend) ---
 export const getAdminOrders = () => api.get('/orders/admin/all');
 export const getAdminOrderById = (id) => api.get(`/orders/admin/${id}`);
 export const updateOrderStatus = (id, status) => api.put(`/orders/admin/${id}/status`, { status });
-export const deleteAdminOrder = (id) => api.delete(`/orders/admin/${id}`);
+export const deleteAdminOrder = (id) => prodApi.delete(`/orders/admin/${id}`);
 export const getAdminUsers = () => api.get('/auth/admin/users');
 
 // --- Custom Requests ---
@@ -84,16 +103,16 @@ export const updateContactEnquiryStatus = (id, status) => api.put(`/contact/admi
 export const deleteAdminContactEnquiry = (id) => api.delete(`/contact/admin/${id}`);
 
 // --- Blogs ---
-export const getBlogs = () => api.get('/blogs');
-export const getBlogBySlug = (slug) => api.get(`/blogs/slug/${slug}`);
-export const getBlogById = (id) => api.get(`/blogs/${id}`); 
+export const getBlogs = () => prodApi.get('/blogs');
+export const getBlogBySlug = (slug) => prodApi.get(`/blogs/slug/${slug}`);
+export const getBlogById = (id) => prodApi.get(`/blogs/${id}`);
 export const createBlog = (data) => api.post('/blogs', data, { headers: { 'Content-Type': 'multipart/form-data' } });
-export const updateBlog = (id, data) => api.put(`/blogs/${id}`, data, { headers: { 'Content-Type': 'multipart/form-data' } }); 
+export const updateBlog = (id, data) => api.put(`/blogs/${id}`, data, { headers: { 'Content-Type': 'multipart/form-data' } });
 export const deleteBlog = (id) => api.delete(`/blogs/${id}`);
 
-// Remove the fetch functions and replace them with these:
-export const getInstaPosts = () => api.get('/insta');
-export const addInstaPost = (data) => api.post('/insta', data, { 
-    headers: { 'Content-Type': 'multipart/form-data' } 
+// --- Insta Posts ---
+export const getInstaPosts = () => prodApi.get('/insta');
+export const addInstaPost = (data) => api.post('/insta', data, {
+    headers: { 'Content-Type': 'multipart/form-data' }
 });
 export const deleteInstaPost = (id) => api.delete(`/insta/${id}`);

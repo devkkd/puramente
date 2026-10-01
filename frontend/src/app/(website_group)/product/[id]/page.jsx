@@ -1,9 +1,12 @@
-"use client";
+﻿"use client";
 
 import React, { useEffect, useState, useRef, useLayoutEffect } from "react";
 import { useParams } from "next/navigation";
+import Head from "next/head";
 import { Heart, Share } from "lucide-react";
 import { getProductById } from "@/lib/api"; 
+import { getProductSchema, extractSeoData } from "@/lib/seoMeta";
+import StructuredData from "@/components/StructuredData";
 import ProdOptions from "@/components/ProdOptions"; 
 import AddToCartButton from "@/components/AddToCartButton";
 
@@ -13,6 +16,7 @@ export default function ProductDetailPage() {
 
   const [product, setProduct] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [productSchema, setProductSchema] = useState(null);
   
   // FIXED: Force the page to the top immediately upon entry.
   // We use useLayoutEffect to ensure it scrolls before the user sees the page.
@@ -45,6 +49,49 @@ export default function ProductDetailPage() {
         if (response.success && response.data) {
           const productData = Array.isArray(response.data) ? response.data[0] : response.data;
           setProduct(productData);
+          
+          // Generate structured schema for product
+          const schema = getProductSchema(productData);
+          setProductSchema(schema);
+
+          // Update document meta tags for SEO
+          const seoData = extractSeoData(productData, 'product', `/product/${id}`);
+          document.title = seoData.metaTitle;
+          
+          // Update or create meta description tag
+          let metaDesc = document.querySelector('meta[name="description"]');
+          if (!metaDesc) {
+            metaDesc = document.createElement('meta');
+            metaDesc.setAttribute('name', 'description');
+            document.head.appendChild(metaDesc);
+          }
+          metaDesc.setAttribute('content', seoData.metaDescription);
+
+          // Update Open Graph tags
+          const createOrUpdateMetaTag = (property, content) => {
+            let tag = document.querySelector(`meta[property="${property}"]`);
+            if (!tag) {
+              tag = document.createElement('meta');
+              tag.setAttribute('property', property);
+              document.head.appendChild(tag);
+            }
+            tag.setAttribute('content', content);
+          };
+
+          createOrUpdateMetaTag('og:title', seoData.metaTitle);
+          createOrUpdateMetaTag('og:description', seoData.metaDescription);
+          createOrUpdateMetaTag('og:image', seoData.metaImage);
+          createOrUpdateMetaTag('og:url', seoData.canonicalUrl);
+          createOrUpdateMetaTag('og:type', 'product');
+
+          // Update canonical URL
+          let canonical = document.querySelector('link[rel="canonical"]');
+          if (!canonical) {
+            canonical = document.createElement('link');
+            canonical.setAttribute('rel', 'canonical');
+            document.head.appendChild(canonical);
+          }
+          canonical.setAttribute('href', seoData.canonicalUrl);
         }
       } catch (error) {
         console.error("Error fetching product details:", error);
@@ -89,6 +136,9 @@ export default function ProductDetailPage() {
 
   return (
     <main className="w-full bg-white font-mona pb-24 pt-10">
+      {/* Render structured data for search engines */}
+      {productSchema && <StructuredData schema={productSchema} />}
+
       <div className="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8 flex flex-col lg:flex-row gap-12 lg:gap-20">
         
         {/* --- LEFT COLUMN: IMAGE --- */}

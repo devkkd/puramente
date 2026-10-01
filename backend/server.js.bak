@@ -1,0 +1,170 @@
+require("dotenv").config();
+const express = require("express");
+const mongoose = require("mongoose");
+const cors = require("cors");
+
+const app = express();
+const PORT = process.env.PORT || 5001;
+
+// CORS Configuration
+const allowedOrigins = [
+  "http://localhost:3000",
+  "https://kontentkraftdigital.tech",
+  "https://www.kontentkraftdigital.tech",
+  process.env.FRONTEND_URL
+];
+
+app.use(cors({
+  origin: function (origin, callback) {
+    if (!origin) return callback(null, true);
+    if (allowedOrigins.includes(origin)) {
+      return callback(null, true);
+    } else {
+      return callback(new Error("CORS not allowed: " + origin));
+    }
+  },
+  credentials: true
+}));
+
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+
+// ROUTES
+const categoryRoutes = require("./routes/categoryRoutes");
+const productRoutes = require("./routes/productRoutes");
+const cartRoutes = require("./routes/cartRoutes");
+const authRoutes = require("./routes/authRoutes");
+const orderRoutes = require("./routes/orderRoutes");
+const customRequestRoutes = require("./routes/customRequestRoutes");
+const contactRoutes = require("./routes/contactRoutes");
+const blogRoutes = require("./routes/blogRoutes");
+const instaRoutes = require("./routes/instaRoutes");
+
+// MOUNT ROUTES
+app.use("/api/categories", categoryRoutes);
+app.use("/api/products", productRoutes);
+app.use("/api/cart", cartRoutes);
+app.use("/api/auth", authRoutes);
+app.use("/api/orders", orderRoutes);
+app.use("/api/custom-requests", customRequestRoutes);
+app.use("/api/contact", contactRoutes);
+app.use("/api/blogs", blogRoutes);
+app.use("/api/insta", instaRoutes);
+
+app.get("/", (req, res) => {
+  res.send("Puramente API running");
+});
+
+// ============================================
+// MONGODB CONNECTION WITH AUTOMATIC RETRY
+// ============================================
+
+let mongoConnected = false;
+let connectionAttempts = 0;
+const MAX_RETRIES = 5;
+const RETRY_DELAY = 10000; // 10 seconds
+
+const connectDB = async () => {
+  const mongoUri = process.env.MONGO_URI;
+
+  if (!mongoUri) {
+    console.error("❌ MONGO_URI not found in .env file");
+    return false;
+  }
+
+  connectionAttempts++;
+  console.log(`\n🔄 Connecting to MongoDB Atlas... (Attempt ${connectionAttempts}/${MAX_RETRIES})`);
+  console.log("   Host: puramentedb.irbq9pg.mongodb.net");
+
+  try {
+    await mongoose.connect(mongoUri, {
+      serverSelectionTimeoutMS: 5000,
+      socketTimeoutMS: 45000,
+      maxPoolSize: 10,
+      retryWrites: true,
+      w: "majority"
+    });
+    
+    console.log("✅ MongoDB connected successfully!");
+    console.log("   Database: puramente");
+    console.log("   Connection Status: Ready");
+    mongoConnected = true;
+    connectionAttempts = 0;
+    return true;
+
+  } catch (err) {
+    console.error("❌ MongoDB connection failed:");
+    console.error("   Error:", err.message);
+    
+    // Provide specific troubleshooting
+    if (err.message.includes("ECONNREFUSED") || err.message.includes("querySrv")) {
+      console.error("\n   ⚠️  CONNECTION REFUSED - IP likely NOT whitelisted");
+      console.error("\n   📋 YOUR IP ADDRESS: 106.219.68.38");
+      console.error("\n   🔧 FIX THIS NOW:");
+      console.error("      1. Go to: https://cloud.mongodb.com");
+      console.error("      2. Select cluster: puramentedb");
+      console.error("      3. Security → Network Access → IP Whitelist");
+      console.error("      4. Add IP: 106.219.68.38");
+      console.error("      5. OR Add: 0.0.0.0/0 (allow all for dev)");
+      console.error("      6. Click Confirm");
+      console.error("      7. Wait 2-3 minutes");
+      console.error("      8. Restart this server");
+    } else if (err.message.includes("authentication failed")) {
+      console.error("   → Auth failed: Check username/password in .env");
+    } else if (err.message.includes("ENOTFOUND")) {
+      console.error("   → DNS error: Check internet connection");
+    }
+
+    // Auto-retry logic
+    if (connectionAttempts < MAX_RETRIES) {
+      const delaySeconds = RETRY_DELAY / 1000;
+      console.error(`\n⏳ Retrying in ${delaySeconds} seconds... (${MAX_RETRIES - connectionAttempts} retries left)`);
+      
+      setTimeout(() => {
+        connectDB();
+      }, RETRY_DELAY);
+    } else {
+      console.error("\n❌ Max retries reached. Server running in development mode WITHOUT database.");
+      console.error("   Please fix the MongoDB connection and restart the server.");
+      mongoConnected = false;
+    }
+
+    return false;
+  }
+};
+
+// Start connection attempt
+connectDB();
+
+// Status endpoint
+app.get("/api/health", (req, res) => {
+  res.json({
+    status: "ok",
+    port: PORT,
+    mongoConnected: mongoConnected,
+    mongoAttempts: connectionAttempts
+  });
+});
+
+// Start Server
+const server = app.listen(PORT, () => {
+  console.log(`\n🚀 Server running on port ${PORT}`);
+  console.log(`📊 Health check: http://localhost:${PORT}/api/health`);
+  
+  if (!mongoConnected) {
+    console.log("\n⚠️  DATABASE NOT CONNECTED - Dev mode active");
+    console.log("   Auto-retry every 10 seconds...\n");
+  }
+});
+
+// Graceful Shutdown
+process.on("SIGINT", () => {
+  console.log("\n📛 Shutting down...");
+  if (mongoConnected) {
+    mongoose.connection.close();
+  }
+  server.close();
+  process.exit(0);
+});
+
+module.exports = { app, mongoConnected };
