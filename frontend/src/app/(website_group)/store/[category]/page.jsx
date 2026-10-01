@@ -165,44 +165,6 @@ function StoreContent() {
     description: "Wholesale jewelry collections from Puramente Jewel, crafted for retailers and global brands."
   };
 
-  useEffect(() => {
-    // Update document meta tags for SEO
-    document.title = currentCategoryMeta.title;
-
-    let metaDesc = document.querySelector('meta[name="description"]');
-    if (!metaDesc) {
-      metaDesc = document.createElement("meta");
-      metaDesc.setAttribute("name", "description");
-      document.head.appendChild(metaDesc);
-    }
-    metaDesc.setAttribute("content", currentCategoryMeta.description);
-
-    // Update Open Graph tags
-    const createOrUpdateMetaTag = (property, content) => {
-      let tag = document.querySelector(`meta[property="${property}"]`);
-      if (!tag) {
-        tag = document.createElement('meta');
-        tag.setAttribute('property', property);
-        document.head.appendChild(tag);
-      }
-      tag.setAttribute('content', content);
-    };
-
-    createOrUpdateMetaTag('og:title', currentCategoryMeta.title);
-    createOrUpdateMetaTag('og:description', currentCategoryMeta.description);
-    createOrUpdateMetaTag('og:image', categoryData?.imageUrl || '');
-    createOrUpdateMetaTag('og:url', `https://puramente.com/store/${categorySlug}`);
-    createOrUpdateMetaTag('og:type', 'website');
-
-    // Update canonical URL
-    let canonical = document.querySelector('link[rel="canonical"]');
-    if (!canonical) {
-      canonical = document.createElement('link');
-      canonical.setAttribute('rel', 'canonical');
-      document.head.appendChild(canonical);
-    }
-    canonical.setAttribute('href', `https://puramente.com/store/${categorySlug}`);
-  }, [currentCategoryMeta.title, currentCategoryMeta.description, categoryData?.imageUrl, categorySlug]);
 
   if (loading) {
     return (

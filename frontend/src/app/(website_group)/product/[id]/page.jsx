@@ -49,49 +49,9 @@ export default function ProductDetailPage() {
         if (response.success && response.data) {
           const productData = Array.isArray(response.data) ? response.data[0] : response.data;
           setProduct(productData);
-          
-          // Generate structured schema for product
-          const schema = getProductSchema(productData);
+          // Use saved schema from DB if available, otherwise auto-generate
+          const schema = productData?.seo?.schema || getProductSchema(productData);
           setProductSchema(schema);
-
-          // Update document meta tags for SEO
-          const seoData = extractSeoData(productData, 'product', `/product/${id}`);
-          document.title = seoData.metaTitle;
-          
-          // Update or create meta description tag
-          let metaDesc = document.querySelector('meta[name="description"]');
-          if (!metaDesc) {
-            metaDesc = document.createElement('meta');
-            metaDesc.setAttribute('name', 'description');
-            document.head.appendChild(metaDesc);
-          }
-          metaDesc.setAttribute('content', seoData.metaDescription);
-
-          // Update Open Graph tags
-          const createOrUpdateMetaTag = (property, content) => {
-            let tag = document.querySelector(`meta[property="${property}"]`);
-            if (!tag) {
-              tag = document.createElement('meta');
-              tag.setAttribute('property', property);
-              document.head.appendChild(tag);
-            }
-            tag.setAttribute('content', content);
-          };
-
-          createOrUpdateMetaTag('og:title', seoData.metaTitle);
-          createOrUpdateMetaTag('og:description', seoData.metaDescription);
-          createOrUpdateMetaTag('og:image', seoData.metaImage);
-          createOrUpdateMetaTag('og:url', seoData.canonicalUrl);
-          createOrUpdateMetaTag('og:type', 'product');
-
-          // Update canonical URL
-          let canonical = document.querySelector('link[rel="canonical"]');
-          if (!canonical) {
-            canonical = document.createElement('link');
-            canonical.setAttribute('rel', 'canonical');
-            document.head.appendChild(canonical);
-          }
-          canonical.setAttribute('href', seoData.canonicalUrl);
         }
       } catch (error) {
         console.error("Error fetching product details:", error);
