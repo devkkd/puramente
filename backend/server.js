@@ -15,8 +15,8 @@ const PORT = process.env.PORT || 5001;
 // CORS Configuration
 const allowedOrigins = [
   "http://localhost:3000",
-  "https://kontentkraftdigital.tech",
-  "https://www.kontentkraftdigital.tech",
+  "https://puramentejewel.com",
+  "https://www.puramentejewel.com",
   process.env.FRONTEND_URL
 ];
 
