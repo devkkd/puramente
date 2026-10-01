@@ -175,30 +175,28 @@ exports.updateProduct = async (req, res) => {
 // --- NEW: Update product SEO fields ---
 exports.updateProductSeo = async (req, res) => {
   try {
-    const { metaTitle, metaDescription, metaKeywords } = req.body;
-    
-    let product = await Product.findById(req.params.id).populate("category");
-    if (!product) {
-      return res.status(404).json({ error: "Product not found" });
-    }
+    const { metaTitle, metaDescription, metaKeywords, schema } = req.body;
 
-    // Sanitize and validate SEO fields
+    const product = await Product.findById(req.params.id).populate("category");
+    if (!product) return res.status(404).json({ error: "Product not found" });
+
     const seoData = sanitizeSeoFields(metaTitle, metaDescription, metaKeywords);
-    
-    // Generate schema if SEO data provided
-    if (seoData.metaTitle || seoData.metaDescription) {
+
+    if (schema && typeof schema === "object") {
+      seoData.schema = schema;
+    } else if (seoData.metaTitle || seoData.metaDescription) {
       seoData.schema = generateProductSchema(product);
     }
 
-    product.seo = { ...product.seo, ...seoData };
-    await product.save();
+    // Use $set on seo subdoc only - avoids required field validation on other fields
+    const existingSeo = product.seo ? product.seo.toObject() : {};
+    const updated = await Product.findByIdAndUpdate(
+      req.params.id,
+      { $set: { seo: { ...existingSeo, ...seoData } } },
+      { new: true, runValidators: false }
+    ).populate("category", "name");
 
-    res.status(200).json({
-      success: true,
-      message: "Product SEO updated successfully",
-      data: product
-    });
-
+    res.status(200).json({ success: true, message: "Product SEO updated successfully", data: updated });
   } catch (error) {
     console.error("Error updating product SEO:", error);
     res.status(500).json({ error: "Server error while updating product SEO" });
