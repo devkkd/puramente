@@ -1,14 +1,16 @@
 ﻿// Server Component — generateMetadata runs on server for SSR meta tags
-const API_URL = process.env.NEXT_PUBLIC_PROD_API_URL || "https://puramentejewel.com/api";
+// NOTE: Use hardcoded API URL — NEXT_PUBLIC_ env vars are unreliable in server components during SSR
+
+const PROD_API = "https://puramentejewel.com/api";
+const SITE_URL = "https://puramentejewel.com";
 
 export async function generateMetadata({ params }) {
   const { category: categorySlug } = await params;
 
   try {
-    const res = await fetch(`${API_URL}/categories`, {
-      cache: "no-store",
-    });
+    const res = await fetch(`${PROD_API}/categories`, { cache: "no-store" });
     const data = await res.json();
+
     const category = data?.data?.find(
       (c) => c.name?.toLowerCase() === categorySlug?.toLowerCase()
     );
@@ -29,6 +31,7 @@ export async function generateMetadata({ params }) {
       `Discover wholesale ${category.name.toLowerCase()} manufactured in India for retailers, fashion brands and international jewelry businesses.`;
 
     const keywords = category.seo?.metaKeywords?.join(", ") || "";
+    const pageUrl = `${SITE_URL}/store/${categorySlug}`;
 
     return {
       title: metaTitle,
@@ -37,8 +40,8 @@ export async function generateMetadata({ params }) {
       openGraph: {
         title: metaTitle,
         description: metaDescription,
-        images: category.imageUrl ? [{ url: category.imageUrl }] : [],
-        url: `https://puramentejewel.com/store/${categorySlug}`,
+        images: category.imageUrl ? [{ url: category.imageUrl, alt: metaTitle }] : [],
+        url: pageUrl,
         type: "website",
         siteName: "Puramente Jewel",
       },
@@ -49,10 +52,11 @@ export async function generateMetadata({ params }) {
         images: category.imageUrl ? [category.imageUrl] : [],
       },
       alternates: {
-        canonical: `https://puramentejewel.com/store/${categorySlug}`,
+        canonical: pageUrl,
       },
     };
   } catch (err) {
+    console.error("generateMetadata category error:", err.message);
     return {
       title: `${categorySlug} | Puramente Jewel`,
       description: "Explore our jewelry collection at Puramente Jewel.",

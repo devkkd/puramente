@@ -1,4 +1,4 @@
-import { Mona_Sans, Playfair_Display } from "next/font/google";
+﻿import { Mona_Sans, Playfair_Display } from "next/font/google";
 import Script from "next/script";
 import "./globals.css";
 import ExhibitionPopup from "@/components/ExhibitionPopup";
