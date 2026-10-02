@@ -1,5 +1,5 @@
 const ContactEnquiry = require("../models/ContactEnquiry");
-const sendEmail = require("../utils/sendEmail"); // <-- IMPORT ADDED
+const sendEmail = require("../utils/sendEmail");
 
 // Submit a new contact enquiry
 exports.submitEnquiry = async (req, res) => {
@@ -26,11 +26,12 @@ exports.submitEnquiry = async (req, res) => {
     });
 
     await newEnquiry.save();
+    console.log("?? Enquiry saved to DB:", newEnquiry._id);
 
     // --- SEND EMAIL NOTIFICATION TO ADMIN ---
     const emailHtml = `
       <div style="font-family: Arial, sans-serif; max-w: 600px; padding: 20px; border: 1px solid #e0e0e0; border-radius: 10px;">
-        <h2 style="color: #0082A4;">New Contact Enquiry 📩</h2>
+        <h2 style="color: #0082A4;">New Contact Enquiry ??</h2>
         <p>A new contact enquiry has been submitted on the Puramente website.</p>
         <hr style="border: none; border-top: 1px solid #eee; margin: 20px 0;" />
         <p><strong>Name:</strong> ${fullName}</p>
@@ -49,10 +50,17 @@ exports.submitEnquiry = async (req, res) => {
       </div>
     `;
 
-    await sendEmail({
-      subject: `New Contact Enquiry from ${fullName}`,
-      html: emailHtml,
-    });
+    try {
+      console.log("?? Attempting to send email to:", process.env.RECEIVER_EMAIL);
+      await sendEmail({
+        subject: `New Contact Enquiry from ${fullName}`,
+        html: emailHtml,
+      });
+      console.log("? Email sent successfully!");
+    } catch (emailError) {
+      console.error("? Error sending email:", emailError.message);
+      console.error("Email error details:", emailError);
+    }
 
     res.status(201).json({
       success: true,
@@ -61,7 +69,8 @@ exports.submitEnquiry = async (req, res) => {
     });
 
   } catch (error) {
-    console.error("Contact Enquiry Error:", error);
+    console.error("? Contact Enquiry Error:", error.message);
+    console.error("Full error:", error);
     res.status(500).json({ success: false, error: "Failed to submit message." });
   }
 };
@@ -110,3 +119,5 @@ exports.deleteEnquiry = async (req, res) => {
     res.status(500).json({ success: false, error: "Server error deleting enquiry." });
   }
 };
+
+module.exports = exports;
