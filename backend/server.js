@@ -1,4 +1,4 @@
-﻿require("dotenv").config();
+require("dotenv").config();
 // Fix for DNS SRV resolution (required for MongoDB Atlas on some systems)
 // const dns = require("dns");
 // dns.setServers(["8.8.8.8", "8.8.4.4", "1.1.1.1"]);
@@ -178,46 +178,5 @@ const connectDB = async () => {
 
 connectDB();
 
-
-// TEST EMAIL ENDPOINT
-app.get("/api/test-email", async (req, res) => {
-  try {
-    const sendEmail = require("./utils/sendEmail");
-    console.log("\n?? TEST EMAIL ENDPOINT CALLED");
-    
-    await sendEmail({
-      subject: "?? Puramente Test Email",
-      html: `<h1>Test Email Works! ?</h1><p>This is a test email from Puramente backend.</p><p>Time: ${new Date().toISOString()}</p>`
-    });
-    
-    res.json({ success: true, message: "Test email sent - check your inbox!" });
-  } catch (error) {
-    console.error("Test email error:", error);
-    res.status(500).json({ success: false, error: error.message });
-  }
-});
-
-
-// Health endpoint
-app.get("/api/health", (req, res) => {
-  res.json({
-    status: "ok",
-    mongoConnected: mongoConnected
-  });
-});
-
-// Start Server
-const server = app.listen(PORT, () => {
-  console.log(`\n?? Server on port ${PORT}`);
-  if (!mongoConnected) console.log("??  MongoDB connecting...\n");
-});
-
-process.on("SIGINT", () => {
-  if (mongoConnected) mongoose.connection.close();
-  server.close();
-  process.exit(0);
-});
-
-module.exports = { app, mongoConnected };
 
 
