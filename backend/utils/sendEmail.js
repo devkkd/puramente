@@ -3,7 +3,8 @@ const nodemailer = require("nodemailer");
 const sendEmail = async (options) => {
   try {
     if (!process.env.EMAIL_USER || !process.env.EMAIL_PASS) {
-      throw new Error("EMAIL_USER or EMAIL_PASS not configured in .env");
+      console.error("[EMAIL] Missing EMAIL_USER or EMAIL_PASS in .env");
+      return { success: false, error: "Email not configured" };
     }
 
     const transporter = nodemailer.createTransport({
@@ -22,14 +23,16 @@ const sendEmail = async (options) => {
       attachments: options.attachments || [],
     };
 
-    console.log(`?? Sending email: ${mailOptions.subject} ? ${mailOptions.to}`);
+    console.log(`[EMAIL] Sending: ${mailOptions.subject} -> ${mailOptions.to}`);
     const info = await transporter.sendMail(mailOptions);
-    console.log(`? Email sent: ${info.messageId}`);
+    console.log(`[SUCCESS] Email sent: ${info.messageId}`);
     
     return info;
   } catch (error) {
-    console.error(`? Email error: ${error.message}`);
-    throw error;
+    console.error(`[EMAIL_ERROR] ${error.message}`);
+    console.error(`[EMAIL_ERROR] Code: ${error.code}`);
+    // Don't throw - just log and return error object
+    return { success: false, error: error.message };
   }
 };
 
