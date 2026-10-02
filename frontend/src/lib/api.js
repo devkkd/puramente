@@ -62,24 +62,24 @@ export const updateProductSeo = (id, seoData) => prodApi.put(`/products/${id}/se
 export const bulkUploadProducts = (data) => api.post('/products/bulk-upload', data);
 
 // --- Cart ---
-export const getCart = (data) => api.post('/cart/view', data);
-export const addToCart = (data) => api.post('/cart/add', data);
-export const updateCartItem = (data) => api.put('/cart/update', data);
-export const removeFromCart = (data) => api.post('/cart/remove', data);
+export const getCart = (data) => prodApi.post('/cart/view', data);
+export const addToCart = (data) => prodApi.post('/cart/add', data);
+export const updateCartItem = (data) => prodApi.put('/cart/update', data);
+export const removeFromCart = (data) => prodApi.post('/cart/remove', data);
 
 // --- Auth ---
-export const registerUser = (data) => api.post('/auth/register', data);
-export const loginUser = (data) => api.post('/auth/login', data);
+export const registerUser = (data) => prodApi.post('/auth/register', data);
+export const loginUser = (data) => prodApi.post('/auth/login', data);
 export const getAdminUserCart = (id) => api.get(`/auth/admin/users/${id}/cart`);
-export const loginAdminUser = (data) => api.post('/auth/admin-login', data);
-export const forgotPassword = (data) => api.post('/auth/forgot-password', data);
-export const resetPassword = (token, data) => api.put(`/auth/reset-password/${token}`, data);
+export const loginAdminUser = (data) => prodApi.post('/auth/admin-login', data);
+export const forgotPassword = (data) => prodApi.post('/auth/forgot-password', data);
+export const resetPassword = (token, data) => prodApi.put(`/auth/reset-password/${token}`, data);
 
 // --- User Profile ---
 export const getUserProfile = (id) => api.get(`/auth/me/${id}`);
 
 // --- Orders ---
-export const submitOrderRequest = (data) => api.post('/orders/submit', data);
+export const submitOrderRequest = (data) => prodApi.post('/orders/submit', data);
 
 // --- ADMIN ROUTES (all on local backend) ---
 export const getAdminOrders = () => api.get('/orders/admin/all');
@@ -89,7 +89,7 @@ export const deleteAdminOrder = (id) => prodApi.delete(`/orders/admin/${id}`);
 export const getAdminUsers = () => api.get('/auth/admin/users');
 
 // --- Custom Requests ---
-export const submitCustomRequest = (formData) => api.post('/custom-requests/submit', formData, {
+export const submitCustomRequest = (formData) => prodApi.post('/custom-requests/submit', formData, {
     headers: { 'Content-Type': 'multipart/form-data' }
 });
 export const getAdminCustomRequests = () => api.get('/custom-requests/admin/all');
@@ -97,7 +97,7 @@ export const updateCustomRequestStatus = (id, status) => api.put(`/custom-reques
 export const deleteAdminCustomRequest = (id) => api.delete(`/custom-requests/admin/${id}`);
 
 // --- Contact Enquiries ---
-export const submitContactEnquiry = (data) => api.post('/contact/submit', data);
+export const submitContactEnquiry = (data) => prodApi.post('/contact/submit', data);
 export const getAdminContactEnquiries = () => api.get('/contact/admin/all');
 export const updateContactEnquiryStatus = (id, status) => api.put(`/contact/admin/${id}/status`, { status });
 export const deleteAdminContactEnquiry = (id) => api.delete(`/contact/admin/${id}`);
