@@ -14,7 +14,7 @@ exports.registerUser = async (req, res) => {
     const userExists = await User.findOne({ email });
     if (userExists) return res.status(400).json({ success: false, error: "User already exists" });
 
-    const user = await User.create({ email, password, fullName, country, whatsappNo, companyName, companyWebsite });
+    const user = await User.create({ email: normalizedEmail, password, fullName, country, whatsappNo, companyName, companyWebsite });
 
     // --- SEND WELCOME EMAIL TO NEW USER ---
     try {
@@ -24,7 +24,7 @@ exports.registerUser = async (req, res) => {
           <p>Thank you for registering with us. Your account has been successfully created.</p>
           <hr style="border: none; border-top: 1px solid #eee; margin: 20px 0;" />
           <p><strong>Full Name:</strong> ${fullName}</p>
-          <p><strong>Email:</strong> ${email}</p>
+          <p><strong>Email:</strong> ${normalizedEmail}</p>
           <p><strong>Company:</strong> ${companyName || "N/A"}</p>
           <p style="margin-top: 25px;">You can now log in and explore our products, place orders, and request custom jewelry designs.</p>
           <br/>
@@ -167,7 +167,8 @@ exports.forgotPassword = async (req, res) => {
   try {
     console.log(`\n--- PASSWORD RESET INITIATED FOR: ${req.body.email} ---`);
     
-    const user = await User.findOne({ email: req.body.email });
+    const normalizedEmail = req.body.email.toLowerCase().trim();
+    const user = await User.findOne({ email: normalizedEmail });
     if (!user) {
       console.log("❌ Failed: No user found in database with this email.");
       return res.status(404).json({ success: false, error: "There is no user with that email" });
@@ -256,3 +257,5 @@ exports.resetPassword = async (req, res) => {
     res.status(500).json({ success: false, error: "Server Error" });
   }
 };
+
+
