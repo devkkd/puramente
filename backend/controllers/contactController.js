@@ -39,6 +39,36 @@ exports.submitEnquiry = async (req, res) => {
     `;
 
     try {
+      // --- SEND CUSTOMER CONFIRMATION EMAIL ---
+      const customerEmailHtml = `
+        <div style="font-family: Arial, sans-serif; max-width: 600px; padding: 20px; border: 1px solid #e0e0e0; border-radius: 10px;">
+          <h2 style="color: #0082A4;">Thank You for Your Enquiry! ??</h2>
+          <p>Hi ${fullName},</p>
+          <p>We have received your contact enquiry and appreciate your interest in Puramente Jewelry.</p>
+          <p>Our team will review your message and get back to you within 24-48 hours.</p>
+          <hr style="border: none; border-top: 1px solid #eee; margin: 20px 0;" />
+          <p><strong>Your Enquiry Details:</strong></p>
+          <p><strong>Phone:</strong> ${phone}</p>
+          <p><strong>Country:</strong> ${country || "Not provided"}</p>
+          <p style="white-space: pre-wrap;"><strong>Message:</strong><br/>${message}</p>
+          <hr style="border: none; border-top: 1px solid #eee; margin: 20px 0;" />
+          <p>In the meantime, feel free to explore our <a href="${process.env.FRONTEND_URL}">jewelry collection</a>.</p>
+          <p style="margin-top: 25px; font-size: 12px; color: #666;">Best regards,<br/>Puramente Jewelry Team</p>
+        </div>
+      `;
+
+      try {
+        await sendEmail({
+          to: email,
+          subject: "We received your enquiry - Puramente Jewelry",
+          html: customerEmailHtml,
+        });
+        console.log(`[EMAIL] ? Customer confirmation sent to ${email}`);
+      } catch (customerEmailError) {
+        console.error(`[EMAIL_ERROR] Customer confirmation failed: ${customerEmailError.message}`);
+      }
+
+      // --- SEND ADMIN NOTIFICATION ---
       console.log("[EMAIL] Sending admin notification...");
       await sendEmail({
         subject: `New Contact Enquiry from ${fullName}`,
@@ -101,4 +131,5 @@ exports.deleteEnquiry = async (req, res) => {
 };
 
 module.exports = exports;
+
 

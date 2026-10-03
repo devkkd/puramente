@@ -69,6 +69,44 @@ exports.submitCustomRequest = async (req, res) => {
     `;
 
     try {
+      // --- SEND CUSTOMER CONFIRMATION EMAIL ---
+      const customerEmailHtml = `
+        <div style="font-family: Arial, sans-serif; max-width: 600px; padding: 20px; border: 1px solid #e0e0e0; border-radius: 10px;">
+          <h2 style="color: #0082A4;">Your Bespoke Design Request Received ?</h2>
+          <p>Hi ${data.fullName},</p>
+          <p>Thank you for submitting your custom jewelry request! We are thrilled to work on your bespoke design.</p>
+          <hr style="border: none; border-top: 1px solid #eee; margin: 20px 0;" />
+          <p><strong>Your Design Summary:</strong></p>
+          <p><strong>Category:</strong> ${data.category}</p>
+          <p><strong>Metal:</strong> ${data.metal}</p>
+          <p><strong>Stone:</strong> ${data.stoneType} (${data.stoneDetails})</p>
+          <p><strong>Dimensions:</strong> ${data.length} x ${data.width}</p>
+          <p style="white-space: pre-wrap;"><strong>Your Design Notes:</strong><br/>${data.designNotes}</p>
+          <hr style="border: none; border-top: 1px solid #eee; margin: 20px 0;" />
+          <p><strong>Next Steps:</strong></p>
+          <ol>
+            <li>Our team will review your design specifications</li>
+            <li>We will create mockups or 3D renders for your approval</li>
+            <li>Once approved, we will provide you with a detailed quotation</li>
+            <li>Upon confirmation, your bespoke jewelry will be crafted with precision</li>
+          </ol>
+          <p><strong>Expected Response Time:</strong> 24-48 hours</p>
+          <p>We will reach out to you shortly at <strong>${data.phone}</strong> or via this email.</p>
+          <p style="margin-top: 25px; font-size: 12px; color: #666;">Best regards,<br/>Puramente Jewelry Design Team</p>
+        </div>
+      `;
+
+      try {
+        await sendEmail({
+          to: data.email,
+          subject: "Your Bespoke Jewelry Request - Confirmation",
+          html: customerEmailHtml,
+        });
+        console.log(`[CUSTOM_REQUEST_EMAIL] ? Customer confirmation sent to ${data.email}`);
+      } catch (customerEmailError) {
+        console.error(`[CUSTOM_REQUEST_EMAIL] ? Customer confirmation failed: ${customerEmailError.message}`);
+      }
+
       console.log(`[CUSTOM_REQUEST_EMAIL] Sending email for request from ${data.fullName}...`);
       await sendEmail({
         subject: `New Custom Request from ${data.fullName}`,
@@ -133,3 +171,4 @@ exports.deleteCustomRequest = async (req, res) => {
     res.status(500).json({ success: false, error: "Server error" });
   }
 };
+

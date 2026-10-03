@@ -13,7 +13,10 @@ exports.registerUser = async (req, res) => {
     const normalizedEmail = email.toLowerCase().trim();
 
     const userExists = await User.findOne({ email: normalizedEmail });
-    if (userExists) return res.status(400).json({ success: false, error: "User already exists" });
+    if (userExists) {
+      console.log(`[REGISTER] ? Registration failed - Email already registered: ${normalizedEmail}`);
+      return res.status(400).json({ success: false, error: "This email address is already registered. Please use the login page or contact support." });
+    }
 
     const user = await User.create({ email: normalizedEmail, password, fullName, country, whatsappNo, companyName, companyWebsite });
 
@@ -259,6 +262,7 @@ exports.resetPassword = async (req, res) => {
     res.status(500).json({ success: false, error: "Server Error" });
   }
 };
+
 
 
 

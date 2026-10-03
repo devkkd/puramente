@@ -230,6 +230,7 @@ exports.submitOrder = async (req, res) => {
 
       console.log("?? SENDING ORDER EMAIL WITH ATTACHMENT...");
       await sendEmail({
+        to: contactDetails.email,
         subject: `New Cart Request [${orderSerialNumber}] from ${contactDetails.fullName}`,
         html: emailHtml,
         attachments: [
@@ -288,6 +289,7 @@ exports.deleteOrder = async (req, res) => {
     res.status(500).json({ success: false, error: "Server error" });
   }
 };
+
 
 
 
