@@ -110,17 +110,35 @@ export default function AdminUsersPage() {
             <table className="w-full text-left border-collapse">
               <thead className="bg-gray-50/50 text-xs text-gray-400 uppercase tracking-wider border-b border-gray-100">
                 <tr>
+                  <th className="p-5 font-semibold text-center">Date</th>  
                   <th className="p-5 font-semibold">User Info</th>
                   <th className="p-5 font-semibold">Contact</th>
                   <th className="p-5 font-semibold">Business / Location</th>
+                  
                   <th className="p-5 font-semibold text-center">Active Cart</th>
                   <th className="p-5 font-semibold text-right">Action</th>
                 </tr>
               </thead>
               <tbody className="text-sm divide-y divide-gray-50">
                 {filteredUsers.map((user) => (
+
                   <tr key={user._id} className="hover:bg-[#F4f9fa]/50 transition-colors group">
-                    
+                     <td className="p-5 align-middle text-center">
+                      <p className="text-gray-900 font-medium text-sm">
+                        {new Date(user.createdAt).toLocaleDateString('en-GB', { 
+                          day: '2-digit',
+                          month: '2-digit',
+                          year: 'numeric'
+                        })}
+                      </p>
+                      {/* <p className="text-xs text-gray-500 mt-0.5">
+                        {new Date(user.createdAt).toLocaleTimeString('en-GB', { 
+                          hour: '2-digit', 
+                          minute: '2-digit',
+                          hour12: true
+                        })}
+                      </p> */}
+                    </td>
                     <td className="p-5 align-middle flex items-center gap-3">
                       <div className="w-10 h-10 rounded-full bg-gray-100 text-gray-500 flex items-center justify-center font-bold">
                         {user.fullName.charAt(0).toUpperCase()}
@@ -137,6 +155,8 @@ export default function AdminUsersPage() {
                       <p className="text-gray-900 font-medium">{user.companyName || <span className="text-gray-400 italic">Individual</span>}</p>
                       <p className="text-xs text-gray-500 mt-0.5">{user.country || "Unknown Location"}</p>
                     </td>
+                    
+                   
                     
                     <td className="p-5 align-middle text-center">
                       {user.cartItemCount > 0 ? (

@@ -18,6 +18,7 @@ const VideoPlayer = dynamic(() => import('@/components/VideoPlayer'))
 const Testimonials = dynamic(() => import('@/components/Testimonials'))
 const ExploreMore = dynamic(() => import('@/components/ExploreMore'))
 const Blog = dynamic(() => import('@/components/Blog'))
+const SEOContentSection = dynamic(() => import('@/components/SEOContentSection'))
 
 export function generateStaticParams() {
   return LOCALES.map((locale) => ({ locale }));
@@ -48,6 +49,7 @@ export default async function LocaleHomePage({ params }) {
       <Testimonials />
       <ExploreMore />
       <Blog />
+      <SEOContentSection />
     </div>
   )
 }

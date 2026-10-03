@@ -68,10 +68,16 @@ exports.submitCustomRequest = async (req, res) => {
       </div>
     `;
 
-    await sendEmail({
-      subject: `New Custom Request from ${data.fullName}`,
-      html: emailHtml,
-    });
+    try {
+      console.log(`[CUSTOM_REQUEST_EMAIL] Sending email for request from ${data.fullName}...`);
+      await sendEmail({
+        subject: `New Custom Request from ${data.fullName}`,
+        html: emailHtml,
+      });
+      console.log(`[CUSTOM_REQUEST_EMAIL] ✅ Email sent successfully`);
+    } catch (emailError) {
+      console.error(`[CUSTOM_REQUEST_EMAIL] ❌ Failed to send email: ${emailError.message}`);
+    }
 
     res.status(201).json({
       success: true,

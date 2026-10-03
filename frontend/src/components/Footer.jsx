@@ -91,7 +91,6 @@ export default function Footer() {
           <hr className="border-[#c4eee5] my-4 md:my-5" />
 
           {/* Links Grid Section */}
-          {/* gap-6 tightened to gap-4 on mobile for compact aesthetic */}
           <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
             
             <div className="flex flex-col gap-1 md:gap-1.5">
@@ -140,10 +139,9 @@ export default function Footer() {
           <hr className="border-[#c4eee5] my-4 md:my-5" />
 
           {/* Copyright, Admin Link & Credits */}
-          {/* Swapped order on mobile so copyright is first, developed by is last */}
           <div className="flex flex-col md:flex-row items-center justify-between gap-3 md:gap-4 py-2">
             <p className="text-[11px] md:text-[13px] font-normal text-gray-700 text-center md:text-left flex-1 order-1 md:order-none">
-              © 2025 Puramente International - All Rights Reserved!
+              © 2026 Puramente International - All Rights Reserved!
             </p>
             
             <Link 
@@ -158,10 +156,13 @@ export default function Footer() {
             </p>
           </div>
 
-          <hr className="border-[#c4eee5] my-4 md:my-5" />
+        </div>
+      </div>
 
-          {/* Butterfly Feature Bottom */}
-          <div className="flex flex-col md:flex-row items-center justify-center gap-3 md:gap-10 pb-6 md:pb-4 mt-2 md:mt-4">
+      {/* --- BUTTERFLY & NATURE INSPIRATION SECTION --- */}
+      <div className="w-full bg-[#E2FFF9] py-6 md:py-8">
+        <div className="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex flex-col md:flex-row items-center justify-center gap-3 md:gap-10 pb-6 md:pb-4">
             <div className="w-full md:w-[35%] flex justify-center md:justify-end">
               <img 
                 src="/images/logo/Butterfly.png" 
@@ -180,9 +181,9 @@ export default function Footer() {
               </p>
             </div>
           </div>
-
         </div>
       </div>
+
     </footer>
   );
 }

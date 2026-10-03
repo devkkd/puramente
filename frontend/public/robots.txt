@@ -1,35 +1,72 @@
-# Robots.txt for Puramente Jewel
-# Last Updated: 2024
+# Robots.txt for Puramente Jewel - Premium Jewelry Manufacturer
+# Last Updated: October 2026
 
-# Allow all search engines
+# ─────────────────────────────────────────────────────────────────
+# DEFAULT RULES - Applied to all user-agents
+# ─────────────────────────────────────────────────────────────────
+
 User-agent: *
 Allow: /
+Allow: /en-in/
+Allow: /en-ae/
+Allow: /en-gb/
+Allow: /en-ca/
+Allow: /en-fr/
+Allow: /en-de/
+Allow: /en-es/
+Allow: /en-it/
+Allow: /en-pt/
+Allow: /en-se/
+Allow: /en-dk/
+Allow: /en-no/
+Allow: /en-fi/
+Allow: /en-nl/
 
-# Disallow admin and private pages
+# Disallow private & admin areas
 Disallow: /admin/
+Disallow: /(Admin_group)/
 Disallow: /account/
+Disallow: /cart/
 Disallow: /api/
 Disallow: /_next/
 Disallow: /.next/
 Disallow: /private/
 
+# Allow specific media types
+Allow: /*.jpg$
+Allow: /*.jpeg$
+Allow: /*.png$
+Allow: /*.gif$
+Allow: /*.webp$
+Allow: /*.mp4$
+Allow: /public/images/
+
 # Crawl-delay for respectful crawling
 Crawl-delay: 1
-
-# Request-rate
 Request-rate: 1 requests per 10 seconds
 
-# Specific rules for Google
+# ─────────────────────────────────────────────────────────────────
+# GOOGLE SPECIFIC RULES
+# ─────────────────────────────────────────────────────────────────
+
 User-agent: Googlebot
 Allow: /
 Crawl-delay: 0.5
+Request-rate: 1 requests per 5 seconds
 
-# Specific rules for Bing
+# ─────────────────────────────────────────────────────────────────
+# BING SPECIFIC RULES
+# ─────────────────────────────────────────────────────────────────
+
 User-agent: Bingbot
 Allow: /
 Crawl-delay: 1
+Request-rate: 1 requests per 10 seconds
 
-# Block bad bots
+# ─────────────────────────────────────────────────────────────────
+# BLOCK BAD BOTS - Aggressive crawlers & scrapers
+# ─────────────────────────────────────────────────────────────────
+
 User-agent: MJ12bot
 Disallow: /
 
@@ -39,18 +76,18 @@ Disallow: /
 User-agent: SemrushBot
 Disallow: /
 
-# Allow images and media
-User-agent: *
-Allow: /public/images/
-Allow: *.jpg$
-Allow: *.jpeg$
-Allow: *.png$
-Allow: *.gif$
-Allow: *.webp$
+User-agent: AhrefsBot
+Disallow: /
 
-# Sitemap
-Sitemap: https://puramente.com/sitemap.xml
+User-agent: BLEXBot
+Disallow: /
 
-# Search engines to notify
-# Google Search Console: https://search.google.com/search-console
-# Bing Webmaster Tools: https://www.bing.com/webmaster
+User-agent: MojeekBot
+Disallow: /
+
+# ─────────────────────────────────────────────────────────────────
+# SITEMAPS - Dynamic & static
+# ─────────────────────────────────────────────────────────────────
+
+Sitemap: https://puramentejewel.com/sitemap.xml
+Sitemap: https://www.puramentejewel.com/sitemap.xml

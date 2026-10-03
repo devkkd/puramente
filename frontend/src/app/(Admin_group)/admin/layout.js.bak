@@ -16,9 +16,7 @@ import {
   FileText,
   Clapperboard, // <-- IMPORTED CLAPPERBOARD FOR INSTA VIDEOS
   Menu, 
-  X,
-  LogOut
-} from "lucide-react";
+  X,`r`n  LogOut`r`n} from "lucide-react";
 import { getAdminCustomRequests, getAdminOrders, getAdminContactEnquiries } from "@/lib/api";
 
 export default function AdminLayout({ children }) {
@@ -226,26 +224,6 @@ export default function AdminLayout({ children }) {
               Back to Store
             </span>
           </Link>
-
-          {/* Logout Button */}
-          <button 
-            onClick={() => {
-              localStorage.removeItem("adminToken");
-              localStorage.removeItem("userId");
-              sessionStorage.clear();
-              router.push("/adminlogin");
-            }}
-            className="flex items-center space-x-3 w-full px-4 py-3 rounded-xl bg-red-500/20 hover:bg-red-500/30 text-white transition-colors border border-red-500/30 hover:border-red-500/50 overflow-hidden"
-          >
-            <div className="shrink-0 flex items-center justify-center">
-              <LogOut size={22} strokeWidth={2} />
-            </div>
-            <span className={`tracking-wide text-sm whitespace-nowrap transition-all duration-300
-              ${isMobileOpen ? "opacity-100" : "opacity-100 md:opacity-0 md:group-hover/sidebar:opacity-100"}`}
-            >
-              Logout
-            </span>
-          </button>
         </div>
 
       </aside>
@@ -278,5 +256,3 @@ export default function AdminLayout({ children }) {
     </div>
   );
 }
-
-

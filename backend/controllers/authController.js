@@ -16,6 +16,58 @@ exports.registerUser = async (req, res) => {
 
     const user = await User.create({ email, password, fullName, country, whatsappNo, companyName, companyWebsite });
 
+    // --- SEND WELCOME EMAIL TO NEW USER ---
+    try {
+      const welcomeEmailHtml = `
+        <div style="font-family: Arial, sans-serif; max-w: 600px; padding: 20px; border: 1px solid #e0e0e0; border-radius: 10px;">
+          <h2 style="color: #0082A4;">Welcome to Puramente! 🎉</h2>
+          <p>Thank you for registering with us. Your account has been successfully created.</p>
+          <hr style="border: none; border-top: 1px solid #eee; margin: 20px 0;" />
+          <p><strong>Full Name:</strong> ${fullName}</p>
+          <p><strong>Email:</strong> ${email}</p>
+          <p><strong>Company:</strong> ${companyName || "N/A"}</p>
+          <p style="margin-top: 25px;">You can now log in and explore our products, place orders, and request custom jewelry designs.</p>
+          <br/>
+          <a href="${process.env.FRONTEND_URL}/login" style="display: inline-block; background-color: #0082A4; color: #ffffff; padding: 10px 20px; text-decoration: none; border-radius: 5px; font-weight: bold;">Login to Your Account</a>
+        </div>
+      `;
+
+      await sendEmail({
+        to: email,
+        subject: "Welcome to Puramente!",
+        html: welcomeEmailHtml,
+      });
+      console.log(`[REGISTER_EMAIL] ✅ Welcome email sent to ${email}`);
+    } catch (emailError) {
+      console.error(`[REGISTER_EMAIL] ❌ Failed to send welcome email: ${emailError.message}`);
+    }
+
+    // --- SEND ADMIN NOTIFICATION ---
+    try {
+      const adminNotificationHtml = `
+        <div style="font-family: Arial, sans-serif; max-w: 600px; padding: 20px; border: 1px solid #e0e0e0; border-radius: 10px;">
+          <h2 style="color: #0082A4;">New User Registration 👤</h2>
+          <p>A new user has registered on the Puramente website.</p>
+          <hr style="border: none; border-top: 1px solid #eee; margin: 20px 0;" />
+          <p><strong>Name:</strong> ${fullName}</p>
+          <p><strong>Email:</strong> <a href="mailto:${email}">${email}</a></p>
+          <p><strong>WhatsApp:</strong> ${whatsappNo || "N/A"}</p>
+          <p><strong>Country:</strong> ${country || "N/A"}</p>
+          <p><strong>Company:</strong> ${companyName || "N/A"}</p>
+          ${companyWebsite ? `<p><strong>Website:</strong> <a href="${companyWebsite}">${companyWebsite}</a></p>` : ""}
+          <p style="margin-top: 20px; font-size: 12px; color: #666;">Registration Time: ${new Date().toLocaleString('en-IN', { timeZone: 'Asia/Kolkata' })}</p>
+        </div>
+      `;
+
+      await sendEmail({
+        subject: `New User Registration: ${fullName}`,
+        html: adminNotificationHtml,
+      });
+      console.log(`[REGISTER_EMAIL] ✅ Admin notification sent`);
+    } catch (emailError) {
+      console.error(`[REGISTER_EMAIL] ❌ Failed to send admin notification: ${emailError.message}`);
+    }
+
     res.status(201).json({
       success: true,
       data: {

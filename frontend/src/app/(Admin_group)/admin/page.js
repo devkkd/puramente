@@ -144,8 +144,8 @@ export default function AdminDashboard() {
       {/* --- KPI CARDS (Top Stats) --- */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
         
-        {/* Card 1 */}
-        <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 hover:shadow-md transition-shadow group">
+        {/* Card 1 - Shop Orders */}
+        <Link href="/admin/orders" className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 hover:shadow-lg hover:border-blue-200 transition-all cursor-pointer group">
           <div className="flex justify-between items-start mb-4">
             <div className="p-3 bg-blue-50 text-blue-600 rounded-xl group-hover:bg-blue-600 group-hover:text-white transition-colors">
               <ShoppingBag size={24} />
@@ -158,10 +158,10 @@ export default function AdminDashboard() {
           </div>
           <h3 className="text-3xl font-bold text-gray-900">{stats.orders.total}</h3>
           <p className="text-sm font-medium text-gray-500 mt-1">Total Price Requests</p>
-        </div>
+        </Link>
 
-        {/* Card 2 */}
-        <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 hover:shadow-md transition-shadow group">
+        {/* Card 2 - Custom Requests */}
+        <Link href="/admin/custom-requests" className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 hover:shadow-lg hover:border-purple-200 transition-all cursor-pointer group">
           <div className="flex justify-between items-start mb-4">
             <div className="p-3 bg-purple-50 text-purple-600 rounded-xl group-hover:bg-purple-600 group-hover:text-white transition-colors">
               <Wand2 size={24} />
@@ -174,10 +174,10 @@ export default function AdminDashboard() {
           </div>
           <h3 className="text-3xl font-bold text-gray-900">{stats.customReqs.total}</h3>
           <p className="text-sm font-medium text-gray-500 mt-1">Custom Jewelry Requests</p>
-        </div>
+        </Link>
 
-        {/* Card 3 */}
-        <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 hover:shadow-md transition-shadow group">
+        {/* Card 3 - Contact Enquiries */}
+        <Link href="/admin/contact" className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 hover:shadow-lg hover:border-emerald-200 transition-all cursor-pointer group">
           <div className="flex justify-between items-start mb-4">
             <div className="p-3 bg-emerald-50 text-emerald-600 rounded-xl group-hover:bg-emerald-600 group-hover:text-white transition-colors">
               <Mail size={24} />
@@ -190,10 +190,10 @@ export default function AdminDashboard() {
           </div>
           <h3 className="text-3xl font-bold text-gray-900">{stats.contacts.total}</h3>
           <p className="text-sm font-medium text-gray-500 mt-1">Contact Enquiries</p>
-        </div>
+        </Link>
 
-        {/* Card 4 */}
-        <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 hover:shadow-md transition-shadow group">
+        {/* Card 4 - Registered Users */}
+        <Link href="/admin/users" className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 hover:shadow-lg hover:border-orange-200 transition-all cursor-pointer group">
           <div className="flex justify-between items-start mb-4">
             <div className="p-3 bg-orange-50 text-orange-600 rounded-xl group-hover:bg-orange-600 group-hover:text-white transition-colors">
               <Users size={24} />
@@ -204,7 +204,7 @@ export default function AdminDashboard() {
           </div>
           <h3 className="text-3xl font-bold text-gray-900">{stats.users.total}</h3>
           <p className="text-sm font-medium text-gray-500 mt-1">Registered Users</p>
-        </div>
+        </Link>
 
       </div>
 

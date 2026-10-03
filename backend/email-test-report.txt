@@ -1,0 +1,25 @@
+{
+  "timestamp": "2026-10-03T06:31:12.752Z",
+  "results": [
+    {
+      "test": "User Registration",
+      "status": "API_OK",
+      "note": "Check server console for email send logs"
+    },
+    {
+      "test": "User Login Alert",
+      "status": "API_OK",
+      "note": "Check server console for login alert email log"
+    },
+    {
+      "test": "Contact Enquiry",
+      "status": "API_OK",
+      "note": "Expect: [EMAIL] Sending admin notification... and [EMAIL] Sending customer confirmation..."
+    },
+    {
+      "test": "Custom Jewelry Request",
+      "status": "API_OK",
+      "note": "Expect: [CUSTOM_REQUEST_EMAIL] Sending email... and [CUSTOM_REQUEST_EMAIL] ✅ Email sent successfully"
+    }
+  ]
+}

@@ -15,12 +15,12 @@ exports.submitEnquiry = async (req, res) => {
     });
 
     await newEnquiry.save();
-    console.log(`?? Enquiry saved: ${newEnquiry._id} from ${fullName}`);
+    console.log(`[EMAIL] Enquiry saved: ${newEnquiry._id} from ${fullName}`);
 
-    // Send email notification
-    const emailHtml = `
+    // Send admin notification email
+    const adminEmailHtml = `
       <div style="font-family: Arial, sans-serif; max-width: 600px; padding: 20px; border: 1px solid #e0e0e0; border-radius: 10px;">
-        <h2 style="color: #0082A4;">New Contact Enquiry ??</h2>
+        <h2 style="color: #0082A4;">New Contact Enquiry</h2>
         <p>A new contact enquiry has been submitted on the Puramente website.</p>
         <hr style="border: none; border-top: 1px solid #eee; margin: 20px 0;" />
         <p><strong>Name:</strong> ${fullName}</p>
@@ -39,13 +39,50 @@ exports.submitEnquiry = async (req, res) => {
     `;
 
     try {
+      console.log("[EMAIL] Sending admin notification...");
       await sendEmail({
         subject: `New Contact Enquiry from ${fullName}`,
-        html: emailHtml,
+        html: adminEmailHtml,
       });
     } catch (emailError) {
-      console.error(`?? Email failed for enquiry ${newEnquiry._id}:`, emailError.message);
-      // Don't fail the response - enquiry is saved
+      console.error(`[EMAIL_ERROR] Admin notification failed: ${emailError.message}`);
+    }
+
+    // Send customer confirmation email
+    const customerEmailHtml = `
+      <div style="font-family: Arial, sans-serif; max-width: 600px; padding: 20px; border: 1px solid #e0e0e0; border-radius: 10px;">
+        <h2 style="color: #0082A4;">We Received Your Message</h2>
+        <p>Thank you for reaching out to Puramente. We have received your enquiry and appreciate your interest.</p>
+        <hr style="border: none; border-top: 1px solid #eee; margin: 20px 0;" />
+        
+        <p>Our team will review your message and get back to you within <strong>24 business hours</strong>.</p>
+        
+        <div style="background-color: #f9f9f9; padding: 15px; border-radius: 5px; margin-top: 20px;">
+          <p style="margin: 0; font-weight: bold;">Message Details:</p>
+          <p style="margin-top: 10px; white-space: pre-wrap;">${message}</p>
+        </div>
+
+        <p style="margin-top: 25px; font-size: 13px; color: #666;">
+          If you need immediate assistance, contact us:<br/>
+          <strong>Phone:</strong> +91 9314 346 148<br/>
+          <strong>WhatsApp:</strong> +91 97991 68300<br/>
+          <strong>Email:</strong> info@puramentejewel.com
+        </p>
+        
+        <br/>
+        <a href="${process.env.FRONTEND_URL}" style="display: inline-block; background-color: #0082A4; color: #ffffff; padding: 10px 20px; text-decoration: none; border-radius: 5px; font-weight: bold;">Explore Products</a>
+      </div>
+    `;
+
+    try {
+      console.log("[EMAIL] Sending customer confirmation...");
+      await sendEmail({
+        to: email,
+        subject: `We Received Your Message`,
+        html: customerEmailHtml
+      });
+    } catch (customerEmailError) {
+      console.error(`[EMAIL_ERROR] Customer confirmation failed: ${customerEmailError.message}`);
     }
 
     res.status(201).json({
@@ -55,7 +92,7 @@ exports.submitEnquiry = async (req, res) => {
     });
 
   } catch (error) {
-    console.error(`? Contact enquiry error:`, error.message);
+    console.error(`[ERROR] Contact enquiry error: ${error.message}`);
     res.status(500).json({ success: false, error: "Failed to submit message." });
   }
 };

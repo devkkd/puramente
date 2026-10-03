@@ -1,7 +1,7 @@
 require("dotenv").config();
 // Fix for DNS SRV resolution (required for MongoDB Atlas on some systems)
-// const dns = require("dns");
-// dns.setServers(["8.8.8.8", "8.8.4.4", "1.1.1.1"]);
+const dns = require("dns");
+dns.setServers(["8.8.8.8", "8.8.4.4", "1.1.1.1"]);
 
 const express = require("express");
 const mongoose = require("mongoose");
@@ -92,11 +92,11 @@ const whitelistIPInMongoDB = async (ipAddress, groupId, apiPublicKey, apiPrivate
       }
     );
     
-    console.log("? IP automatically whitelisted in MongoDB Atlas!");
+    console.log("[DB] IP automatically whitelisted in MongoDB Atlas!");
     return true;
   } catch (err) {
     if (err.response?.status === 400 && err.response?.data?.detail?.includes("already exists")) {
-      console.log("? IP already whitelisted");
+      console.log("[DB] IP already whitelisted");
       return true;
     }
     return false;
@@ -116,12 +116,12 @@ const connectDB = async () => {
   const mongoUri = process.env.MONGO_URI;
 
   if (!mongoUri) {
-    console.error("? MONGO_URI not found in .env");
+    console.error("[DB] MONGO_URI not found in .env");
     return false;
   }
 
   connectionAttempts++;
-  console.log(`\n?? Connecting to MongoDB... (Attempt ${connectionAttempts}/${MAX_RETRIES})`);
+  console.log(`\n[DB] Connecting to MongoDB... (Attempt ${connectionAttempts}/${MAX_RETRIES})`);
 
   try {
     await mongoose.connect(mongoUri, {
@@ -132,28 +132,28 @@ const connectDB = async () => {
       w: "majority"
     });
     
-    console.log("? MongoDB Connected!");
+    console.log("[DB] MongoDB Connected!");
     mongoConnected = true;
     connectionAttempts = 0;
     return true;
 
   } catch (err) {
-    console.error("? Connection failed:", err.message);
+    console.error("[DB] Connection failed:", err.message);
     
     const userIP = await getPublicIP();
     
     if (err.message.includes("ECONNREFUSED") || err.message.includes("querySrv")) {
       if (userIP) {
-        console.log(`\n?? Your IP: ${userIP}`);
+        console.log(`\n[DB] Your IP: ${userIP}`);
       }
       
       // Try auto-whitelist if API credentials exist
       const hasAPI = process.env.MONGO_API_PUBLIC_KEY && process.env.MONGO_API_PRIVATE_KEY && process.env.MONGO_GROUP_ID;
       if (hasAPI && userIP && connectionAttempts === 1) {
-        console.log("?? Auto-whitelisting IP in MongoDB Atlas...");
+        console.log("[DB] Auto-whitelisting IP in MongoDB Atlas...");
         await whitelistIPInMongoDB(userIP, process.env.MONGO_GROUP_ID, process.env.MONGO_API_PUBLIC_KEY, process.env.MONGO_API_PRIVATE_KEY);
       } else if (!hasAPI) {
-        console.log("\n?? TO WHITELIST YOUR IP MANUALLY:");
+        console.log("\n[DB] TO WHITELIST YOUR IP MANUALLY:");
         console.log("   1. Go to https://cloud.mongodb.com");
         console.log("   2. Select cluster: puramentedb");
         console.log("   3. Network Access ? Add IP Address");
@@ -166,10 +166,10 @@ const connectDB = async () => {
     }
 
     if (connectionAttempts < MAX_RETRIES) {
-      console.log(`? Retry in 10s... (${MAX_RETRIES - connectionAttempts} left)\n`);
+      console.log(`[DB] Retry in 10s... (${MAX_RETRIES - connectionAttempts} left)\n`);
       setTimeout(() => connectDB(), RETRY_DELAY);
     } else {
-      console.log("? Max retries. Server running WITHOUT database.\n");
+      console.log("[DB] Max retries. Server running WITHOUT database.\n");
       mongoConnected = false;
     }
     return false;
@@ -178,5 +178,24 @@ const connectDB = async () => {
 
 connectDB();
 
+// Health endpoint
+app.get("/api/health", (req, res) => {
+  res.json({
+    status: "ok",
+    mongoConnected: mongoConnected
+  });
+});
 
+// Start Server
+const server = app.listen(PORT, () => {
+  console.log(`\n[SERVER] Running on port ${PORT}`);
+  if (!mongoConnected) console.log("[DB] MongoDB connecting...\n");
+});
 
+process.on("SIGINT", () => {
+  if (mongoConnected) mongoose.connection.close();
+  server.close();
+  process.exit(0);
+});
+
+module.exports = { app, mongoConnected };
