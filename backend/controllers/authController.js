@@ -10,8 +10,9 @@ const generateToken = (id) => {
 exports.registerUser = async (req, res) => {
   try {
     const { email, password, fullName, country, whatsappNo, companyName, companyWebsite } = req.body;
+    const normalizedEmail = email.toLowerCase().trim();
 
-    const userExists = await User.findOne({ email });
+    const userExists = await User.findOne({ email: normalizedEmail });
     if (userExists) return res.status(400).json({ success: false, error: "User already exists" });
 
     const user = await User.create({ email: normalizedEmail, password, fullName, country, whatsappNo, companyName, companyWebsite });
@@ -33,7 +34,7 @@ exports.registerUser = async (req, res) => {
       `;
 
       await sendEmail({
-        to: email,
+        to: normalizedEmail,
         subject: "Welcome to Puramente!",
         html: welcomeEmailHtml,
       });
@@ -86,7 +87,8 @@ exports.registerUser = async (req, res) => {
 exports.loginUser = async (req, res) => {
   try {
     const { email, password } = req.body;
-    const user = await User.findOne({ email });
+    const normalizedEmail = email.toLowerCase().trim();
+    const user = await User.findOne({ email: normalizedEmail });
 
     if (user && (await user.comparePassword(password))) {
       
@@ -257,5 +259,8 @@ exports.resetPassword = async (req, res) => {
     res.status(500).json({ success: false, error: "Server Error" });
   }
 };
+
+
+
 
 

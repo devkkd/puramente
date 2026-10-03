@@ -1,8 +1,11 @@
-﻿const Product = require("../models/Product");
+const Product = require("../models/Product");
 const Category = require("../models/Category");
 const { uploadToCloudflare } = require("../utils/upload");
 const { sanitizeSeoFields, generateProductSchema } = require("../utils/seoHelper");
 const xlsx = require("xlsx");
+
+// Helper: Validate MongoDB ObjectId format (24 hex chars)
+const isValidObjectId = (id) => /^[0-9a-f]{24}$/.test(id);
 
 // --- EXISTING: Create a new product ---
 exports.createProduct = async (req, res) => {
@@ -74,6 +77,9 @@ exports.getProducts = async (req, res) => {
 // --- NEW: Get single product by ID ---
 exports.getProductById = async (req, res) => {
   try {
+    if (!isValidObjectId(req.params.id)) {
+      return res.status(400).json({ error: "Invalid product ID format" });
+    }
     const product = await Product.findById(req.params.id).populate("category", "name");
 
     if (!product) {
@@ -115,6 +121,9 @@ exports.getProductBySlug = async (req, res) => {
 // --- NEW: Update a product ---
 exports.updateProduct = async (req, res) => {
   try {
+    if (!isValidObjectId(req.params.id)) {
+      return res.status(400).json({ error: "Invalid product ID format" });
+    }
     let product = await Product.findById(req.params.id);
     if (!product) {
       return res.status(404).json({ error: "Product not found" });
@@ -175,6 +184,9 @@ exports.updateProduct = async (req, res) => {
 // --- NEW: Update product SEO fields ---
 exports.updateProductSeo = async (req, res) => {
   try {
+    if (!isValidObjectId(req.params.id)) {
+      return res.status(400).json({ error: "Invalid product ID format" });
+    }
     const { metaTitle, metaDescription, metaKeywords, schema } = req.body;
 
     const product = await Product.findById(req.params.id).populate("category");
@@ -190,8 +202,7 @@ exports.updateProductSeo = async (req, res) => {
 
     // Use $set on seo subdoc only - avoids required field validation on other fields
     const existingSeo = product.seo ? product.seo.toObject() : {};
-    const updated = await Product.findByIdAndUpdate(
-      req.params.id,
+    const updated = await Product.findByIdAndUpdate(req.params.id,
       { $set: { seo: { ...existingSeo, ...seoData } } },
       { new: true, runValidators: false }
     ).populate("category", "name");
@@ -206,6 +217,9 @@ exports.updateProductSeo = async (req, res) => {
 // --- NEW: Delete a product ---
 exports.deleteProduct = async (req, res) => {
   try {
+    if (!isValidObjectId(req.params.id)) {
+      return res.status(400).json({ error: "Invalid product ID format" });
+    }
     const product = await Product.findByIdAndDelete(req.params.id);
 
     if (!product) {
@@ -251,7 +265,7 @@ exports.bulkUploadProducts = async (req, res) => {
     // 2. BACKGROUND WORKER (Runs after response is sent)
     (async () => {
       try {
-        console.log("\nðŸš€ BACKGROUND WORKER STARTED: Parsing Excel File...");
+        console.log("\n🚀 BACKGROUND WORKER STARTED: Parsing Excel File...");
         const workbook = xlsx.read(excelFile.buffer, { type: 'buffer' });
         const sheetName = workbook.SheetNames[0]; 
         const rows = xlsx.utils.sheet_to_json(workbook.Sheets[sheetName]);
@@ -268,7 +282,7 @@ exports.bulkUploadProducts = async (req, res) => {
         let successCount = 0;
         let skipCount = 0;
 
-        console.log(`ðŸ“¦ Found ${rows.length} rows in Excel. Starting Cloudflare uploads...`);
+        console.log(`📦 Found ${rows.length} rows in Excel. Starting Cloudflare uploads...`);
 
         // Loop through Excel rows sequentially to prevent Cloudflare rate limits
         for (let i = 0; i < rows.length; i++) {
@@ -284,14 +298,14 @@ exports.bulkUploadProducts = async (req, res) => {
           const imgUrl = row['Image URL'] ? row['Image URL'].toString().trim() : null;
 
           if (!code || !name) {
-            console.log(`âš ï¸ Row ${i + 1}: Missing product code or product name. Skipping.`);
+            console.log(`⚠️ Row ${i + 1}: Missing product code or product name. Skipping.`);
             skipCount++;
             continue;
           }
 
           // 1. Resolve Category
           if (!catName) {
-            console.log(`âš ï¸ Row ${i + 1}: Category is missing for product "${name}" (${code}). Skipping.`);
+            console.log(`⚠️ Row ${i + 1}: Category is missing for product "${name}" (${code}). Skipping.`);
             skipCount++;
             continue;
           }
@@ -301,7 +315,7 @@ exports.bulkUploadProducts = async (req, res) => {
           );
 
           if (!matchedCategory) {
-            console.log(`âš ï¸ Row ${i + 1}: Category "${catName}" not found in database for product "${name}" (${code}). Skipping.`);
+            console.log(`⚠️ Row ${i + 1}: Category "${catName}" not found in database for product "${name}" (${code}). Skipping.`);
             skipCount++;
             continue;
           }
@@ -314,13 +328,13 @@ exports.bulkUploadProducts = async (req, res) => {
 
           // 3. Prevent duplicate designCode / slug
           if (existingDesignCodes.has(code.toUpperCase()) || insertedDesignCodesInBatch.has(code.toUpperCase())) {
-            console.log(`âš ï¸ Row ${i + 1}: Design Code "${code}" already exists in DB or current batch. Skipping.`);
+            console.log(`⚠️ Row ${i + 1}: Design Code "${code}" already exists in DB or current batch. Skipping.`);
             skipCount++;
             continue;
           }
 
           if (existingSlugs.has(generatedSlug.toLowerCase()) || insertedSlugsInBatch.has(generatedSlug.toLowerCase())) {
-            console.log(`âš ï¸ Row ${i + 1}: Generated Slug "${generatedSlug}" already exists in DB or current batch. Skipping.`);
+            console.log(`⚠️ Row ${i + 1}: Generated Slug "${generatedSlug}" already exists in DB or current batch. Skipping.`);
             skipCount++;
             continue;
           }
@@ -343,7 +357,7 @@ exports.bulkUploadProducts = async (req, res) => {
             });
 
             if (!matchedImage) {
-              console.log(`âš ï¸ Row ${i + 1}: Image file not found (searched for custom name: "${imgName || 'N/A'}" and code: "${code}"). Skipping.`);
+              console.log(`⚠️ Row ${i + 1}: Image file not found (searched for custom name: "${imgName || 'N/A'}" and code: "${code}"). Skipping.`);
               skipCount++;
               continue;
             }
@@ -352,7 +366,7 @@ exports.bulkUploadProducts = async (req, res) => {
               // Upload to Cloudflare
               imageUrl = await uploadToCloudflare(matchedImage);
             } catch (uploadError) {
-              console.error(`âŒ Row ${i + 1}: Cloudflare upload failed for image "${matchedImage.originalname}":`, uploadError.message);
+              console.error(`❌ Row ${i + 1}: Cloudflare upload failed for image "${matchedImage.originalname}":`, uploadError.message);
               skipCount++;
               continue;
             }
@@ -393,20 +407,20 @@ exports.bulkUploadProducts = async (req, res) => {
 
           // Log progress every 50 items so you know it's working
           if (successCount % 50 === 0) {
-            console.log(`â³ Uploaded ${successCount} / ${rows.length} items to Cloudflare...`);
+            console.log(`⏳ Uploaded ${successCount} / ${rows.length} items to Cloudflare...`);
           }
         }
 
         // Save everything to MongoDB at the very end
         if (productsToInsert.length > 0) {
-          console.log(`ðŸ’¾ Saving ${productsToInsert.length} products to MongoDB...`);
+          console.log(`💾 Saving ${productsToInsert.length} products to MongoDB...`);
           await Product.insertMany(productsToInsert);
         }
 
-        console.log(`âœ… BACKGROUND TASK COMPLETE! Successfully added ${successCount} products. Skipped ${skipCount}.`);
+        console.log(`✅ BACKGROUND TASK COMPLETE! Successfully added ${successCount} products. Skipped ${skipCount}.`);
 
       } catch (bgError) {
-        console.error("âŒ Background Worker Crashed:", bgError);
+        console.error("❌ Background Worker Crashed:", bgError);
       }
     })();
 
@@ -452,5 +466,14 @@ exports.uploadMedia = async (req, res) => {
     res.status(500).json({ success: false, error: "Server error uploading media." });
   }
 };
+
+
+
+
+
+
+
+
+
 
 
