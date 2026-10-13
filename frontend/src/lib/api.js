@@ -1,4 +1,4 @@
-﻿/**
+/**
  * API Client for Puramente Admin Dashboard
  */
 
@@ -358,6 +358,172 @@ export async function bulkEditProducts(productIds, updateFields) {
     };
   } catch (error) {
     console.error('Error in bulk edit:', error);
+    return {
+      success: false,
+      error: error.response?.data?.error || error.message,
+      data: null
+    };
+  }
+}
+
+/**
+ * Get all blogs (public)
+ */
+export async function getBlogs() {
+  try {
+    const response = await apiClient.get('/api/blogs');
+    return {
+      success: true,
+      data: response.data.data || response.data.blogs || []
+    };
+  } catch (error) {
+    console.error('Error fetching blogs:', error);
+    return {
+      success: false,
+      error: error.response?.data?.error || error.message,
+      data: []
+    };
+  }
+}
+
+/**
+ * Get a blog by slug (public)
+ */
+export async function getBlogBySlug(slug) {
+  try {
+    const response = await apiClient.get(`/api/blogs/slug/${slug}`);
+    return {
+      success: true,
+      data: response.data.data
+    };
+  } catch (error) {
+    console.error('Error fetching blog:', error);
+    return {
+      success: false,
+      error: error.response?.data?.error || error.message,
+      data: null
+    };
+  }
+}
+
+/**
+ * Create a new blog (admin)
+ */
+export async function createBlog(formData) {
+  try {
+    const response = await apiClient.post('/api/blogs', formData, {
+      headers: { 'Content-Type': 'multipart/form-data' }
+    });
+    return {
+      success: true,
+      data: response.data.data
+    };
+  } catch (error) {
+    console.error('Error creating blog:', error);
+    return {
+      success: false,
+      error: error.response?.data?.error || error.message,
+      data: null
+    };
+  }
+}
+
+/**
+ * Update a blog (admin)
+ */
+export async function updateBlog(id, formData) {
+  try {
+    const response = await apiClient.put(`/api/blogs/${id}`, formData, {
+      headers: { 'Content-Type': 'multipart/form-data' }
+    });
+    return {
+      success: true,
+      data: response.data.data
+    };
+  } catch (error) {
+    console.error('Error updating blog:', error);
+    return {
+      success: false,
+      error: error.response?.data?.error || error.message,
+      data: null
+    };
+  }
+}
+
+/**
+ * Delete a blog (admin)
+ */
+export async function deleteBlog(id) {
+  try {
+    const response = await apiClient.delete(`/api/blogs/${id}`);
+    return {
+      success: true,
+      data: response.data.data
+    };
+  } catch (error) {
+    console.error('Error deleting blog:', error);
+    return {
+      success: false,
+      error: error.response?.data?.error || error.message,
+      data: null
+    };
+  }
+}
+
+/**
+ * Get all insta posts (public)
+ */
+export async function getInstaPosts() {
+  try {
+    const response = await apiClient.get('/api/insta');
+    return {
+      success: true,
+      data: response.data.data || response.data.posts || []
+    };
+  } catch (error) {
+    console.error('Error fetching insta posts:', error);
+    return {
+      success: false,
+      error: error.response?.data?.error || error.message,
+      data: []
+    };
+  }
+}
+
+/**
+ * Add an insta post (admin)
+ */
+export async function addInstaPost(formData) {
+  try {
+    const response = await apiClient.post('/api/insta', formData, {
+      headers: { 'Content-Type': 'multipart/form-data' }
+    });
+    return {
+      success: true,
+      data: response.data.data
+    };
+  } catch (error) {
+    console.error('Error adding insta post:', error);
+    return {
+      success: false,
+      error: error.response?.data?.error || error.message,
+      data: null
+    };
+  }
+}
+
+/**
+ * Delete an insta post (admin)
+ */
+export async function deleteInstaPost(id) {
+  try {
+    const response = await apiClient.delete(`/api/insta/${id}`);
+    return {
+      success: true,
+      data: response.data.data
+    };
+  } catch (error) {
+    console.error('Error deleting insta post:', error);
     return {
       success: false,
       error: error.response?.data?.error || error.message,
