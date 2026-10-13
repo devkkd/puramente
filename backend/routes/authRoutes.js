@@ -59,4 +59,35 @@ router.get("/admin/users/:id/cart", async (req, res) => {
   }
 });
 
+
+// Delete a user (Admin only)
+router.delete("/admin/users/:id", async (req, res) => {
+  try {
+    const userId = req.params.id;
+    
+    // Validate ID format
+    if (!userId.match(/^[0-9a-fA-F]{24}$/)) {
+      return res.status(400).json({ success: false, error: "Invalid user ID format" });
+    }
+
+    // Find and delete user
+    const user = await User.findByIdAndDelete(userId);
+    if (!user) {
+      return res.status(404).json({ success: false, error: "User not found" });
+    }
+
+    // Also delete their cart if it exists
+    await Cart.deleteOne({ userId: userId });
+
+    res.status(200).json({ 
+      success: true, 
+      message: `User ${user.fullName} and associated cart have been deleted successfully`,
+      data: user 
+    });
+  } catch (error) {
+    console.error("Delete user error:", error);
+    res.status(500).json({ success: false, error: "Failed to delete user" });
+  }
+});
+
 module.exports = router;

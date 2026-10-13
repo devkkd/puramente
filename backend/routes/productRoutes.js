@@ -11,7 +11,8 @@ const {
   updateProduct, 
   deleteProduct,
   bulkUploadProducts,
-  updateProductSeo
+  updateProductSeo,
+  bulkEditProducts
 } = require("../controllers/productController");
 
 // --- PUBLIC ROUTES (No token required) ---
@@ -36,6 +37,7 @@ const handleUpload = (multerMiddleware) => {
 };
 
 router.post("/bulk-upload", protect, admin, handleUpload(upload.any()), bulkUploadProducts);
+router.post("/bulk-edit", protect, admin, bulkEditProducts);
 router.post("/", protect, admin, handleUpload(upload.single("image")), createProduct);
 router.put("/:id/seo", protect, admin, updateProductSeo);
 router.put("/:id", protect, admin, handleUpload(upload.single("image")), updateProduct);

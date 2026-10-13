@@ -1,0 +1,86 @@
+﻿╔════════════════════════════════════════════════════════════════════════════╗
+║          अगर आप MANUALLY columns add करना चाहते हो तो यह करो:             ║
+╚════════════════════════════════════════════════════════════════════════════╝
+
+अगर आपका पुराना Excel template है और Meta columns नहीं हैं, तो:
+
+STEP 1: अपने Excel में सबसे आखिरी column के बाद नया column add करो
+────────────────────────────────────────────────────────────────
+   ✅ Best Seller के बाद right-click करो (Column I के बाद)
+   ✅ Insert → Columns Right चुनो
+   ✅ नया empty column आ जाएगा (अब यह Column J है)
+
+STEP 2: Column Headers add करो (सबसे पहली row में)
+────────────────────────────────────────────────────────
+   Column J  = "Meta Title"
+   Column K  = "Meta Description"  
+   Column L  = "Meta Keyword 1"
+   Column M  = "Meta Keyword 2"
+   Column N  = "Meta Keyword 3"
+
+STEP 3: Columns के width बढ़ाओ (ताकि data दिखे)
+────────────────────────────────────────────────
+   ✅ Column J header पर double-click करो (auto-fit हो जाएगा)
+   ✅ Column K, L, M, N पर भी double-click करो
+
+STEP 4: अपने products के साथ fill करो
+────────────────────────────────────────
+   Example:
+   Row 1 (Header): Meta Title | Meta Description | Meta Keyword 1 | ...
+   Row 2 (Data):   Classic Pearl Necklace | Discover our... | pearl necklace | ...
+
+STEP 5: Save करो as Excel file (.xlsx)
+─────────────────────────────────────────
+   Ctrl+S → Save As → Format: Excel Workbook (.xlsx)
+
+═══════════════════════════════════════════════════════════════════════════════
+
+✅ या बस यह करो (आसान तरीका):
+
+   नया Template download करो: BULK_UPLOAD_TEMPLATE_SEO_FIXED.xlsx
+   
+   यह पहले से ही 5 Meta columns के साथ आता है:
+   ✅ Meta Title
+   ✅ Meta Description
+   ✅ Meta Keyword 1
+   ✅ Meta Keyword 2
+   ✅ Meta Keyword 3
+
+   बस अपने products की जानकारी copy-paste करो!
+
+═══════════════════════════════════════════════════════════════════════════════
+
+📊 Column Width Reference (ताकि data properly दिखे):
+
+Column A (Product Code):      15 chars
+Column B (Product Name):      25 chars
+Column C (Category):          15 chars
+Column D (Sub-Category):      18 chars
+Column E (Description):       35 chars
+Column F (Image Name):        15 chars
+Column G (Image URL):         25 chars
+Column H (New Arrival):       12 chars
+Column I (Best Seller):       12 chars
+Column J (Meta Title):        40 chars ← बड़ा
+Column K (Meta Description):  50 chars ← बहुत बड़ा
+Column L (Meta Keyword 1):    25 chars
+Column M (Meta Keyword 2):    25 chars
+Column N (Meta Keyword 3):    25 chars
+
+═══════════════════════════════════════════════════════════════════════════════
+
+✅ SUMMARY:
+
+जो करो:
+   1️⃣  BULK_UPLOAD_TEMPLATE_SEO_FIXED.xlsx download करो
+   2️⃣  इसमें सभी columns पहले से हैं
+   3️⃣  अपने products के साथ fill करो
+   4️⃣  Upload करो
+
+या अगर manually add करना है:
+   1️⃣  पुराने template के बाद 5 नए columns insert करो
+   2️⃣  Headers: Meta Title, Meta Description, Meta Keyword 1, 2, 3
+   3️⃣  Width बढ़ाओ (ताकि data visible हो)
+   4️⃣  Fill करो और save करो
+
+═══════════════════════════════════════════════════════════════════════════════

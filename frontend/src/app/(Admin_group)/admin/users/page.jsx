@@ -2,13 +2,30 @@
 
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
-import { Eye, Filter, ShoppingCart, Users, Search, User as UserIcon } from "lucide-react";
-import { getAdminUsers } from "@/lib/api";
+import { Eye, Filter, ShoppingCart, Users, Search, User as UserIcon, Trash2 } from "lucide-react";
+import { getAdminUsers, deleteAdminUser } from "@/lib/api";
 
 export default function AdminUsersPage() {
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [cartFilter, setCartFilter] = useState("All");
+  // Delete user handler
+  const handleDeleteUser = async (userId, userName) => {
+    if (!window.confirm(`Are you sure you want to delete ${userName}? This action cannot be undone.`)) {
+      return;
+    }
+
+    try {
+      const res = await deleteAdminUser(userId);
+      if (res.success) {
+        setUsers(users.filter(u => u._id !== userId));
+        alert(`${userName} has been deleted successfully`);
+      }
+    } catch (error) {
+      console.error("Delete user failed:", error);
+      alert(`Failed to delete ${userName}: ${error.error || 'Unknown error'}`);
+    }
+  };
 
   useEffect(() => {
     const fetchUsers = async () => {
@@ -177,6 +194,12 @@ export default function AdminUsersPage() {
                       >
                         <Eye size={14} /> View
                       </Link>
+                      <button
+                        onClick={() => handleDeleteUser(user._id, user.fullName)}
+                        className="inline-flex items-center gap-1.5 px-4 py-2 ml-2 bg-red-50 text-red-600 hover:text-white hover:bg-red-600 rounded-lg transition-colors font-semibold text-xs uppercase tracking-wider"
+                      >
+                        <Trash2 size={14} /> Delete
+                      </button>
                     </td>
                     
                   </tr>
@@ -189,3 +212,8 @@ export default function AdminUsersPage() {
     </div>
   );
 }
+
+
+
+
+

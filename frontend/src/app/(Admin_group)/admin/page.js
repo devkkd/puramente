@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { 
   LayoutDashboard, 
@@ -24,6 +25,7 @@ import {
 } from "@/lib/api";
 
 export default function AdminDashboard() {
+  const router = useRouter();
   const [loading, setLoading] = useState(true);
   const [stats, setStats] = useState({
     orders: { total: 0, pending: 0, reviewed: 0, fulfilled: 0, recent: [] },
@@ -40,13 +42,15 @@ export default function AdminDashboard() {
   const fetchDashboardData = async () => {
     try {
       // Fetch all data in parallel for speed
-      const [ordersRes, customRes, contactRes, productRes, userRes] = await Promise.all([
+      const results = await Promise.allSettled([
         getAdminOrders(),
         getAdminCustomRequests(),
         getAdminContactEnquiries(),
         getProducts(),
         getAdminUsers()
       ]);
+
+      const [ordersRes, customRes, contactRes, productRes, userRes] = results.map(r => r.status === "fulfilled" ? r.value : { success: false, data: null, error: r.reason?.error || "API Failed" });
 
       const data = {
         orders: { total: 0, pending: 0, reviewed: 0, fulfilled: 0, recent: [] },
@@ -387,3 +391,7 @@ export default function AdminDashboard() {
     </div>
   );
 }
+
+
+
+

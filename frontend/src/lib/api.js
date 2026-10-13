@@ -1,118 +1,371 @@
-﻿import axios from 'axios';
+﻿/**
+ * API Client for Puramente Admin Dashboard
+ */
 
-// Write operations (create/update/delete) → local backend
-const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5001/api';
-// Read operations (products/categories/blogs) → production (has real data)
-const PROD_URL = process.env.NEXT_PUBLIC_PROD_API_URL || 'https://puramentejewel.com/api';
+import axios from 'axios';
 
-export const api = axios.create({ baseURL: API_URL });
-export const prodApi = axios.create({ baseURL: PROD_URL });
+// Create axios instance with default config
+const apiClient = axios.create({
+  baseURL: process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:5001',
+  timeout: 30000,
+  headers: {
+    'Content-Type': 'application/json'
+  }
+});
 
-// Auth token interceptor for local api
-api.interceptors.request.use(
-    (config) => {
-        if (typeof window !== "undefined") {
-            const token = localStorage.getItem("adminToken") || localStorage.getItem("userToken") || localStorage.getItem("token");
-            if (token) config.headers.Authorization = `Bearer ${token}`;
-        }
-        return config;
-    },
-    (error) => Promise.reject(error)
-);
+// Add request interceptor to include auth token
+apiClient.interceptors.request.use(
+  (config) => {
+    const token = typeof window !== 'undefined' 
+      ? localStorage.getItem('adminToken') || localStorage.getItem('token')
+      : null;
 
-// Auth token interceptor for prodApi (admin reads need auth too)
-prodApi.interceptors.request.use(
-    (config) => {
-        if (typeof window !== "undefined") {
-            const token = localStorage.getItem("adminToken") || localStorage.getItem("userToken") || localStorage.getItem("token");
-            if (token) config.headers.Authorization = `Bearer ${token}`;
-        }
-        return config;
-    },
-    (error) => Promise.reject(error)
-);
-
-api.interceptors.response.use(
-    (response) => response.data,
-    (error) => {
-        console.error("API Error:", error.response?.data || error.message);
-        return Promise.reject(error.response?.data || { error: "Server error" });
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`;
     }
+
+    return config;
+  },
+  (error) => Promise.reject(error)
 );
 
-prodApi.interceptors.response.use(
-    (response) => response.data,
-    (error) => Promise.reject(error.response?.data || { error: "Server error" })
+// Add response interceptor for error handling
+apiClient.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    if (error.response?.status === 401) {
+      if (typeof window !== 'undefined') {
+        localStorage.removeItem('adminToken');
+        localStorage.removeItem('token');
+        window.location.href = '/adminlogin';
+      }
+    }
+    return Promise.reject(error);
+  }
 );
 
-// --- Products & Categories ---
-// READ → production (real data), WRITE → local backend
-export const getCategories = () => prodApi.get('/categories');
-export const createCategory = (data) => api.post('/categories', data);
-export const getCategoryById = (id) => prodApi.get(`/categories/${id}`);
-export const updateCategory = (id, data) => prodApi.put(`/categories/${id}`, data);
-export const updateCategorySeo = (id, seoData) => prodApi.put(`/categories/${id}/seo`, seoData);
+/**
+ * Login admin user with cookie-based authentication
+ */
+export async function loginAdminUser(credentials) {
+  try {
+    const { email, password } = credentials;
 
-export const getProducts = () => prodApi.get('/products');
-export const getProductById = (id) => prodApi.get(`/products/${id}`);
-export const getProductBySlug = (slug) => prodApi.get(`/products/slug/${slug}`);
-export const createProduct = (data) => api.post('/products', data);
-export const updateProduct = (id, data) => prodApi.put(`/products/${id}`, data);
-export const updateProductSeo = (id, seoData) => prodApi.put(`/products/${id}/seo`, seoData);
-export const bulkUploadProducts = (data) => api.post('/products/bulk-upload', data);
+    if (!email || !password) {
+      return {
+        success: false,
+        error: 'Email and password are required'
+      };
+    }
 
-// --- Cart ---
-export const getCart = (data) => prodApi.post('/cart/view', data);
-export const addToCart = (data) => prodApi.post('/cart/add', data);
-export const updateCartItem = (data) => prodApi.put('/cart/update', data);
-export const removeFromCart = (data) => prodApi.post('/cart/remove', data);
+    const loginClient = axios.create({
+      baseURL: process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:5001',
+      timeout: 10000,
+      withCredentials: true,
+      headers: {
+        'Content-Type': 'application/json'
+      }
+    });
 
-// --- Auth ---
-export const registerUser = (data) => prodApi.post('/auth/register', data);
-export const loginUser = (data) => prodApi.post('/auth/login', data);
-export const getAdminUserCart = (id) => api.get(`/auth/admin/users/${id}/cart`);
-export const loginAdminUser = (data) => prodApi.post('/auth/admin-login', data);
-export const forgotPassword = (data) => prodApi.post('/auth/forgot-password', data);
-export const resetPassword = (token, data) => prodApi.put(`/auth/reset-password/${token}`, data);
+    const response = await loginClient.post('/api/auth/admin-login', {
+      email: email.toLowerCase().trim(),
+      password
+    });
 
-// --- User Profile ---
-export const getUserProfile = (id) => api.get(`/auth/me/${id}`);
+    if (response.data.success) {
+      if (typeof window !== 'undefined') {
+        localStorage.setItem('adminToken', response.data.data.token);
+        // Set cookie - simple approach
+        const token = response.data.data.token;
+        const date = new Date();
+        date.setTime(date.getTime() + (30 * 24 * 60 * 60 * 1000));
+        document.cookie = "adminToken=" + token + "; expires=" + date.toUTCString() + "; path=/";
+      }
+      
+      return {
+        success: true,
+        data: response.data.data
+      };
+    } else {
+      return {
+        success: false,
+        error: response.data.error || 'Login failed'
+      };
+    }
+  } catch (error) {
+    console.error('Admin login error:', error.message);
+    
+    if (error.response?.status === 401) {
+      return {
+        success: false,
+        error: error.response.data?.error || 'Invalid admin credentials'
+      };
+    }
+    
+    if (error.code === 'ECONNABORTED') {
+      return {
+        success: false,
+        error: 'Request timeout - backend may not be running'
+      };
+    }
 
-// --- Orders ---
-export const submitOrderRequest = (data) => prodApi.post('/orders/submit', data);
+    return {
+      success: false,
+      error: error.message || 'Login failed. Please try again.'
+    };
+  }
+}
 
-// --- ADMIN ROUTES (all on local backend) ---
-export const getAdminOrders = () => api.get('/orders/admin/all');
-export const getAdminOrderById = (id) => api.get(`/orders/admin/${id}`);
-export const updateOrderStatus = (id, status) => api.put(`/orders/admin/${id}/status`, { status });
-export const deleteAdminOrder = (id) => prodApi.delete(`/orders/admin/${id}`);
-export const getAdminUsers = () => api.get('/auth/admin/users');
+/**
+ * Get all admin orders
+ */
+export async function getAdminOrders() {
+  try {
+    const response = await apiClient.get('/api/orders/admin/all');
+    return {
+      success: true,
+      data: response.data.data || response.data.orders || []
+    };
+  } catch (error) {
+    console.error('Error fetching orders:', error);
+    return {
+      success: false,
+      error: error.response?.data?.error || error.message,
+      data: []
+    };
+  }
+}
 
-// --- Custom Requests ---
-export const submitCustomRequest = (formData) => prodApi.post('/custom-requests/submit', formData, {
-    headers: { 'Content-Type': 'multipart/form-data' }
-});
-export const getAdminCustomRequests = () => api.get('/custom-requests/admin/all');
-export const updateCustomRequestStatus = (id, status) => api.put(`/custom-requests/admin/${id}/status`, { status });
-export const deleteAdminCustomRequest = (id) => api.delete(`/custom-requests/admin/${id}`);
+/**
+ * Get all admin custom requests
+ */
+export async function getAdminCustomRequests() {
+  try {
+    const response = await apiClient.get('/api/custom-requests/admin/all');
+    return {
+      success: true,
+      data: response.data.data || response.data.customRequests || []
+    };
+  } catch (error) {
+    console.error('Error fetching custom requests:', error);
+    return {
+      success: false,
+      error: error.response?.data?.error || error.message,
+      data: []
+    };
+  }
+}
 
-// --- Contact Enquiries ---
-export const submitContactEnquiry = (data) => prodApi.post('/contact/submit', data);
-export const getAdminContactEnquiries = () => api.get('/contact/admin/all');
-export const updateContactEnquiryStatus = (id, status) => api.put(`/contact/admin/${id}/status`, { status });
-export const deleteAdminContactEnquiry = (id) => api.delete(`/contact/admin/${id}`);
+/**
+ * Get all admin contact enquiries
+ */
+export async function getAdminContactEnquiries() {
+  try {
+    const response = await apiClient.get('/api/contact/admin/all');
+    return {
+      success: true,
+      data: response.data.data || response.data.contacts || []
+    };
+  } catch (error) {
+    console.error('Error fetching contact enquiries:', error);
+    return {
+      success: false,
+      error: error.response?.data?.error || error.message,
+      data: []
+    };
+  }
+}
 
-// --- Blogs ---
-export const getBlogs = () => prodApi.get('/blogs');
-export const getBlogBySlug = (slug) => prodApi.get(`/blogs/slug/${slug}`);
-export const getBlogById = (id) => prodApi.get(`/blogs/${id}`);
-export const createBlog = (data) => api.post('/blogs', data, { headers: { 'Content-Type': 'multipart/form-data' } });
-export const updateBlog = (id, data) => api.put(`/blogs/${id}`, data, { headers: { 'Content-Type': 'multipart/form-data' } });
-export const deleteBlog = (id) => api.delete(`/blogs/${id}`);
+/**
+ * Get all products
+ */
+export async function getProducts(limit = null) {
+  try {
+    let url = '/api/products';
+    if (limit) {
+      url += `?limit=${limit}`;
+    }
+    const response = await apiClient.get(url);
+    return {
+      success: true,
+      data: response.data.data || response.data.products || []
+    };
+  } catch (error) {
+    console.error('Error fetching products:', error);
+    return {
+      success: false,
+      error: error.response?.data?.error || error.message,
+      data: []
+    };
+  }
+}
 
-// --- Insta Posts ---
-export const getInstaPosts = () => prodApi.get('/insta');
-export const addInstaPost = (data) => api.post('/insta', data, {
-    headers: { 'Content-Type': 'multipart/form-data' }
-});
-export const deleteInstaPost = (id) => api.delete(`/insta/${id}`);
+/**
+ * Get all admin users
+ */
+export async function getAdminUsers() {
+  try {
+    const response = await apiClient.get('/api/auth/admin/users');
+    return {
+      success: true,
+      data: response.data.data || response.data.users || []
+    };
+  } catch (error) {
+    console.error('Error fetching users:', error);
+    return {
+      success: false,
+      error: error.response?.data?.error || error.message,
+      data: []
+    };
+  }
+}
+
+/**
+ * Get all categories
+ */
+export async function getCategories() {
+  try {
+    const response = await apiClient.get('/api/categories');
+    return {
+      success: true,
+      data: response.data.data || response.data.categories || []
+    };
+  } catch (error) {
+    console.error('Error fetching categories:', error);
+    return {
+      success: false,
+      error: error.response?.data?.error || error.message,
+      data: []
+    };
+  }
+}
+
+/**
+ * Create a new product
+ */
+export async function createProduct(formData) {
+  try {
+    const response = await apiClient.post('/api/products', formData, {
+      headers: { 'Content-Type': 'multipart/form-data' }
+    });
+    return {
+      success: true,
+      data: response.data.data
+    };
+  } catch (error) {
+    console.error('Error creating product:', error);
+    return {
+      success: false,
+      error: error.response?.data?.error || error.message,
+      data: null
+    };
+  }
+}
+
+/**
+ * Update a product
+ */
+export async function updateProduct(id, formData) {
+  try {
+    const response = await apiClient.put(`/api/products/${id}`, formData, {
+      headers: { 'Content-Type': 'multipart/form-data' }
+    });
+    return {
+      success: true,
+      data: response.data.data
+    };
+  } catch (error) {
+    console.error('Error updating product:', error);
+    return {
+      success: false,
+      error: error.response?.data?.error || error.message,
+      data: null
+    };
+  }
+}
+
+/**
+ * Delete a product
+ */
+export async function deleteProduct(id) {
+  try {
+    const response = await apiClient.delete(`/api/products/${id}`);
+    return {
+      success: true,
+      data: response.data.data
+    };
+  } catch (error) {
+    console.error('Error deleting product:', error);
+    return {
+      success: false,
+      error: error.response?.data?.error || error.message,
+      data: null
+    };
+  }
+}
+
+/**
+ * Get a product by ID
+ */
+export async function getProductById(id) {
+  try {
+    const response = await apiClient.get(`/api/products/${id}`);
+    return {
+      success: true,
+      data: response.data.data
+    };
+  } catch (error) {
+    console.error('Error fetching product:', error);
+    return {
+      success: false,
+      error: error.response?.data?.error || error.message,
+      data: null
+    };
+  }
+}
+
+/**
+ * Bulk edit multiple products
+ */
+export async function bulkEditProducts(productIds, updateFields) {
+  try {
+    if (!Array.isArray(productIds) || productIds.length === 0) {
+      return {
+        success: false,
+        error: 'productIds must be a non-empty array',
+        data: null
+      };
+    }
+
+    if (typeof updateFields !== 'object' || updateFields === null || Object.keys(updateFields).length === 0) {
+      return {
+        success: false,
+        error: 'updateFields must be a non-empty object',
+        data: null
+      };
+    }
+
+    const response = await apiClient.post('/api/products/bulk-edit', {
+      productIds,
+      updateFields
+    });
+
+    return {
+      success: response.data.success,
+      data: response.data.data,
+      message: response.data.message,
+      updatedCount: response.data.data?.updatedCount || 0
+    };
+  } catch (error) {
+    console.error('Error in bulk edit:', error);
+    return {
+      success: false,
+      error: error.response?.data?.error || error.message,
+      data: null
+    };
+  }
+}
+
+// Export apiClient as both default and named export
+export { apiClient as api };
+export default apiClient;

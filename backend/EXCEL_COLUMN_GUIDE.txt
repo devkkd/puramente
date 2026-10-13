@@ -1,0 +1,94 @@
+﻿╔════════════════════════════════════════════════════════════════════════════╗
+║                    ✅ EXCEL TEMPLATE - COLUMN LAYOUT                       ║
+╚════════════════════════════════════════════════════════════════════════════╝
+
+📌 नया Template File: BULK_UPLOAD_TEMPLATE_SEO_FIXED.xlsx
+
+यह सभी columns दिखाता है (कोई hidden नहीं):
+
+┌─────┬──────────────────┬────────────────────────────────────────────────┐
+│ Col │ Column Name      │ Description                                    │
+├─────┼──────────────────┼────────────────────────────────────────────────┤
+│  A  │ Product Code     │ Unique ID (e.g., NK-101)                       │
+│  B  │ Product Name     │ Product का नाम                                 │
+│  C  │ Category         │ Category का नाम (Database से match होना चाहिए) │
+│  D  │ Sub - Category   │ "with gemstone" या "without gemstone"          │
+│  E  │ Description      │ Product की description                         │
+│  F  │ Image Name       │ Image file का नाम (NK-101.jpg)                 │
+│  G  │ Image URL        │ Direct URL (optional)                          │
+│  H  │ New Arrival      │ yes / no                                       │
+│  I  │ Best Seller      │ yes / no                                       │
+├─────┼──────────────────┼────────────────────────────────────────────────┤
+│  J  │ Meta Title       │ SEO Title (max 60 chars) ← NOW VISIBLE! ✅     │
+│  K  │ Meta Description │ SEO Description (max 160 chars) ← NOW VISIBLE! │
+│  L  │ Meta Keyword 1   │ First keyword ← NOW VISIBLE! ✅                │
+│  M  │ Meta Keyword 2   │ Second keyword ← NOW VISIBLE! ✅               │
+│  N  │ Meta Keyword 3   │ Third keyword ← NOW VISIBLE! ✅                │
+└─────┴──────────────────┴────────────────────────────────────────────────┘
+
+💡 क्या बदला:
+   ✅ Columns J, K, L, M, N अब visible हैं (पहले hidden/scroll करने पड़ते थे)
+   ✅ Column widths बढ़ाए गए (Meta Title: 40, Description: 50)
+   ✅ Top row frozen है (scroll करने पर भी header दिखेगा)
+   ✅ यह template पहले से ही 2 example rows दे रहा है
+
+═══════════════════════════════════════════════════════════════════════════════
+
+📋 EXAMPLE ROW 1 में क्या है:
+
+Product Code:       NK-101
+Product Name:       Classic Pearl Necklace
+Category:           Necklaces
+Sub - Category:     with gemstone
+Description:        Handcrafted pearl necklace with gemstone accents
+Image Name:         NK-101.jpg
+Image URL:          (खाली)
+New Arrival:        yes
+Best Seller:        no
+Meta Title:         Classic Pearl Necklace - Handcrafted Design ✅
+Meta Description:   Discover our exquisite handcrafted pearl necklaces... ✅
+Meta Keyword 1:     pearl necklace ✅
+Meta Keyword 2:     jewelry ✅
+Meta Keyword 3:     luxury ✅
+
+═══════════════════════════════════════════════════════════════════════════════
+
+🚀 कैसे Use करें:
+
+1. BULK_UPLOAD_TEMPLATE_SEO_FIXED.xlsx खोलें
+   ↓
+2. आप देखेंगे - सभी 14 columns एक साथ दिखेंगे:
+   [A] Product Code | [B] Name | [C] Category | [D] Sub-Category | [E] Desc
+   [F] Image Name | [G] Image URL | [H] New Arrival | [I] Best Seller
+   [J] Meta Title | [K] Meta Description | [L] Keyword1 | [M] Keyword2 | [N] Keyword3
+   ↓
+3. अपने products के साथ fill करें
+   ↓
+4. Upload करें (images के साथ)
+   ↓
+5. Backend में सभी fields process होंगे ✅
+
+═══════════════════════════════════════════════════════════════════════════════
+
+❓ अगर Meta columns अभी भी नहीं दिख रहे:
+
+Option 1: Right-arrow key press करो
+   → Excel में सभी columns को right scroll करने से सब दिखेगा
+
+Option 2: Column J पर click करो
+   → फिर Shift+Right arrow press करके columns को select करो
+   → सब दिखने लगेंगे
+
+Option 3: Format → Column → Unhide select करो
+   → अगर columns hidden हों
+
+═══════════════════════════════════════════════════════════════════════════════
+
+✅ Files Ready:
+
+OLD:  BULK_UPLOAD_TEMPLATE_SEO.xlsx (hidden columns issue)
+NEW:  BULK_UPLOAD_TEMPLATE_SEO_FIXED.xlsx (सभी columns visible) ✅
+
+Use करो: BULK_UPLOAD_TEMPLATE_SEO_FIXED.xlsx
+
+═══════════════════════════════════════════════════════════════════════════════

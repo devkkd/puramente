@@ -1,4 +1,4 @@
-const Product = require("../models/Product");
+﻿const Product = require("../models/Product");
 const Category = require("../models/Category");
 const { uploadToCloudflare } = require("../utils/upload");
 const { sanitizeSeoFields, generateProductSchema } = require("../utils/seoHelper");
@@ -59,7 +59,7 @@ exports.createProduct = async (req, res) => {
 // --- EXISTING: Get all products ---
 exports.getProducts = async (req, res) => {
   try {
-    const products = await Product.find()
+    const categoryId = req.query.category; let query = {}; if (categoryId && /^[0-9a-f]{24}$/.test(categoryId)) { query.category = categoryId; } const products = await Product.find(query)
       .populate("category", "name")
       .sort({ createdAt: -1 });
 
@@ -265,7 +265,7 @@ exports.bulkUploadProducts = async (req, res) => {
     // 2. BACKGROUND WORKER (Runs after response is sent)
     (async () => {
       try {
-        console.log("\n🚀 BACKGROUND WORKER STARTED: Parsing Excel File...");
+        console.log("\nðŸš€ BACKGROUND WORKER STARTED: Parsing Excel File...");
         const workbook = xlsx.read(excelFile.buffer, { type: 'buffer' });
         const sheetName = workbook.SheetNames[0]; 
         const rows = xlsx.utils.sheet_to_json(workbook.Sheets[sheetName]);
@@ -282,7 +282,7 @@ exports.bulkUploadProducts = async (req, res) => {
         let successCount = 0;
         let skipCount = 0;
 
-        console.log(`📦 Found ${rows.length} rows in Excel. Starting Cloudflare uploads...`);
+        console.log(`ðŸ“¦ Found ${rows.length} rows in Excel. Starting Cloudflare uploads...`);
 
         // Loop through Excel rows sequentially to prevent Cloudflare rate limits
         for (let i = 0; i < rows.length; i++) {
@@ -298,14 +298,14 @@ exports.bulkUploadProducts = async (req, res) => {
           const imgUrl = row['Image URL'] ? row['Image URL'].toString().trim() : null;
 
           if (!code || !name) {
-            console.log(`⚠️ Row ${i + 1}: Missing product code or product name. Skipping.`);
+            console.log(`âš ï¸ Row ${i + 1}: Missing product code or product name. Skipping.`);
             skipCount++;
             continue;
           }
 
           // 1. Resolve Category
           if (!catName) {
-            console.log(`⚠️ Row ${i + 1}: Category is missing for product "${name}" (${code}). Skipping.`);
+            console.log(`âš ï¸ Row ${i + 1}: Category is missing for product "${name}" (${code}). Skipping.`);
             skipCount++;
             continue;
           }
@@ -315,7 +315,7 @@ exports.bulkUploadProducts = async (req, res) => {
           );
 
           if (!matchedCategory) {
-            console.log(`⚠️ Row ${i + 1}: Category "${catName}" not found in database for product "${name}" (${code}). Skipping.`);
+            console.log(`âš ï¸ Row ${i + 1}: Category "${catName}" not found in database for product "${name}" (${code}). Skipping.`);
             skipCount++;
             continue;
           }
@@ -328,13 +328,13 @@ exports.bulkUploadProducts = async (req, res) => {
 
           // 3. Prevent duplicate designCode / slug
           if (existingDesignCodes.has(code.toUpperCase()) || insertedDesignCodesInBatch.has(code.toUpperCase())) {
-            console.log(`⚠️ Row ${i + 1}: Design Code "${code}" already exists in DB or current batch. Skipping.`);
+            console.log(`âš ï¸ Row ${i + 1}: Design Code "${code}" already exists in DB or current batch. Skipping.`);
             skipCount++;
             continue;
           }
 
           if (existingSlugs.has(generatedSlug.toLowerCase()) || insertedSlugsInBatch.has(generatedSlug.toLowerCase())) {
-            console.log(`⚠️ Row ${i + 1}: Generated Slug "${generatedSlug}" already exists in DB or current batch. Skipping.`);
+            console.log(`âš ï¸ Row ${i + 1}: Generated Slug "${generatedSlug}" already exists in DB or current batch. Skipping.`);
             skipCount++;
             continue;
           }
@@ -357,7 +357,7 @@ exports.bulkUploadProducts = async (req, res) => {
             });
 
             if (!matchedImage) {
-              console.log(`⚠️ Row ${i + 1}: Image file not found (searched for custom name: "${imgName || 'N/A'}" and code: "${code}"). Skipping.`);
+              console.log(`âš ï¸ Row ${i + 1}: Image file not found (searched for custom name: "${imgName || 'N/A'}" and code: "${code}"). Skipping.`);
               skipCount++;
               continue;
             }
@@ -366,7 +366,7 @@ exports.bulkUploadProducts = async (req, res) => {
               // Upload to Cloudflare
               imageUrl = await uploadToCloudflare(matchedImage);
             } catch (uploadError) {
-              console.error(`❌ Row ${i + 1}: Cloudflare upload failed for image "${matchedImage.originalname}":`, uploadError.message);
+              console.error(`âŒ Row ${i + 1}: Cloudflare upload failed for image "${matchedImage.originalname}":`, uploadError.message);
               skipCount++;
               continue;
             }
@@ -407,20 +407,20 @@ exports.bulkUploadProducts = async (req, res) => {
 
           // Log progress every 50 items so you know it's working
           if (successCount % 50 === 0) {
-            console.log(`⏳ Uploaded ${successCount} / ${rows.length} items to Cloudflare...`);
+            console.log(`â³ Uploaded ${successCount} / ${rows.length} items to Cloudflare...`);
           }
         }
 
         // Save everything to MongoDB at the very end
         if (productsToInsert.length > 0) {
-          console.log(`💾 Saving ${productsToInsert.length} products to MongoDB...`);
+          console.log(`ðŸ’¾ Saving ${productsToInsert.length} products to MongoDB...`);
           await Product.insertMany(productsToInsert);
         }
 
-        console.log(`✅ BACKGROUND TASK COMPLETE! Successfully added ${successCount} products. Skipped ${skipCount}.`);
+        console.log(`âœ… BACKGROUND TASK COMPLETE! Successfully added ${successCount} products. Skipped ${skipCount}.`);
 
       } catch (bgError) {
-        console.error("❌ Background Worker Crashed:", bgError);
+        console.error("âŒ Background Worker Crashed:", bgError);
       }
     })();
 
@@ -467,13 +467,2423 @@ exports.uploadMedia = async (req, res) => {
   }
 };
 
+// --- Bulk Edit Products ---
+exports.bulkEditProducts = async (req, res) => {
+  try {
+    const { products: updatePayload } = req.body;
+
+    if (!updatePayload || !Array.isArray(updatePayload)) {
+      return res.status(400).json({ error: "Invalid payload: products array required" });
+    }
+
+    const results = {
+      successful: [],
+      failed: [],
+      totalProcessed: 0
+    };
+
+    for (const item of updatePayload) {
+      const { _id, updates } = item;
+
+      if (!_id || !updates) {
+        results.failed.push({ _id, error: "Missing _id or updates" });
+        results.totalProcessed++;
+        continue;
+      }
+
+      try {
+        if (!isValidObjectId(_id)) {
+          results.failed.push({ _id, error: "Invalid product ID format" });
+          results.totalProcessed++;
+          continue;
+        }
+
+        // Find product
+        const product = await Product.findById(_id);
+        if (!product) {
+          results.failed.push({ _id, error: "Product not found" });
+          results.totalProcessed++;
+          continue;
+        }
+
+        // Validate category if being updated
+        if (updates.category) {
+          const categoryExists = await Category.findById(updates.category);
+          if (!categoryExists) {
+            results.failed.push({ _id, error: "Category not found" });
+            results.totalProcessed++;
+            continue;
+          }
+        }
+
+        // Parse boolean fields
+        if (updates.bestSeller !== undefined) {
+          updates.bestSeller = updates.bestSeller === "true" || updates.bestSeller === true;
+        }
+        if (updates.newArrival !== undefined) {
+          updates.newArrival = updates.newArrival === "true" || updates.newArrival === true;
+        }
+
+        // Update product
+        const updated = await Product.findByIdAndUpdate(_id, updates, { new: true, runValidators: true }).populate("category", "name");
+        results.successful.push(updated);
+        results.totalProcessed++;
+      } catch (itemError) {
+        results.failed.push({ _id, error: itemError.message });
+        results.totalProcessed++;
+      }
+    }
+
+    res.status(200).json({
+      success: true,
+      message: "Bulk edit completed",
+      data: results,
+      summary: {
+        successful: results.successful.length,
+        failed: results.failed.length,
+        total: results.totalProcessed
+      }
+    });
+  } catch (error) {
+    console.error("Bulk Edit Error:", error);
+    res.status(500).json({ error: "Server error during bulk edit" });
+  }
+};
+
+// --- Bulk Edit Products ---
+exports.bulkEditProducts = async (req, res) => {
+  try {
+    const { products: updatePayload } = req.body;
+
+    if (!updatePayload || !Array.isArray(updatePayload)) {
+      return res.status(400).json({ error: "Invalid payload: products array required" });
+    }
+
+    const results = {
+      successful: [],
+      failed: [],
+      totalProcessed: 0
+    };
+
+    for (const item of updatePayload) {
+      const { _id, updates } = item;
+
+      if (!_id || !updates) {
+        results.failed.push({ _id, error: "Missing _id or updates" });
+        results.totalProcessed++;
+        continue;
+      }
+
+      try {
+        if (!isValidObjectId(_id)) {
+          results.failed.push({ _id, error: "Invalid product ID format" });
+          results.totalProcessed++;
+          continue;
+        }
+
+        // Find product
+        const product = await Product.findById(_id);
+        if (!product) {
+          results.failed.push({ _id, error: "Product not found" });
+          results.totalProcessed++;
+          continue;
+        }
+
+        // Validate category if being updated
+        if (updates.category) {
+          const categoryExists = await Category.findById(updates.category);
+          if (!categoryExists) {
+            results.failed.push({ _id, error: "Category not found" });
+            results.totalProcessed++;
+            continue;
+          }
+        }
+
+        // Parse boolean fields
+        if (updates.bestSeller !== undefined) {
+          updates.bestSeller = updates.bestSeller === "true" || updates.bestSeller === true;
+        }
+        if (updates.newArrival !== undefined) {
+          updates.newArrival = updates.newArrival === "true" || updates.newArrival === true;
+        }
+
+        // Update product
+        const updated = await Product.findByIdAndUpdate(_id, updates, { new: true, runValidators: true }).populate("category", "name");
+        results.successful.push(updated);
+        results.totalProcessed++;
+      } catch (itemError) {
+        results.failed.push({ _id, error: itemError.message });
+        results.totalProcessed++;
+      }
+    }
+
+    res.status(200).json({
+      success: true,
+      message: "Bulk edit completed",
+      data: results,
+      summary: {
+        successful: results.successful.length,
+        failed: results.failed.length,
+        total: results.totalProcessed
+      }
+    });
+  } catch (error) {
+    console.error("Bulk Edit Error:", error);
+    res.status(500).json({ error: "Server error during bulk edit" });
+  }
+};
 
 
+// --- Bulk Edit Products ---
+exports.bulkEditProducts = async (req, res) => {
+  try {
+    const { products: updatePayload } = req.body;
+
+    if (!updatePayload || !Array.isArray(updatePayload)) {
+      return res.status(400).json({ error: "Invalid payload: products array required" });
+    }
+
+    const results = {
+      successful: [],
+      failed: [],
+      totalProcessed: 0
+    };
+
+    for (const item of updatePayload) {
+      const { _id, updates } = item;
+
+      if (!_id || !updates) {
+        results.failed.push({ _id, error: "Missing _id or updates" });
+        results.totalProcessed++;
+        continue;
+      }
+
+      try {
+        if (!isValidObjectId(_id)) {
+          results.failed.push({ _id, error: "Invalid product ID format" });
+          results.totalProcessed++;
+          continue;
+        }
+
+        // Find product
+        const product = await Product.findById(_id);
+        if (!product) {
+          results.failed.push({ _id, error: "Product not found" });
+          results.totalProcessed++;
+          continue;
+        }
+
+        // Validate category if being updated
+        if (updates.category) {
+          const categoryExists = await Category.findById(updates.category);
+          if (!categoryExists) {
+            results.failed.push({ _id, error: "Category not found" });
+            results.totalProcessed++;
+            continue;
+          }
+        }
+
+        // Parse boolean fields
+        if (updates.bestSeller !== undefined) {
+          updates.bestSeller = updates.bestSeller === "true" || updates.bestSeller === true;
+        }
+        if (updates.newArrival !== undefined) {
+          updates.newArrival = updates.newArrival === "true" || updates.newArrival === true;
+        }
+
+        // Update product
+        const updated = await Product.findByIdAndUpdate(_id, updates, { new: true, runValidators: true }).populate("category", "name");
+        results.successful.push(updated);
+        results.totalProcessed++;
+      } catch (itemError) {
+        results.failed.push({ _id, error: itemError.message });
+        results.totalProcessed++;
+      }
+    }
+
+    res.status(200).json({
+      success: true,
+      message: "Bulk edit completed",
+      data: results,
+      summary: {
+        successful: results.successful.length,
+        failed: results.failed.length,
+        total: results.totalProcessed
+      }
+    });
+  } catch (error) {
+    console.error("Bulk Edit Error:", error);
+    res.status(500).json({ error: "Server error during bulk edit" });
+  }
+};
+
+// --- Bulk Edit Products ---
+exports.bulkEditProducts = async (req, res) => {
+  try {
+    const { products: updatePayload } = req.body;
+
+    if (!updatePayload || !Array.isArray(updatePayload)) {
+      return res.status(400).json({ error: "Invalid payload: products array required" });
+    }
+
+    const results = {
+      successful: [],
+      failed: [],
+      totalProcessed: 0
+    };
+
+    for (const item of updatePayload) {
+      const { _id, updates } = item;
+
+      if (!_id || !updates) {
+        results.failed.push({ _id, error: "Missing _id or updates" });
+        results.totalProcessed++;
+        continue;
+      }
+
+      try {
+        if (!isValidObjectId(_id)) {
+          results.failed.push({ _id, error: "Invalid product ID format" });
+          results.totalProcessed++;
+          continue;
+        }
+
+        // Find product
+        const product = await Product.findById(_id);
+        if (!product) {
+          results.failed.push({ _id, error: "Product not found" });
+          results.totalProcessed++;
+          continue;
+        }
+
+        // Validate category if being updated
+        if (updates.category) {
+          const categoryExists = await Category.findById(updates.category);
+          if (!categoryExists) {
+            results.failed.push({ _id, error: "Category not found" });
+            results.totalProcessed++;
+            continue;
+          }
+        }
+
+        // Parse boolean fields
+        if (updates.bestSeller !== undefined) {
+          updates.bestSeller = updates.bestSeller === "true" || updates.bestSeller === true;
+        }
+        if (updates.newArrival !== undefined) {
+          updates.newArrival = updates.newArrival === "true" || updates.newArrival === true;
+        }
+
+        // Update product
+        const updated = await Product.findByIdAndUpdate(_id, updates, { new: true, runValidators: true }).populate("category", "name");
+        results.successful.push(updated);
+        results.totalProcessed++;
+      } catch (itemError) {
+        results.failed.push({ _id, error: itemError.message });
+        results.totalProcessed++;
+      }
+    }
+
+    res.status(200).json({
+      success: true,
+      message: "Bulk edit completed",
+      data: results,
+      summary: {
+        successful: results.successful.length,
+        failed: results.failed.length,
+        total: results.totalProcessed
+      }
+    });
+  } catch (error) {
+    console.error("Bulk Edit Error:", error);
+    res.status(500).json({ error: "Server error during bulk edit" });
+  }
+};
 
 
+// --- Bulk Edit Products ---
+exports.bulkEditProducts = async (req, res) => {
+  try {
+    const { products: updatePayload } = req.body;
+
+    if (!updatePayload || !Array.isArray(updatePayload)) {
+      return res.status(400).json({ error: "Invalid payload: products array required" });
+    }
+
+    const results = {
+      successful: [],
+      failed: [],
+      totalProcessed: 0
+    };
+
+    for (const item of updatePayload) {
+      const { _id, updates } = item;
+
+      if (!_id || !updates) {
+        results.failed.push({ _id, error: "Missing _id or updates" });
+        results.totalProcessed++;
+        continue;
+      }
+
+      try {
+        if (!isValidObjectId(_id)) {
+          results.failed.push({ _id, error: "Invalid product ID format" });
+          results.totalProcessed++;
+          continue;
+        }
+
+        // Find product
+        const product = await Product.findById(_id);
+        if (!product) {
+          results.failed.push({ _id, error: "Product not found" });
+          results.totalProcessed++;
+          continue;
+        }
+
+        // Validate category if being updated
+        if (updates.category) {
+          const categoryExists = await Category.findById(updates.category);
+          if (!categoryExists) {
+            results.failed.push({ _id, error: "Category not found" });
+            results.totalProcessed++;
+            continue;
+          }
+        }
+
+        // Parse boolean fields
+        if (updates.bestSeller !== undefined) {
+          updates.bestSeller = updates.bestSeller === "true" || updates.bestSeller === true;
+        }
+        if (updates.newArrival !== undefined) {
+          updates.newArrival = updates.newArrival === "true" || updates.newArrival === true;
+        }
+
+        // Update product
+        const updated = await Product.findByIdAndUpdate(_id, updates, { new: true, runValidators: true }).populate("category", "name");
+        results.successful.push(updated);
+        results.totalProcessed++;
+      } catch (itemError) {
+        results.failed.push({ _id, error: itemError.message });
+        results.totalProcessed++;
+      }
+    }
+
+    res.status(200).json({
+      success: true,
+      message: "Bulk edit completed",
+      data: results,
+      summary: {
+        successful: results.successful.length,
+        failed: results.failed.length,
+        total: results.totalProcessed
+      }
+    });
+  } catch (error) {
+    console.error("Bulk Edit Error:", error);
+    res.status(500).json({ error: "Server error during bulk edit" });
+  }
+};
+
+// --- Bulk Edit Products ---
+exports.bulkEditProducts = async (req, res) => {
+  try {
+    const { products: updatePayload } = req.body;
+
+    if (!updatePayload || !Array.isArray(updatePayload)) {
+      return res.status(400).json({ error: "Invalid payload: products array required" });
+    }
+
+    const results = {
+      successful: [],
+      failed: [],
+      totalProcessed: 0
+    };
+
+    for (const item of updatePayload) {
+      const { _id, updates } = item;
+
+      if (!_id || !updates) {
+        results.failed.push({ _id, error: "Missing _id or updates" });
+        results.totalProcessed++;
+        continue;
+      }
+
+      try {
+        if (!isValidObjectId(_id)) {
+          results.failed.push({ _id, error: "Invalid product ID format" });
+          results.totalProcessed++;
+          continue;
+        }
+
+        // Find product
+        const product = await Product.findById(_id);
+        if (!product) {
+          results.failed.push({ _id, error: "Product not found" });
+          results.totalProcessed++;
+          continue;
+        }
+
+        // Validate category if being updated
+        if (updates.category) {
+          const categoryExists = await Category.findById(updates.category);
+          if (!categoryExists) {
+            results.failed.push({ _id, error: "Category not found" });
+            results.totalProcessed++;
+            continue;
+          }
+        }
+
+        // Parse boolean fields
+        if (updates.bestSeller !== undefined) {
+          updates.bestSeller = updates.bestSeller === "true" || updates.bestSeller === true;
+        }
+        if (updates.newArrival !== undefined) {
+          updates.newArrival = updates.newArrival === "true" || updates.newArrival === true;
+        }
+
+        // Update product
+        const updated = await Product.findByIdAndUpdate(_id, updates, { new: true, runValidators: true }).populate("category", "name");
+        results.successful.push(updated);
+        results.totalProcessed++;
+      } catch (itemError) {
+        results.failed.push({ _id, error: itemError.message });
+        results.totalProcessed++;
+      }
+    }
+
+    res.status(200).json({
+      success: true,
+      message: "Bulk edit completed",
+      data: results,
+      summary: {
+        successful: results.successful.length,
+        failed: results.failed.length,
+        total: results.totalProcessed
+      }
+    });
+  } catch (error) {
+    console.error("Bulk Edit Error:", error);
+    res.status(500).json({ error: "Server error during bulk edit" });
+  }
+};
 
 
+// --- Bulk Edit Products ---
+exports.bulkEditProducts = async (req, res) => {
+  try {
+    const { products: updatePayload } = req.body;
+
+    if (!updatePayload || !Array.isArray(updatePayload)) {
+      return res.status(400).json({ error: "Invalid payload: products array required" });
+    }
+
+    const results = {
+      successful: [],
+      failed: [],
+      totalProcessed: 0
+    };
+
+    for (const item of updatePayload) {
+      const { _id, updates } = item;
+
+      if (!_id || !updates) {
+        results.failed.push({ _id, error: "Missing _id or updates" });
+        results.totalProcessed++;
+        continue;
+      }
+
+      try {
+        if (!isValidObjectId(_id)) {
+          results.failed.push({ _id, error: "Invalid product ID format" });
+          results.totalProcessed++;
+          continue;
+        }
+
+        // Find product
+        const product = await Product.findById(_id);
+        if (!product) {
+          results.failed.push({ _id, error: "Product not found" });
+          results.totalProcessed++;
+          continue;
+        }
+
+        // Validate category if being updated
+        if (updates.category) {
+          const categoryExists = await Category.findById(updates.category);
+          if (!categoryExists) {
+            results.failed.push({ _id, error: "Category not found" });
+            results.totalProcessed++;
+            continue;
+          }
+        }
+
+        // Parse boolean fields
+        if (updates.bestSeller !== undefined) {
+          updates.bestSeller = updates.bestSeller === "true" || updates.bestSeller === true;
+        }
+        if (updates.newArrival !== undefined) {
+          updates.newArrival = updates.newArrival === "true" || updates.newArrival === true;
+        }
+
+        // Update product
+        const updated = await Product.findByIdAndUpdate(_id, updates, { new: true, runValidators: true }).populate("category", "name");
+        results.successful.push(updated);
+        results.totalProcessed++;
+      } catch (itemError) {
+        results.failed.push({ _id, error: itemError.message });
+        results.totalProcessed++;
+      }
+    }
+
+    res.status(200).json({
+      success: true,
+      message: "Bulk edit completed",
+      data: results,
+      summary: {
+        successful: results.successful.length,
+        failed: results.failed.length,
+        total: results.totalProcessed
+      }
+    });
+  } catch (error) {
+    console.error("Bulk Edit Error:", error);
+    res.status(500).json({ error: "Server error during bulk edit" });
+  }
+};
+
+// --- Bulk Edit Products ---
+exports.bulkEditProducts = async (req, res) => {
+  try {
+    const { products: updatePayload } = req.body;
+
+    if (!updatePayload || !Array.isArray(updatePayload)) {
+      return res.status(400).json({ error: "Invalid payload: products array required" });
+    }
+
+    const results = {
+      successful: [],
+      failed: [],
+      totalProcessed: 0
+    };
+
+    for (const item of updatePayload) {
+      const { _id, updates } = item;
+
+      if (!_id || !updates) {
+        results.failed.push({ _id, error: "Missing _id or updates" });
+        results.totalProcessed++;
+        continue;
+      }
+
+      try {
+        if (!isValidObjectId(_id)) {
+          results.failed.push({ _id, error: "Invalid product ID format" });
+          results.totalProcessed++;
+          continue;
+        }
+
+        // Find product
+        const product = await Product.findById(_id);
+        if (!product) {
+          results.failed.push({ _id, error: "Product not found" });
+          results.totalProcessed++;
+          continue;
+        }
+
+        // Validate category if being updated
+        if (updates.category) {
+          const categoryExists = await Category.findById(updates.category);
+          if (!categoryExists) {
+            results.failed.push({ _id, error: "Category not found" });
+            results.totalProcessed++;
+            continue;
+          }
+        }
+
+        // Parse boolean fields
+        if (updates.bestSeller !== undefined) {
+          updates.bestSeller = updates.bestSeller === "true" || updates.bestSeller === true;
+        }
+        if (updates.newArrival !== undefined) {
+          updates.newArrival = updates.newArrival === "true" || updates.newArrival === true;
+        }
+
+        // Update product
+        const updated = await Product.findByIdAndUpdate(_id, updates, { new: true, runValidators: true }).populate("category", "name");
+        results.successful.push(updated);
+        results.totalProcessed++;
+      } catch (itemError) {
+        results.failed.push({ _id, error: itemError.message });
+        results.totalProcessed++;
+      }
+    }
+
+    res.status(200).json({
+      success: true,
+      message: "Bulk edit completed",
+      data: results,
+      summary: {
+        successful: results.successful.length,
+        failed: results.failed.length,
+        total: results.totalProcessed
+      }
+    });
+  } catch (error) {
+    console.error("Bulk Edit Error:", error);
+    res.status(500).json({ error: "Server error during bulk edit" });
+  }
+};
 
 
+// --- Bulk Edit Products ---
+exports.bulkEditProducts = async (req, res) => {
+  try {
+    const { products: updatePayload } = req.body;
+
+    if (!updatePayload || !Array.isArray(updatePayload)) {
+      return res.status(400).json({ error: "Invalid payload: products array required" });
+    }
+
+    const results = {
+      successful: [],
+      failed: [],
+      totalProcessed: 0
+    };
+
+    for (const item of updatePayload) {
+      const { _id, updates } = item;
+
+      if (!_id || !updates) {
+        results.failed.push({ _id, error: "Missing _id or updates" });
+        results.totalProcessed++;
+        continue;
+      }
+
+      try {
+        if (!isValidObjectId(_id)) {
+          results.failed.push({ _id, error: "Invalid product ID format" });
+          results.totalProcessed++;
+          continue;
+        }
+
+        // Find product
+        const product = await Product.findById(_id);
+        if (!product) {
+          results.failed.push({ _id, error: "Product not found" });
+          results.totalProcessed++;
+          continue;
+        }
+
+        // Validate category if being updated
+        if (updates.category) {
+          const categoryExists = await Category.findById(updates.category);
+          if (!categoryExists) {
+            results.failed.push({ _id, error: "Category not found" });
+            results.totalProcessed++;
+            continue;
+          }
+        }
+
+        // Parse boolean fields
+        if (updates.bestSeller !== undefined) {
+          updates.bestSeller = updates.bestSeller === "true" || updates.bestSeller === true;
+        }
+        if (updates.newArrival !== undefined) {
+          updates.newArrival = updates.newArrival === "true" || updates.newArrival === true;
+        }
+
+        // Update product
+        const updated = await Product.findByIdAndUpdate(_id, updates, { new: true, runValidators: true }).populate("category", "name");
+        results.successful.push(updated);
+        results.totalProcessed++;
+      } catch (itemError) {
+        results.failed.push({ _id, error: itemError.message });
+        results.totalProcessed++;
+      }
+    }
+
+    res.status(200).json({
+      success: true,
+      message: "Bulk edit completed",
+      data: results,
+      summary: {
+        successful: results.successful.length,
+        failed: results.failed.length,
+        total: results.totalProcessed
+      }
+    });
+  } catch (error) {
+    console.error("Bulk Edit Error:", error);
+    res.status(500).json({ error: "Server error during bulk edit" });
+  }
+};
+
+// --- Bulk Edit Products ---
+exports.bulkEditProducts = async (req, res) => {
+  try {
+    const { products: updatePayload } = req.body;
+
+    if (!updatePayload || !Array.isArray(updatePayload)) {
+      return res.status(400).json({ error: "Invalid payload: products array required" });
+    }
+
+    const results = {
+      successful: [],
+      failed: [],
+      totalProcessed: 0
+    };
+
+    for (const item of updatePayload) {
+      const { _id, updates } = item;
+
+      if (!_id || !updates) {
+        results.failed.push({ _id, error: "Missing _id or updates" });
+        results.totalProcessed++;
+        continue;
+      }
+
+      try {
+        if (!isValidObjectId(_id)) {
+          results.failed.push({ _id, error: "Invalid product ID format" });
+          results.totalProcessed++;
+          continue;
+        }
+
+        // Find product
+        const product = await Product.findById(_id);
+        if (!product) {
+          results.failed.push({ _id, error: "Product not found" });
+          results.totalProcessed++;
+          continue;
+        }
+
+        // Validate category if being updated
+        if (updates.category) {
+          const categoryExists = await Category.findById(updates.category);
+          if (!categoryExists) {
+            results.failed.push({ _id, error: "Category not found" });
+            results.totalProcessed++;
+            continue;
+          }
+        }
+
+        // Parse boolean fields
+        if (updates.bestSeller !== undefined) {
+          updates.bestSeller = updates.bestSeller === "true" || updates.bestSeller === true;
+        }
+        if (updates.newArrival !== undefined) {
+          updates.newArrival = updates.newArrival === "true" || updates.newArrival === true;
+        }
+
+        // Update product
+        const updated = await Product.findByIdAndUpdate(_id, updates, { new: true, runValidators: true }).populate("category", "name");
+        results.successful.push(updated);
+        results.totalProcessed++;
+      } catch (itemError) {
+        results.failed.push({ _id, error: itemError.message });
+        results.totalProcessed++;
+      }
+    }
+
+    res.status(200).json({
+      success: true,
+      message: "Bulk edit completed",
+      data: results,
+      summary: {
+        successful: results.successful.length,
+        failed: results.failed.length,
+        total: results.totalProcessed
+      }
+    });
+  } catch (error) {
+    console.error("Bulk Edit Error:", error);
+    res.status(500).json({ error: "Server error during bulk edit" });
+  }
+};
 
 
+// --- Bulk Edit Products ---
+exports.bulkEditProducts = async (req, res) => {
+  try {
+    const { products: updatePayload } = req.body;
+
+    if (!updatePayload || !Array.isArray(updatePayload)) {
+      return res.status(400).json({ error: "Invalid payload: products array required" });
+    }
+
+    const results = {
+      successful: [],
+      failed: [],
+      totalProcessed: 0
+    };
+
+    for (const item of updatePayload) {
+      const { _id, updates } = item;
+
+      if (!_id || !updates) {
+        results.failed.push({ _id, error: "Missing _id or updates" });
+        results.totalProcessed++;
+        continue;
+      }
+
+      try {
+        if (!isValidObjectId(_id)) {
+          results.failed.push({ _id, error: "Invalid product ID format" });
+          results.totalProcessed++;
+          continue;
+        }
+
+        // Find product
+        const product = await Product.findById(_id);
+        if (!product) {
+          results.failed.push({ _id, error: "Product not found" });
+          results.totalProcessed++;
+          continue;
+        }
+
+        // Validate category if being updated
+        if (updates.category) {
+          const categoryExists = await Category.findById(updates.category);
+          if (!categoryExists) {
+            results.failed.push({ _id, error: "Category not found" });
+            results.totalProcessed++;
+            continue;
+          }
+        }
+
+        // Parse boolean fields
+        if (updates.bestSeller !== undefined) {
+          updates.bestSeller = updates.bestSeller === "true" || updates.bestSeller === true;
+        }
+        if (updates.newArrival !== undefined) {
+          updates.newArrival = updates.newArrival === "true" || updates.newArrival === true;
+        }
+
+        // Update product
+        const updated = await Product.findByIdAndUpdate(_id, updates, { new: true, runValidators: true }).populate("category", "name");
+        results.successful.push(updated);
+        results.totalProcessed++;
+      } catch (itemError) {
+        results.failed.push({ _id, error: itemError.message });
+        results.totalProcessed++;
+      }
+    }
+
+    res.status(200).json({
+      success: true,
+      message: "Bulk edit completed",
+      data: results,
+      summary: {
+        successful: results.successful.length,
+        failed: results.failed.length,
+        total: results.totalProcessed
+      }
+    });
+  } catch (error) {
+    console.error("Bulk Edit Error:", error);
+    res.status(500).json({ error: "Server error during bulk edit" });
+  }
+};
+
+// --- Bulk Edit Products ---
+exports.bulkEditProducts = async (req, res) => {
+  try {
+    const { products: updatePayload } = req.body;
+
+    if (!updatePayload || !Array.isArray(updatePayload)) {
+      return res.status(400).json({ error: "Invalid payload: products array required" });
+    }
+
+    const results = {
+      successful: [],
+      failed: [],
+      totalProcessed: 0
+    };
+
+    for (const item of updatePayload) {
+      const { _id, updates } = item;
+
+      if (!_id || !updates) {
+        results.failed.push({ _id, error: "Missing _id or updates" });
+        results.totalProcessed++;
+        continue;
+      }
+
+      try {
+        if (!isValidObjectId(_id)) {
+          results.failed.push({ _id, error: "Invalid product ID format" });
+          results.totalProcessed++;
+          continue;
+        }
+
+        // Find product
+        const product = await Product.findById(_id);
+        if (!product) {
+          results.failed.push({ _id, error: "Product not found" });
+          results.totalProcessed++;
+          continue;
+        }
+
+        // Validate category if being updated
+        if (updates.category) {
+          const categoryExists = await Category.findById(updates.category);
+          if (!categoryExists) {
+            results.failed.push({ _id, error: "Category not found" });
+            results.totalProcessed++;
+            continue;
+          }
+        }
+
+        // Parse boolean fields
+        if (updates.bestSeller !== undefined) {
+          updates.bestSeller = updates.bestSeller === "true" || updates.bestSeller === true;
+        }
+        if (updates.newArrival !== undefined) {
+          updates.newArrival = updates.newArrival === "true" || updates.newArrival === true;
+        }
+
+        // Update product
+        const updated = await Product.findByIdAndUpdate(_id, updates, { new: true, runValidators: true }).populate("category", "name");
+        results.successful.push(updated);
+        results.totalProcessed++;
+      } catch (itemError) {
+        results.failed.push({ _id, error: itemError.message });
+        results.totalProcessed++;
+      }
+    }
+
+    res.status(200).json({
+      success: true,
+      message: "Bulk edit completed",
+      data: results,
+      summary: {
+        successful: results.successful.length,
+        failed: results.failed.length,
+        total: results.totalProcessed
+      }
+    });
+  } catch (error) {
+    console.error("Bulk Edit Error:", error);
+    res.status(500).json({ error: "Server error during bulk edit" });
+  }
+};
+
+
+// --- Bulk Edit Products ---
+exports.bulkEditProducts = async (req, res) => {
+  try {
+    const { products: updatePayload } = req.body;
+
+    if (!updatePayload || !Array.isArray(updatePayload)) {
+      return res.status(400).json({ error: "Invalid payload: products array required" });
+    }
+
+    const results = {
+      successful: [],
+      failed: [],
+      totalProcessed: 0
+    };
+
+    for (const item of updatePayload) {
+      const { _id, updates } = item;
+
+      if (!_id || !updates) {
+        results.failed.push({ _id, error: "Missing _id or updates" });
+        results.totalProcessed++;
+        continue;
+      }
+
+      try {
+        if (!isValidObjectId(_id)) {
+          results.failed.push({ _id, error: "Invalid product ID format" });
+          results.totalProcessed++;
+          continue;
+        }
+
+        // Find product
+        const product = await Product.findById(_id);
+        if (!product) {
+          results.failed.push({ _id, error: "Product not found" });
+          results.totalProcessed++;
+          continue;
+        }
+
+        // Validate category if being updated
+        if (updates.category) {
+          const categoryExists = await Category.findById(updates.category);
+          if (!categoryExists) {
+            results.failed.push({ _id, error: "Category not found" });
+            results.totalProcessed++;
+            continue;
+          }
+        }
+
+        // Parse boolean fields
+        if (updates.bestSeller !== undefined) {
+          updates.bestSeller = updates.bestSeller === "true" || updates.bestSeller === true;
+        }
+        if (updates.newArrival !== undefined) {
+          updates.newArrival = updates.newArrival === "true" || updates.newArrival === true;
+        }
+
+        // Update product
+        const updated = await Product.findByIdAndUpdate(_id, updates, { new: true, runValidators: true }).populate("category", "name");
+        results.successful.push(updated);
+        results.totalProcessed++;
+      } catch (itemError) {
+        results.failed.push({ _id, error: itemError.message });
+        results.totalProcessed++;
+      }
+    }
+
+    res.status(200).json({
+      success: true,
+      message: "Bulk edit completed",
+      data: results,
+      summary: {
+        successful: results.successful.length,
+        failed: results.failed.length,
+        total: results.totalProcessed
+      }
+    });
+  } catch (error) {
+    console.error("Bulk Edit Error:", error);
+    res.status(500).json({ error: "Server error during bulk edit" });
+  }
+};
+
+// --- Bulk Edit Products ---
+exports.bulkEditProducts = async (req, res) => {
+  try {
+    const { products: updatePayload } = req.body;
+
+    if (!updatePayload || !Array.isArray(updatePayload)) {
+      return res.status(400).json({ error: "Invalid payload: products array required" });
+    }
+
+    const results = {
+      successful: [],
+      failed: [],
+      totalProcessed: 0
+    };
+
+    for (const item of updatePayload) {
+      const { _id, updates } = item;
+
+      if (!_id || !updates) {
+        results.failed.push({ _id, error: "Missing _id or updates" });
+        results.totalProcessed++;
+        continue;
+      }
+
+      try {
+        if (!isValidObjectId(_id)) {
+          results.failed.push({ _id, error: "Invalid product ID format" });
+          results.totalProcessed++;
+          continue;
+        }
+
+        // Find product
+        const product = await Product.findById(_id);
+        if (!product) {
+          results.failed.push({ _id, error: "Product not found" });
+          results.totalProcessed++;
+          continue;
+        }
+
+        // Validate category if being updated
+        if (updates.category) {
+          const categoryExists = await Category.findById(updates.category);
+          if (!categoryExists) {
+            results.failed.push({ _id, error: "Category not found" });
+            results.totalProcessed++;
+            continue;
+          }
+        }
+
+        // Parse boolean fields
+        if (updates.bestSeller !== undefined) {
+          updates.bestSeller = updates.bestSeller === "true" || updates.bestSeller === true;
+        }
+        if (updates.newArrival !== undefined) {
+          updates.newArrival = updates.newArrival === "true" || updates.newArrival === true;
+        }
+
+        // Update product
+        const updated = await Product.findByIdAndUpdate(_id, updates, { new: true, runValidators: true }).populate("category", "name");
+        results.successful.push(updated);
+        results.totalProcessed++;
+      } catch (itemError) {
+        results.failed.push({ _id, error: itemError.message });
+        results.totalProcessed++;
+      }
+    }
+
+    res.status(200).json({
+      success: true,
+      message: "Bulk edit completed",
+      data: results,
+      summary: {
+        successful: results.successful.length,
+        failed: results.failed.length,
+        total: results.totalProcessed
+      }
+    });
+  } catch (error) {
+    console.error("Bulk Edit Error:", error);
+    res.status(500).json({ error: "Server error during bulk edit" });
+  }
+};
+
+
+// --- Bulk Edit Products ---
+exports.bulkEditProducts = async (req, res) => {
+  try {
+    const { products: updatePayload } = req.body;
+
+    if (!updatePayload || !Array.isArray(updatePayload)) {
+      return res.status(400).json({ error: "Invalid payload: products array required" });
+    }
+
+    const results = {
+      successful: [],
+      failed: [],
+      totalProcessed: 0
+    };
+
+    for (const item of updatePayload) {
+      const { _id, updates } = item;
+
+      if (!_id || !updates) {
+        results.failed.push({ _id, error: "Missing _id or updates" });
+        results.totalProcessed++;
+        continue;
+      }
+
+      try {
+        if (!isValidObjectId(_id)) {
+          results.failed.push({ _id, error: "Invalid product ID format" });
+          results.totalProcessed++;
+          continue;
+        }
+
+        // Find product
+        const product = await Product.findById(_id);
+        if (!product) {
+          results.failed.push({ _id, error: "Product not found" });
+          results.totalProcessed++;
+          continue;
+        }
+
+        // Validate category if being updated
+        if (updates.category) {
+          const categoryExists = await Category.findById(updates.category);
+          if (!categoryExists) {
+            results.failed.push({ _id, error: "Category not found" });
+            results.totalProcessed++;
+            continue;
+          }
+        }
+
+        // Parse boolean fields
+        if (updates.bestSeller !== undefined) {
+          updates.bestSeller = updates.bestSeller === "true" || updates.bestSeller === true;
+        }
+        if (updates.newArrival !== undefined) {
+          updates.newArrival = updates.newArrival === "true" || updates.newArrival === true;
+        }
+
+        // Update product
+        const updated = await Product.findByIdAndUpdate(_id, updates, { new: true, runValidators: true }).populate("category", "name");
+        results.successful.push(updated);
+        results.totalProcessed++;
+      } catch (itemError) {
+        results.failed.push({ _id, error: itemError.message });
+        results.totalProcessed++;
+      }
+    }
+
+    res.status(200).json({
+      success: true,
+      message: "Bulk edit completed",
+      data: results,
+      summary: {
+        successful: results.successful.length,
+        failed: results.failed.length,
+        total: results.totalProcessed
+      }
+    });
+  } catch (error) {
+    console.error("Bulk Edit Error:", error);
+    res.status(500).json({ error: "Server error during bulk edit" });
+  }
+};
+
+// --- Bulk Edit Products ---
+exports.bulkEditProducts = async (req, res) => {
+  try {
+    const { products: updatePayload } = req.body;
+
+    if (!updatePayload || !Array.isArray(updatePayload)) {
+      return res.status(400).json({ error: "Invalid payload: products array required" });
+    }
+
+    const results = {
+      successful: [],
+      failed: [],
+      totalProcessed: 0
+    };
+
+    for (const item of updatePayload) {
+      const { _id, updates } = item;
+
+      if (!_id || !updates) {
+        results.failed.push({ _id, error: "Missing _id or updates" });
+        results.totalProcessed++;
+        continue;
+      }
+
+      try {
+        if (!isValidObjectId(_id)) {
+          results.failed.push({ _id, error: "Invalid product ID format" });
+          results.totalProcessed++;
+          continue;
+        }
+
+        // Find product
+        const product = await Product.findById(_id);
+        if (!product) {
+          results.failed.push({ _id, error: "Product not found" });
+          results.totalProcessed++;
+          continue;
+        }
+
+        // Validate category if being updated
+        if (updates.category) {
+          const categoryExists = await Category.findById(updates.category);
+          if (!categoryExists) {
+            results.failed.push({ _id, error: "Category not found" });
+            results.totalProcessed++;
+            continue;
+          }
+        }
+
+        // Parse boolean fields
+        if (updates.bestSeller !== undefined) {
+          updates.bestSeller = updates.bestSeller === "true" || updates.bestSeller === true;
+        }
+        if (updates.newArrival !== undefined) {
+          updates.newArrival = updates.newArrival === "true" || updates.newArrival === true;
+        }
+
+        // Update product
+        const updated = await Product.findByIdAndUpdate(_id, updates, { new: true, runValidators: true }).populate("category", "name");
+        results.successful.push(updated);
+        results.totalProcessed++;
+      } catch (itemError) {
+        results.failed.push({ _id, error: itemError.message });
+        results.totalProcessed++;
+      }
+    }
+
+    res.status(200).json({
+      success: true,
+      message: "Bulk edit completed",
+      data: results,
+      summary: {
+        successful: results.successful.length,
+        failed: results.failed.length,
+        total: results.totalProcessed
+      }
+    });
+  } catch (error) {
+    console.error("Bulk Edit Error:", error);
+    res.status(500).json({ error: "Server error during bulk edit" });
+  }
+};
+
+
+// --- Bulk Edit Products ---
+exports.bulkEditProducts = async (req, res) => {
+  try {
+    const { products: updatePayload } = req.body;
+
+    if (!updatePayload || !Array.isArray(updatePayload)) {
+      return res.status(400).json({ error: "Invalid payload: products array required" });
+    }
+
+    const results = {
+      successful: [],
+      failed: [],
+      totalProcessed: 0
+    };
+
+    for (const item of updatePayload) {
+      const { _id, updates } = item;
+
+      if (!_id || !updates) {
+        results.failed.push({ _id, error: "Missing _id or updates" });
+        results.totalProcessed++;
+        continue;
+      }
+
+      try {
+        if (!isValidObjectId(_id)) {
+          results.failed.push({ _id, error: "Invalid product ID format" });
+          results.totalProcessed++;
+          continue;
+        }
+
+        // Find product
+        const product = await Product.findById(_id);
+        if (!product) {
+          results.failed.push({ _id, error: "Product not found" });
+          results.totalProcessed++;
+          continue;
+        }
+
+        // Validate category if being updated
+        if (updates.category) {
+          const categoryExists = await Category.findById(updates.category);
+          if (!categoryExists) {
+            results.failed.push({ _id, error: "Category not found" });
+            results.totalProcessed++;
+            continue;
+          }
+        }
+
+        // Parse boolean fields
+        if (updates.bestSeller !== undefined) {
+          updates.bestSeller = updates.bestSeller === "true" || updates.bestSeller === true;
+        }
+        if (updates.newArrival !== undefined) {
+          updates.newArrival = updates.newArrival === "true" || updates.newArrival === true;
+        }
+
+        // Update product
+        const updated = await Product.findByIdAndUpdate(_id, updates, { new: true, runValidators: true }).populate("category", "name");
+        results.successful.push(updated);
+        results.totalProcessed++;
+      } catch (itemError) {
+        results.failed.push({ _id, error: itemError.message });
+        results.totalProcessed++;
+      }
+    }
+
+    res.status(200).json({
+      success: true,
+      message: "Bulk edit completed",
+      data: results,
+      summary: {
+        successful: results.successful.length,
+        failed: results.failed.length,
+        total: results.totalProcessed
+      }
+    });
+  } catch (error) {
+    console.error("Bulk Edit Error:", error);
+    res.status(500).json({ error: "Server error during bulk edit" });
+  }
+};
+
+// --- Bulk Edit Products ---
+exports.bulkEditProducts = async (req, res) => {
+  try {
+    const { products: updatePayload } = req.body;
+
+    if (!updatePayload || !Array.isArray(updatePayload)) {
+      return res.status(400).json({ error: "Invalid payload: products array required" });
+    }
+
+    const results = {
+      successful: [],
+      failed: [],
+      totalProcessed: 0
+    };
+
+    for (const item of updatePayload) {
+      const { _id, updates } = item;
+
+      if (!_id || !updates) {
+        results.failed.push({ _id, error: "Missing _id or updates" });
+        results.totalProcessed++;
+        continue;
+      }
+
+      try {
+        if (!isValidObjectId(_id)) {
+          results.failed.push({ _id, error: "Invalid product ID format" });
+          results.totalProcessed++;
+          continue;
+        }
+
+        // Find product
+        const product = await Product.findById(_id);
+        if (!product) {
+          results.failed.push({ _id, error: "Product not found" });
+          results.totalProcessed++;
+          continue;
+        }
+
+        // Validate category if being updated
+        if (updates.category) {
+          const categoryExists = await Category.findById(updates.category);
+          if (!categoryExists) {
+            results.failed.push({ _id, error: "Category not found" });
+            results.totalProcessed++;
+            continue;
+          }
+        }
+
+        // Parse boolean fields
+        if (updates.bestSeller !== undefined) {
+          updates.bestSeller = updates.bestSeller === "true" || updates.bestSeller === true;
+        }
+        if (updates.newArrival !== undefined) {
+          updates.newArrival = updates.newArrival === "true" || updates.newArrival === true;
+        }
+
+        // Update product
+        const updated = await Product.findByIdAndUpdate(_id, updates, { new: true, runValidators: true }).populate("category", "name");
+        results.successful.push(updated);
+        results.totalProcessed++;
+      } catch (itemError) {
+        results.failed.push({ _id, error: itemError.message });
+        results.totalProcessed++;
+      }
+    }
+
+    res.status(200).json({
+      success: true,
+      message: "Bulk edit completed",
+      data: results,
+      summary: {
+        successful: results.successful.length,
+        failed: results.failed.length,
+        total: results.totalProcessed
+      }
+    });
+  } catch (error) {
+    console.error("Bulk Edit Error:", error);
+    res.status(500).json({ error: "Server error during bulk edit" });
+  }
+};
+
+
+// --- Bulk Edit Products ---
+exports.bulkEditProducts = async (req, res) => {
+  try {
+    const { products: updatePayload } = req.body;
+
+    if (!updatePayload || !Array.isArray(updatePayload)) {
+      return res.status(400).json({ error: "Invalid payload: products array required" });
+    }
+
+    const results = {
+      successful: [],
+      failed: [],
+      totalProcessed: 0
+    };
+
+    for (const item of updatePayload) {
+      const { _id, updates } = item;
+
+      if (!_id || !updates) {
+        results.failed.push({ _id, error: "Missing _id or updates" });
+        results.totalProcessed++;
+        continue;
+      }
+
+      try {
+        if (!isValidObjectId(_id)) {
+          results.failed.push({ _id, error: "Invalid product ID format" });
+          results.totalProcessed++;
+          continue;
+        }
+
+        // Find product
+        const product = await Product.findById(_id);
+        if (!product) {
+          results.failed.push({ _id, error: "Product not found" });
+          results.totalProcessed++;
+          continue;
+        }
+
+        // Validate category if being updated
+        if (updates.category) {
+          const categoryExists = await Category.findById(updates.category);
+          if (!categoryExists) {
+            results.failed.push({ _id, error: "Category not found" });
+            results.totalProcessed++;
+            continue;
+          }
+        }
+
+        // Parse boolean fields
+        if (updates.bestSeller !== undefined) {
+          updates.bestSeller = updates.bestSeller === "true" || updates.bestSeller === true;
+        }
+        if (updates.newArrival !== undefined) {
+          updates.newArrival = updates.newArrival === "true" || updates.newArrival === true;
+        }
+
+        // Update product
+        const updated = await Product.findByIdAndUpdate(_id, updates, { new: true, runValidators: true }).populate("category", "name");
+        results.successful.push(updated);
+        results.totalProcessed++;
+      } catch (itemError) {
+        results.failed.push({ _id, error: itemError.message });
+        results.totalProcessed++;
+      }
+    }
+
+    res.status(200).json({
+      success: true,
+      message: "Bulk edit completed",
+      data: results,
+      summary: {
+        successful: results.successful.length,
+        failed: results.failed.length,
+        total: results.totalProcessed
+      }
+    });
+  } catch (error) {
+    console.error("Bulk Edit Error:", error);
+    res.status(500).json({ error: "Server error during bulk edit" });
+  }
+};
+
+// --- Bulk Edit Products ---
+exports.bulkEditProducts = async (req, res) => {
+  try {
+    const { products: updatePayload } = req.body;
+
+    if (!updatePayload || !Array.isArray(updatePayload)) {
+      return res.status(400).json({ error: "Invalid payload: products array required" });
+    }
+
+    const results = {
+      successful: [],
+      failed: [],
+      totalProcessed: 0
+    };
+
+    for (const item of updatePayload) {
+      const { _id, updates } = item;
+
+      if (!_id || !updates) {
+        results.failed.push({ _id, error: "Missing _id or updates" });
+        results.totalProcessed++;
+        continue;
+      }
+
+      try {
+        if (!isValidObjectId(_id)) {
+          results.failed.push({ _id, error: "Invalid product ID format" });
+          results.totalProcessed++;
+          continue;
+        }
+
+        // Find product
+        const product = await Product.findById(_id);
+        if (!product) {
+          results.failed.push({ _id, error: "Product not found" });
+          results.totalProcessed++;
+          continue;
+        }
+
+        // Validate category if being updated
+        if (updates.category) {
+          const categoryExists = await Category.findById(updates.category);
+          if (!categoryExists) {
+            results.failed.push({ _id, error: "Category not found" });
+            results.totalProcessed++;
+            continue;
+          }
+        }
+
+        // Parse boolean fields
+        if (updates.bestSeller !== undefined) {
+          updates.bestSeller = updates.bestSeller === "true" || updates.bestSeller === true;
+        }
+        if (updates.newArrival !== undefined) {
+          updates.newArrival = updates.newArrival === "true" || updates.newArrival === true;
+        }
+
+        // Update product
+        const updated = await Product.findByIdAndUpdate(_id, updates, { new: true, runValidators: true }).populate("category", "name");
+        results.successful.push(updated);
+        results.totalProcessed++;
+      } catch (itemError) {
+        results.failed.push({ _id, error: itemError.message });
+        results.totalProcessed++;
+      }
+    }
+
+    res.status(200).json({
+      success: true,
+      message: "Bulk edit completed",
+      data: results,
+      summary: {
+        successful: results.successful.length,
+        failed: results.failed.length,
+        total: results.totalProcessed
+      }
+    });
+  } catch (error) {
+    console.error("Bulk Edit Error:", error);
+    res.status(500).json({ error: "Server error during bulk edit" });
+  }
+};
+
+
+// --- Bulk Edit Products ---
+exports.bulkEditProducts = async (req, res) => {
+  try {
+    const { products: updatePayload } = req.body;
+
+    if (!updatePayload || !Array.isArray(updatePayload)) {
+      return res.status(400).json({ error: "Invalid payload: products array required" });
+    }
+
+    const results = {
+      successful: [],
+      failed: [],
+      totalProcessed: 0
+    };
+
+    for (const item of updatePayload) {
+      const { _id, updates } = item;
+
+      if (!_id || !updates) {
+        results.failed.push({ _id, error: "Missing _id or updates" });
+        results.totalProcessed++;
+        continue;
+      }
+
+      try {
+        if (!isValidObjectId(_id)) {
+          results.failed.push({ _id, error: "Invalid product ID format" });
+          results.totalProcessed++;
+          continue;
+        }
+
+        // Find product
+        const product = await Product.findById(_id);
+        if (!product) {
+          results.failed.push({ _id, error: "Product not found" });
+          results.totalProcessed++;
+          continue;
+        }
+
+        // Validate category if being updated
+        if (updates.category) {
+          const categoryExists = await Category.findById(updates.category);
+          if (!categoryExists) {
+            results.failed.push({ _id, error: "Category not found" });
+            results.totalProcessed++;
+            continue;
+          }
+        }
+
+        // Parse boolean fields
+        if (updates.bestSeller !== undefined) {
+          updates.bestSeller = updates.bestSeller === "true" || updates.bestSeller === true;
+        }
+        if (updates.newArrival !== undefined) {
+          updates.newArrival = updates.newArrival === "true" || updates.newArrival === true;
+        }
+
+        // Update product
+        const updated = await Product.findByIdAndUpdate(_id, updates, { new: true, runValidators: true }).populate("category", "name");
+        results.successful.push(updated);
+        results.totalProcessed++;
+      } catch (itemError) {
+        results.failed.push({ _id, error: itemError.message });
+        results.totalProcessed++;
+      }
+    }
+
+    res.status(200).json({
+      success: true,
+      message: "Bulk edit completed",
+      data: results,
+      summary: {
+        successful: results.successful.length,
+        failed: results.failed.length,
+        total: results.totalProcessed
+      }
+    });
+  } catch (error) {
+    console.error("Bulk Edit Error:", error);
+    res.status(500).json({ error: "Server error during bulk edit" });
+  }
+};
+
+// --- Bulk Edit Products ---
+exports.bulkEditProducts = async (req, res) => {
+  try {
+    const { products: updatePayload } = req.body;
+
+    if (!updatePayload || !Array.isArray(updatePayload)) {
+      return res.status(400).json({ error: "Invalid payload: products array required" });
+    }
+
+    const results = {
+      successful: [],
+      failed: [],
+      totalProcessed: 0
+    };
+
+    for (const item of updatePayload) {
+      const { _id, updates } = item;
+
+      if (!_id || !updates) {
+        results.failed.push({ _id, error: "Missing _id or updates" });
+        results.totalProcessed++;
+        continue;
+      }
+
+      try {
+        if (!isValidObjectId(_id)) {
+          results.failed.push({ _id, error: "Invalid product ID format" });
+          results.totalProcessed++;
+          continue;
+        }
+
+        // Find product
+        const product = await Product.findById(_id);
+        if (!product) {
+          results.failed.push({ _id, error: "Product not found" });
+          results.totalProcessed++;
+          continue;
+        }
+
+        // Validate category if being updated
+        if (updates.category) {
+          const categoryExists = await Category.findById(updates.category);
+          if (!categoryExists) {
+            results.failed.push({ _id, error: "Category not found" });
+            results.totalProcessed++;
+            continue;
+          }
+        }
+
+        // Parse boolean fields
+        if (updates.bestSeller !== undefined) {
+          updates.bestSeller = updates.bestSeller === "true" || updates.bestSeller === true;
+        }
+        if (updates.newArrival !== undefined) {
+          updates.newArrival = updates.newArrival === "true" || updates.newArrival === true;
+        }
+
+        // Update product
+        const updated = await Product.findByIdAndUpdate(_id, updates, { new: true, runValidators: true }).populate("category", "name");
+        results.successful.push(updated);
+        results.totalProcessed++;
+      } catch (itemError) {
+        results.failed.push({ _id, error: itemError.message });
+        results.totalProcessed++;
+      }
+    }
+
+    res.status(200).json({
+      success: true,
+      message: "Bulk edit completed",
+      data: results,
+      summary: {
+        successful: results.successful.length,
+        failed: results.failed.length,
+        total: results.totalProcessed
+      }
+    });
+  } catch (error) {
+    console.error("Bulk Edit Error:", error);
+    res.status(500).json({ error: "Server error during bulk edit" });
+  }
+};
+
+
+// --- Bulk Edit Products ---
+exports.bulkEditProducts = async (req, res) => {
+  try {
+    const { products: updatePayload } = req.body;
+
+    if (!updatePayload || !Array.isArray(updatePayload)) {
+      return res.status(400).json({ error: "Invalid payload: products array required" });
+    }
+
+    const results = {
+      successful: [],
+      failed: [],
+      totalProcessed: 0
+    };
+
+    for (const item of updatePayload) {
+      const { _id, updates } = item;
+
+      if (!_id || !updates) {
+        results.failed.push({ _id, error: "Missing _id or updates" });
+        results.totalProcessed++;
+        continue;
+      }
+
+      try {
+        if (!isValidObjectId(_id)) {
+          results.failed.push({ _id, error: "Invalid product ID format" });
+          results.totalProcessed++;
+          continue;
+        }
+
+        // Find product
+        const product = await Product.findById(_id);
+        if (!product) {
+          results.failed.push({ _id, error: "Product not found" });
+          results.totalProcessed++;
+          continue;
+        }
+
+        // Validate category if being updated
+        if (updates.category) {
+          const categoryExists = await Category.findById(updates.category);
+          if (!categoryExists) {
+            results.failed.push({ _id, error: "Category not found" });
+            results.totalProcessed++;
+            continue;
+          }
+        }
+
+        // Parse boolean fields
+        if (updates.bestSeller !== undefined) {
+          updates.bestSeller = updates.bestSeller === "true" || updates.bestSeller === true;
+        }
+        if (updates.newArrival !== undefined) {
+          updates.newArrival = updates.newArrival === "true" || updates.newArrival === true;
+        }
+
+        // Update product
+        const updated = await Product.findByIdAndUpdate(_id, updates, { new: true, runValidators: true }).populate("category", "name");
+        results.successful.push(updated);
+        results.totalProcessed++;
+      } catch (itemError) {
+        results.failed.push({ _id, error: itemError.message });
+        results.totalProcessed++;
+      }
+    }
+
+    res.status(200).json({
+      success: true,
+      message: "Bulk edit completed",
+      data: results,
+      summary: {
+        successful: results.successful.length,
+        failed: results.failed.length,
+        total: results.totalProcessed
+      }
+    });
+  } catch (error) {
+    console.error("Bulk Edit Error:", error);
+    res.status(500).json({ error: "Server error during bulk edit" });
+  }
+};
+
+// --- Bulk Edit Products ---
+exports.bulkEditProducts = async (req, res) => {
+  try {
+    const { products: updatePayload } = req.body;
+
+    if (!updatePayload || !Array.isArray(updatePayload)) {
+      return res.status(400).json({ error: "Invalid payload: products array required" });
+    }
+
+    const results = {
+      successful: [],
+      failed: [],
+      totalProcessed: 0
+    };
+
+    for (const item of updatePayload) {
+      const { _id, updates } = item;
+
+      if (!_id || !updates) {
+        results.failed.push({ _id, error: "Missing _id or updates" });
+        results.totalProcessed++;
+        continue;
+      }
+
+      try {
+        if (!isValidObjectId(_id)) {
+          results.failed.push({ _id, error: "Invalid product ID format" });
+          results.totalProcessed++;
+          continue;
+        }
+
+        // Find product
+        const product = await Product.findById(_id);
+        if (!product) {
+          results.failed.push({ _id, error: "Product not found" });
+          results.totalProcessed++;
+          continue;
+        }
+
+        // Validate category if being updated
+        if (updates.category) {
+          const categoryExists = await Category.findById(updates.category);
+          if (!categoryExists) {
+            results.failed.push({ _id, error: "Category not found" });
+            results.totalProcessed++;
+            continue;
+          }
+        }
+
+        // Parse boolean fields
+        if (updates.bestSeller !== undefined) {
+          updates.bestSeller = updates.bestSeller === "true" || updates.bestSeller === true;
+        }
+        if (updates.newArrival !== undefined) {
+          updates.newArrival = updates.newArrival === "true" || updates.newArrival === true;
+        }
+
+        // Update product
+        const updated = await Product.findByIdAndUpdate(_id, updates, { new: true, runValidators: true }).populate("category", "name");
+        results.successful.push(updated);
+        results.totalProcessed++;
+      } catch (itemError) {
+        results.failed.push({ _id, error: itemError.message });
+        results.totalProcessed++;
+      }
+    }
+
+    res.status(200).json({
+      success: true,
+      message: "Bulk edit completed",
+      data: results,
+      summary: {
+        successful: results.successful.length,
+        failed: results.failed.length,
+        total: results.totalProcessed
+      }
+    });
+  } catch (error) {
+    console.error("Bulk Edit Error:", error);
+    res.status(500).json({ error: "Server error during bulk edit" });
+  }
+};
+
+
+// --- Bulk Edit Products ---
+exports.bulkEditProducts = async (req, res) => {
+  try {
+    const { products: updatePayload } = req.body;
+
+    if (!updatePayload || !Array.isArray(updatePayload)) {
+      return res.status(400).json({ error: "Invalid payload: products array required" });
+    }
+
+    const results = {
+      successful: [],
+      failed: [],
+      totalProcessed: 0
+    };
+
+    for (const item of updatePayload) {
+      const { _id, updates } = item;
+
+      if (!_id || !updates) {
+        results.failed.push({ _id, error: "Missing _id or updates" });
+        results.totalProcessed++;
+        continue;
+      }
+
+      try {
+        if (!isValidObjectId(_id)) {
+          results.failed.push({ _id, error: "Invalid product ID format" });
+          results.totalProcessed++;
+          continue;
+        }
+
+        // Find product
+        const product = await Product.findById(_id);
+        if (!product) {
+          results.failed.push({ _id, error: "Product not found" });
+          results.totalProcessed++;
+          continue;
+        }
+
+        // Validate category if being updated
+        if (updates.category) {
+          const categoryExists = await Category.findById(updates.category);
+          if (!categoryExists) {
+            results.failed.push({ _id, error: "Category not found" });
+            results.totalProcessed++;
+            continue;
+          }
+        }
+
+        // Parse boolean fields
+        if (updates.bestSeller !== undefined) {
+          updates.bestSeller = updates.bestSeller === "true" || updates.bestSeller === true;
+        }
+        if (updates.newArrival !== undefined) {
+          updates.newArrival = updates.newArrival === "true" || updates.newArrival === true;
+        }
+
+        // Update product
+        const updated = await Product.findByIdAndUpdate(_id, updates, { new: true, runValidators: true }).populate("category", "name");
+        results.successful.push(updated);
+        results.totalProcessed++;
+      } catch (itemError) {
+        results.failed.push({ _id, error: itemError.message });
+        results.totalProcessed++;
+      }
+    }
+
+    res.status(200).json({
+      success: true,
+      message: "Bulk edit completed",
+      data: results,
+      summary: {
+        successful: results.successful.length,
+        failed: results.failed.length,
+        total: results.totalProcessed
+      }
+    });
+  } catch (error) {
+    console.error("Bulk Edit Error:", error);
+    res.status(500).json({ error: "Server error during bulk edit" });
+  }
+};
+
+// --- Bulk Edit Products ---
+exports.bulkEditProducts = async (req, res) => {
+  try {
+    const { products: updatePayload } = req.body;
+
+    if (!updatePayload || !Array.isArray(updatePayload)) {
+      return res.status(400).json({ error: "Invalid payload: products array required" });
+    }
+
+    const results = {
+      successful: [],
+      failed: [],
+      totalProcessed: 0
+    };
+
+    for (const item of updatePayload) {
+      const { _id, updates } = item;
+
+      if (!_id || !updates) {
+        results.failed.push({ _id, error: "Missing _id or updates" });
+        results.totalProcessed++;
+        continue;
+      }
+
+      try {
+        if (!isValidObjectId(_id)) {
+          results.failed.push({ _id, error: "Invalid product ID format" });
+          results.totalProcessed++;
+          continue;
+        }
+
+        // Find product
+        const product = await Product.findById(_id);
+        if (!product) {
+          results.failed.push({ _id, error: "Product not found" });
+          results.totalProcessed++;
+          continue;
+        }
+
+        // Validate category if being updated
+        if (updates.category) {
+          const categoryExists = await Category.findById(updates.category);
+          if (!categoryExists) {
+            results.failed.push({ _id, error: "Category not found" });
+            results.totalProcessed++;
+            continue;
+          }
+        }
+
+        // Parse boolean fields
+        if (updates.bestSeller !== undefined) {
+          updates.bestSeller = updates.bestSeller === "true" || updates.bestSeller === true;
+        }
+        if (updates.newArrival !== undefined) {
+          updates.newArrival = updates.newArrival === "true" || updates.newArrival === true;
+        }
+
+        // Update product
+        const updated = await Product.findByIdAndUpdate(_id, updates, { new: true, runValidators: true }).populate("category", "name");
+        results.successful.push(updated);
+        results.totalProcessed++;
+      } catch (itemError) {
+        results.failed.push({ _id, error: itemError.message });
+        results.totalProcessed++;
+      }
+    }
+
+    res.status(200).json({
+      success: true,
+      message: "Bulk edit completed",
+      data: results,
+      summary: {
+        successful: results.successful.length,
+        failed: results.failed.length,
+        total: results.totalProcessed
+      }
+    });
+  } catch (error) {
+    console.error("Bulk Edit Error:", error);
+    res.status(500).json({ error: "Server error during bulk edit" });
+  }
+};
+
+
+// --- Bulk Edit Products ---
+exports.bulkEditProducts = async (req, res) => {
+  try {
+    const { products: updatePayload } = req.body;
+
+    if (!updatePayload || !Array.isArray(updatePayload)) {
+      return res.status(400).json({ error: "Invalid payload: products array required" });
+    }
+
+    const results = {
+      successful: [],
+      failed: [],
+      totalProcessed: 0
+    };
+
+    for (const item of updatePayload) {
+      const { _id, updates } = item;
+
+      if (!_id || !updates) {
+        results.failed.push({ _id, error: "Missing _id or updates" });
+        results.totalProcessed++;
+        continue;
+      }
+
+      try {
+        if (!isValidObjectId(_id)) {
+          results.failed.push({ _id, error: "Invalid product ID format" });
+          results.totalProcessed++;
+          continue;
+        }
+
+        // Find product
+        const product = await Product.findById(_id);
+        if (!product) {
+          results.failed.push({ _id, error: "Product not found" });
+          results.totalProcessed++;
+          continue;
+        }
+
+        // Validate category if being updated
+        if (updates.category) {
+          const categoryExists = await Category.findById(updates.category);
+          if (!categoryExists) {
+            results.failed.push({ _id, error: "Category not found" });
+            results.totalProcessed++;
+            continue;
+          }
+        }
+
+        // Parse boolean fields
+        if (updates.bestSeller !== undefined) {
+          updates.bestSeller = updates.bestSeller === "true" || updates.bestSeller === true;
+        }
+        if (updates.newArrival !== undefined) {
+          updates.newArrival = updates.newArrival === "true" || updates.newArrival === true;
+        }
+
+        // Update product
+        const updated = await Product.findByIdAndUpdate(_id, updates, { new: true, runValidators: true }).populate("category", "name");
+        results.successful.push(updated);
+        results.totalProcessed++;
+      } catch (itemError) {
+        results.failed.push({ _id, error: itemError.message });
+        results.totalProcessed++;
+      }
+    }
+
+    res.status(200).json({
+      success: true,
+      message: "Bulk edit completed",
+      data: results,
+      summary: {
+        successful: results.successful.length,
+        failed: results.failed.length,
+        total: results.totalProcessed
+      }
+    });
+  } catch (error) {
+    console.error("Bulk Edit Error:", error);
+    res.status(500).json({ error: "Server error during bulk edit" });
+  }
+};
+
+// --- Bulk Edit Products ---
+exports.bulkEditProducts = async (req, res) => {
+  try {
+    const { products: updatePayload } = req.body;
+
+    if (!updatePayload || !Array.isArray(updatePayload)) {
+      return res.status(400).json({ error: "Invalid payload: products array required" });
+    }
+
+    const results = {
+      successful: [],
+      failed: [],
+      totalProcessed: 0
+    };
+
+    for (const item of updatePayload) {
+      const { _id, updates } = item;
+
+      if (!_id || !updates) {
+        results.failed.push({ _id, error: "Missing _id or updates" });
+        results.totalProcessed++;
+        continue;
+      }
+
+      try {
+        if (!isValidObjectId(_id)) {
+          results.failed.push({ _id, error: "Invalid product ID format" });
+          results.totalProcessed++;
+          continue;
+        }
+
+        // Find product
+        const product = await Product.findById(_id);
+        if (!product) {
+          results.failed.push({ _id, error: "Product not found" });
+          results.totalProcessed++;
+          continue;
+        }
+
+        // Validate category if being updated
+        if (updates.category) {
+          const categoryExists = await Category.findById(updates.category);
+          if (!categoryExists) {
+            results.failed.push({ _id, error: "Category not found" });
+            results.totalProcessed++;
+            continue;
+          }
+        }
+
+        // Parse boolean fields
+        if (updates.bestSeller !== undefined) {
+          updates.bestSeller = updates.bestSeller === "true" || updates.bestSeller === true;
+        }
+        if (updates.newArrival !== undefined) {
+          updates.newArrival = updates.newArrival === "true" || updates.newArrival === true;
+        }
+
+        // Update product
+        const updated = await Product.findByIdAndUpdate(_id, updates, { new: true, runValidators: true }).populate("category", "name");
+        results.successful.push(updated);
+        results.totalProcessed++;
+      } catch (itemError) {
+        results.failed.push({ _id, error: itemError.message });
+        results.totalProcessed++;
+      }
+    }
+
+    res.status(200).json({
+      success: true,
+      message: "Bulk edit completed",
+      data: results,
+      summary: {
+        successful: results.successful.length,
+        failed: results.failed.length,
+        total: results.totalProcessed
+      }
+    });
+  } catch (error) {
+    console.error("Bulk Edit Error:", error);
+    res.status(500).json({ error: "Server error during bulk edit" });
+  }
+};
+
+
+// --- Bulk Edit Products ---
+exports.bulkEditProducts = async (req, res) => {
+  try {
+    const { products: updatePayload } = req.body;
+
+    if (!updatePayload || !Array.isArray(updatePayload)) {
+      return res.status(400).json({ error: "Invalid payload: products array required" });
+    }
+
+    const results = {
+      successful: [],
+      failed: [],
+      totalProcessed: 0
+    };
+
+    for (const item of updatePayload) {
+      const { _id, updates } = item;
+
+      if (!_id || !updates) {
+        results.failed.push({ _id, error: "Missing _id or updates" });
+        results.totalProcessed++;
+        continue;
+      }
+
+      try {
+        if (!isValidObjectId(_id)) {
+          results.failed.push({ _id, error: "Invalid product ID format" });
+          results.totalProcessed++;
+          continue;
+        }
+
+        // Find product
+        const product = await Product.findById(_id);
+        if (!product) {
+          results.failed.push({ _id, error: "Product not found" });
+          results.totalProcessed++;
+          continue;
+        }
+
+        // Validate category if being updated
+        if (updates.category) {
+          const categoryExists = await Category.findById(updates.category);
+          if (!categoryExists) {
+            results.failed.push({ _id, error: "Category not found" });
+            results.totalProcessed++;
+            continue;
+          }
+        }
+
+        // Parse boolean fields
+        if (updates.bestSeller !== undefined) {
+          updates.bestSeller = updates.bestSeller === "true" || updates.bestSeller === true;
+        }
+        if (updates.newArrival !== undefined) {
+          updates.newArrival = updates.newArrival === "true" || updates.newArrival === true;
+        }
+
+        // Update product
+        const updated = await Product.findByIdAndUpdate(_id, updates, { new: true, runValidators: true }).populate("category", "name");
+        results.successful.push(updated);
+        results.totalProcessed++;
+      } catch (itemError) {
+        results.failed.push({ _id, error: itemError.message });
+        results.totalProcessed++;
+      }
+    }
+
+    res.status(200).json({
+      success: true,
+      message: "Bulk edit completed",
+      data: results,
+      summary: {
+        successful: results.successful.length,
+        failed: results.failed.length,
+        total: results.totalProcessed
+      }
+    });
+  } catch (error) {
+    console.error("Bulk Edit Error:", error);
+    res.status(500).json({ error: "Server error during bulk edit" });
+  }
+};

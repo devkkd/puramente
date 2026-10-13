@@ -2,8 +2,9 @@
 import Script from "next/script";
 import "./globals.css";
 import ExhibitionPopup from "@/components/ExhibitionPopup";
+import { ReduxProvider } from "@/redux/provider";
 
-// Configure Mona Sans — only load weights actually used in the design
+// Configure Mona Sans - only load weights actually used in the design
 const monaSans = Mona_Sans({
   subsets: ["latin"],
   variable: "--font-mona-sans",
@@ -38,7 +39,9 @@ export default function RootLayout({ children }) {
     >
       <body className="min-h-full">
         <ExhibitionPopup />
-        {children}
+        <ReduxProvider>
+          {children}
+        </ReduxProvider>
 
         {/* Google Analytics */}
         <Script

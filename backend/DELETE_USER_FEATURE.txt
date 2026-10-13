@@ -1,0 +1,42 @@
+﻿✅ DELETE USER FEATURE - ADDED!
+
+What was implemented:
+1. Backend Endpoint
+   Location: /backend/routes/authRoutes.js
+   Route: DELETE /auth/admin/users/:id
+   → Deletes user from database
+   → Also deletes their cart
+   → Returns success message
+
+2. Frontend API Function
+   Location: /frontend/src/lib/api.js
+   Function: deleteAdminUser(id)
+   → Calls the backend delete endpoint
+   → Handles error responses
+
+3. Frontend Delete Button
+   Location: /frontend/src/app/(Admin_group)/admin/users/page.jsx
+   Feature:
+   ✅ Delete button next to View button
+   ✅ Red colored button (danger action)
+   ✅ Confirmation dialog before deletion
+   ✅ Shows user name in confirmation
+   ✅ Removes user from table on success
+   ✅ Shows error alert if fails
+
+How it works:
+1. Admin clicks Delete button on a user row
+2. Browser shows: "Are you sure you want to delete [User Name]?"
+3. If confirmed:
+   └─ Backend deletes user + cart
+   └─ User removed from UI immediately
+   └─ Success message shown
+4. If cancelled:
+   └─ Nothing happens
+
+Files Modified:
+✅ backend/routes/authRoutes.js - Delete endpoint
+✅ frontend/src/lib/api.js - deleteAdminUser function
+✅ frontend/src/app/(Admin_group)/admin/users/page.jsx - Delete button + handler
+
+Ready to use!

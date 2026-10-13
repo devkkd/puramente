@@ -143,14 +143,28 @@ exports.loginUser = async (req, res) => {
 exports.loginAdmin = async (req, res) => {
   try {
     const { email, password } = req.body;
+    const normalizedEmail = email ? email.toLowerCase().trim() : "";
+    const expectedAdminEmail = (process.env.ADMIN_EMAIL || "").toLowerCase().trim();
+    
+    console.log(`[ADMIN_LOGIN] Attempt with email: ${normalizedEmail}`);
+    console.log(`[ADMIN_LOGIN] Expected email: ${expectedAdminEmail}`);
 
-    if (email === process.env.ADMIN_EMAIL && password === process.env.ADMIN_PASSWORD) {
+    if (normalizedEmail === expectedAdminEmail && password === process.env.ADMIN_PASSWORD) {
+      console.log(`[ADMIN_LOGIN] ? Admin login successful`);
 
       const token = jwt.sign(
         { id: "admin_hardcoded_id", role: "admin" },
         process.env.JWT_SECRET || "fallback_secret",
         { expiresIn: "30d" }
       );
+
+      // Set token in HTTP-only cookie (more secure than localStorage)
+      res.cookie('adminToken', token, {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === 'production',
+        sameSite: 'lax',
+        maxAge: 30 * 24 * 60 * 60 * 1000  // 30 days in milliseconds
+      });
 
       return res.status(200).json({
         success: true,
@@ -161,12 +175,15 @@ exports.loginAdmin = async (req, res) => {
         }
       });
     } else {
+      console.log(`[ADMIN_LOGIN] ? Invalid credentials. Email match: ${normalizedEmail === expectedAdminEmail}, Password match: ${password === process.env.ADMIN_PASSWORD}`);
       return res.status(401).json({ success: false, error: "Invalid admin credentials" });
     }
   } catch (error) {
+    console.error(`[ADMIN_LOGIN] ? Server error: ${error.message}`);
     res.status(500).json({ success: false, error: "Server error during admin login" });
   }
 };
+
 
 exports.forgotPassword = async (req, res) => {
   try {
@@ -262,6 +279,10 @@ exports.resetPassword = async (req, res) => {
     res.status(500).json({ success: false, error: "Server Error" });
   }
 };
+
+
+
+
 
 
 
