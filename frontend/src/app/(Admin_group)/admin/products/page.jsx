@@ -41,14 +41,15 @@ export default function ProductsPage() {
     if (!window.confirm("Are you sure you want to delete this product? This action cannot be undone.")) return;
     
     try {
-      const res = await api.delete(`/products/${id}`);
+      const res = await api.delete(`/api/products/${id}`);
       
-      if (res.success) {
+      if (res.data.success) {
         setProducts(products.filter(p => p._id !== id));
+        alert("Product deleted successfully!");
       }
     } catch (error) {
       console.error("Delete Error:", error);
-      alert(error.error || "Error deleting product.");
+      alert(error.response?.data?.error || "Error deleting product.");
     }
   };
 

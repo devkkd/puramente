@@ -65,7 +65,7 @@ export default function HeroSection() {
     {
       id: 2,
       desktopImage: "/images/home/heroBanner3.png", 
-      mobileImage: "/images/home/mobilebanner3.png", 
+      mobileImage: "/images/home/mobileBanner3.png", 
       altText: "Puramente International New Collection 3",
     },
     {
