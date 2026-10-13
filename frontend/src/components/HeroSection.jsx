@@ -56,32 +56,32 @@ export default function HeroSection() {
   };
 
   const banners = [
-    {
+    // {
+    //   id: 1,
+    //   desktopImage: "/images/home/banner_1.png",
+    //   mobileImage: "/images/home/mobilebanner2.png",
+    //   altText: "Puramente International New Collection 1",
+    // },
+    // {
+    //   id: 2,
+    //   desktopImage: "/images/home/heroBanner3.png", 
+    //   mobileImage: "/images/home/mobileBanner3.png", 
+    //   altText: "Puramente International New Collection 3",
+    // },
+    // {
+    //   id: 3,
+    //   desktopImage: "/images/home/heroBanner4.png", 
+    //   mobileImage: "/images/home/mobileBanner4.png", 
+    //   altText: "Puramente International New Collection 4",
+    // },
+    //  {
+    //   id: 4,
+    //   desktopImage: "/images/home/heroBanner2.png", 
+    //   mobileImage: "/images/home/mobileBanner3.png", 
+    //   altText: "Puramente International New Collection 2",
+    // },
+     {
       id: 1,
-      desktopImage: "/images/home/banner_1.png",
-      mobileImage: "/images/home/mobilebanner2.png",
-      altText: "Puramente International New Collection 1",
-    },
-    {
-      id: 2,
-      desktopImage: "/images/home/heroBanner3.png", 
-      mobileImage: "/images/home/mobileBanner3.png", 
-      altText: "Puramente International New Collection 3",
-    },
-    {
-      id: 3,
-      desktopImage: "/images/home/heroBanner4.png", 
-      mobileImage: "/images/home/mobileBanner4.png", 
-      altText: "Puramente International New Collection 4",
-    },
-     {
-      id: 4,
-      desktopImage: "/images/home/heroBanner2.png", 
-      mobileImage: "/images/home/mobileBanner3.png", 
-      altText: "Puramente International New Collection 2",
-    },
-     {
-      id: 5,
       desktopImage: "/images/home/heroBanner5.PNG", 
       mobileImage: "/images/home/mobileBanner5.jpeg", 
       altText: "Puramente International New Collection 2",
@@ -114,7 +114,7 @@ export default function HeroSection() {
             <div key={banner.id} className="outline-none focus:outline-none block w-full m-0 p-0">
               
               {/* Aspect Ratio Container ensures no gaps */}
-              <div className="relative w-full aspect-[390/370] sm:aspect-[1500/630] overflow-hidden bg-gray-100">
+              <div className="relative w-full aspect-[300/370] sm:aspect-[1500/630] overflow-hidden bg-gray-100">
                 
                 {/* 🔴 FIX: Mobile Image Wrapper (Controls visibility perfectly) */}
                 <div className="block sm:hidden absolute inset-0 w-full h-full">
