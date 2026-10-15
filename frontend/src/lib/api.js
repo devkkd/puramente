@@ -117,6 +117,112 @@ export async function loginAdminUser(credentials) {
 }
 
 /**
+ * Register a new user
+ */
+export async function registerUser(userData) {
+  try {
+    const response = await apiClient.post('/api/auth/register', userData);
+    
+    if (response.data.success) {
+      if (typeof window !== 'undefined') {
+        localStorage.setItem('userToken', response.data.data.token);
+        localStorage.setItem('userId', response.data.data._id);
+      }
+      return {
+        success: true,
+        data: response.data.data
+      };
+    } else {
+      return {
+        success: false,
+        error: response.data.error || 'Registration failed'
+      };
+    }
+  } catch (error) {
+    console.error('Registration error:', error);
+    
+    if (error.response?.status === 400) {
+      return {
+        success: false,
+        error: error.response.data?.error || 'Registration failed - email may already be registered'
+      };
+    }
+    
+    if (error.code === 'ECONNABORTED') {
+      return {
+        success: false,
+        error: 'Request timeout - backend may not be running'
+      };
+    }
+
+    return {
+      success: false,
+      error: error.message || 'Registration failed. Please try again.'
+    };
+  }
+}
+
+/**
+ * Login a user
+ */
+export async function loginUser(credentials) {
+  try {
+    const { email, password } = credentials;
+
+    if (!email || !password) {
+      return {
+        success: false,
+        error: 'Email and password are required'
+      };
+    }
+
+    const response = await apiClient.post('/api/auth/login', {
+      email: email.toLowerCase().trim(),
+      password
+    });
+
+    if (response.data.success) {
+      if (typeof window !== 'undefined') {
+        localStorage.setItem('userToken', response.data.data.token);
+        localStorage.setItem('userId', response.data.data._id);
+      }
+      
+      return {
+        success: true,
+        data: response.data.data
+      };
+    } else {
+      return {
+        success: false,
+        error: response.data.error || 'Login failed'
+      };
+    }
+  } catch (error) {
+    console.error('Login error:', error.message);
+    
+    if (error.response?.status === 401) {
+      return {
+        success: false,
+        error: error.response.data?.error || 'Invalid email or password'
+      };
+    }
+    
+    if (error.code === 'ECONNABORTED') {
+      return {
+        success: false,
+        error: 'Request timeout - backend may not be running'
+      };
+    }
+
+    return {
+      success: false,
+      error: error.message || 'Login failed. Please try again.'
+    };
+  }
+}
+
+
+/**
  * Get all admin orders
  */
 export async function getAdminOrders() {
@@ -535,3 +641,4 @@ export async function deleteInstaPost(id) {
 // Export apiClient as both default and named export
 export { apiClient as api };
 export default apiClient;
+
