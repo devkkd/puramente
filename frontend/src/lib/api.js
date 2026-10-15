@@ -1,4 +1,4 @@
-/**
+﻿/**
  * API Client for Puramente Admin Dashboard
  */
 
@@ -325,7 +325,6 @@ export async function getAdminUsers() {
     };
   }
 }
-
 /**
  * Get all categories
  */
@@ -641,4 +640,53 @@ export async function deleteInstaPost(id) {
 // Export apiClient as both default and named export
 export { apiClient as api };
 export default apiClient;
+
+
+
+
+
+
+
+
+
+
+/**
+ * Get user profile by ID
+ */
+export async function getUserProfile(userId) {
+  try {
+    const response = await apiClient.get(`/api/auth/me/${userId}`);
+    return {
+      success: true,
+      data: response.data.data
+    };
+  } catch (error) {
+    console.error('Error fetching user profile:', error);
+    return {
+      success: false,
+      error: error.response?.data?.error || error.message,
+      data: null
+    };
+  }
+}
+
+/**
+ * Get user's active cart (Admin)
+ */
+export async function getAdminUserCart(userId) {
+  try {
+    const response = await apiClient.get(`/api/auth/admin/users/${userId}/cart`);
+    return {
+      success: true,
+      data: response.data.data
+    };
+  } catch (error) {
+    console.error('Error fetching user cart:', error);
+    return {
+      success: false,
+      error: error.response?.data?.error || error.message,
+      data: null
+    };
+  }
+}
 

@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import { Eye, Filter, ShoppingCart, Users, Search, User as UserIcon, Trash2 } from "lucide-react";
-import { getAdminUsers, deleteAdminUser } from "@/lib/api";
+import { getAdminUsers } from "@/lib/api"; import { deleteAdminUser } from "@/lib/usersApi";
 
 export default function AdminUsersPage() {
   const [users, setUsers] = useState([]);
@@ -212,6 +212,7 @@ export default function AdminUsersPage() {
     </div>
   );
 }
+
 
 
 
