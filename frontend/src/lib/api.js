@@ -649,7 +649,7 @@ export async function bulkUploadProducts(formData) {
  */
 export async function submitContactEnquiry(data) {
   try {
-    const response = await apiClient.post('/api/contact', data);
+    const response = await apiClient.post('/api/contact/submit', data);
     return {
       success: true,
       data: response.data.data || response.data
@@ -709,7 +709,9 @@ export async function deleteAdminContactEnquiry(id) {
  */
 export async function submitCustomRequest(data) {
   try {
-    const response = await apiClient.post('/api/custom-requests', data);
+    const response = await apiClient.post('/api/custom-requests/submit', data, {
+      headers: { 'Content-Type': 'multipart/form-data' }
+    });
     return {
       success: true,
       data: response.data.data || response.data
