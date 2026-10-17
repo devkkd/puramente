@@ -112,6 +112,17 @@ export default function ExcelBulkEditModal() {
   }, [products, selectedProductIds]);
 
   const handleSave = useCallback(async () => {
+    console.log("🔵 [BULK EDIT] handleSave called");
+    console.log("🔵 [BULK EDIT] Current changes object:", changes);
+    console.log("🔵 [BULK EDIT] Number of products with changes:", Object.keys(changes).length);
+    
+    // Show details of each product's changes
+    Object.keys(changes).forEach(productId => {
+      console.log("🔵 [BULK EDIT] Product " + productId + " changes:", changes[productId]);
+      console.log("🔵 [BULK EDIT] Has metaTitle?", "metaTitle" in changes[productId]);
+      console.log("🔵 [BULK EDIT] Has metaDescription?", "metaDescription" in changes[productId]);
+      console.log("🔵 [BULK EDIT] Has metaKeywords?", "metaKeywords" in changes[productId]);
+    });
     if (Object.keys(changes).length === 0) {
       alert("No changes to save.");
       return;
@@ -283,4 +294,6 @@ export default function ExcelBulkEditModal() {
     </>
   );
 }
+
+
 

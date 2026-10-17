@@ -1,8 +1,8 @@
-"use client";
+﻿"use client";
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { Plus, Tags, Search, Image as ImageIcon, Pencil, Trash2 } from "lucide-react";
-import { getCategories } from "@/lib/api";
+import { getCategories, deleteCategory } from "@/lib/api";
 
 export default function CategoriesPage() {
   const [categories, setCategories] = useState([]);
@@ -26,9 +26,22 @@ export default function CategoriesPage() {
   };
 
   // Optional: Add delete functionality here later if needed
-  const handleDelete = (id) => {
-    alert("Delete functionality to be connected to backend.");
+  const handleDelete = async (id) => {
+    if (!window.confirm("Are you sure you want to delete this category?")) return;
+    try {
+      const res = await deleteCategory(id);
+      if (res.success) {
+        setCategories(prev => prev.filter(cat => cat._id !== id));
+        alert("Category deleted successfully");
+      } else {
+        alert("Failed to delete: " + (res.error || "Unknown error"));
+      }
+    } catch (err) {
+      console.error(err);
+      alert("Error deleting category");
+    }
   };
+
 
   return (
     <div className="p-6 lg:p-8 max-w-7xl mx-auto font-mona">
@@ -137,3 +150,5 @@ export default function CategoriesPage() {
     </div>
   );
 }
+
+

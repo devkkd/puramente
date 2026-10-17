@@ -32,11 +32,16 @@ export default function AdminOrderDetailsPage() {
 
   const handleStatusChange = async (e) => {
     const newStatus = e.target.value;
-    setStatus(newStatus);
     try {
-      await updateOrderStatus(id, newStatus);
-      // Optional: replace alert with a subtle toast notification if you have one
+      const res = await updateOrderStatus(id, newStatus);
+      if (res.success) {
+        setStatus(newStatus);
+        alert("Status updated successfully!");
+      } else {
+        alert("Failed to update status: " + (res.error || "Unknown error"));
+      }
     } catch (error) {
+      console.error("Status update error:", error);
       alert("Failed to update status.");
     }
   };

@@ -10,18 +10,17 @@ import InlineEditor from "./InlineEditor";
  */
 export default function TableRow({ product, rowIndex, isSelected }) {
   const dispatch = useDispatch();
-  const { changes, validationErrors } = useSelector(
+  const { changes, validationErrors, categories } = useSelector(
     (state) => state.excelBulkEdit
   );
-  const { categories } = useSelector((state) => state.excelBulkEdit);
 
   const [editingField, setEditingField] = useState(null);
   const productChanges = changes[product._id] || {};
   const productErrors = validationErrors[product._id] || {};
   const hasChanges = Object.keys(productChanges).length > 0;
 
-  const handleToggleSelection = (e) => {
-    e.preventDefault();
+  // Handle checkbox change - Direct dispatch
+  const handleCheckboxChange = (e) => {
     e.stopPropagation();
     dispatch(toggleProductSelection(product._id));
   };
@@ -73,22 +72,32 @@ export default function TableRow({ product, rowIndex, isSelected }) {
     return value || "-";
   };
 
-  const handleCellClick = (fieldKey, fieldType) => {
-    // Allow clicking on checkboxes to edit them
+  const handleCellClick = (fieldKey) => {
     setEditingField(fieldKey);
   };
 
+  const trClassName = bgColor + (hasError ? " border-l-4 border-red-500" : "") + " hover:bg-blue-50 transition";
+  
+  const tdEditorClassName = (field) => {
+    let classes = "px-4 py-4 text-sm whitespace-normal";
+    if (field.key in productChanges) classes += " bg-yellow-50";
+    if (field.key in productErrors) classes += " border-l-2 border-red-500";
+    if (field.type === "checkbox") classes += " text-center cursor-pointer";
+    else classes += " cursor-pointer hover:bg-gray-100";
+    classes += " transition";
+    return classes;
+  };
+
   return (
-    <tr className={`${bgColor} ${hasError ? "border-l-4 border-red-500" : ""} hover:bg-blue-50 transition`}>
+    <tr className={trClassName}>
       {/* Checkbox - Select Row */}
-      <td className="w-12 px-4 py-4 text-center cursor-pointer" onClick={handleToggleSelection}>
+      <td className="w-12 px-4 py-4 text-center">
         <input
           type="checkbox"
           checked={isSelected}
-          onChange={handleToggleSelection}
-          onClick={handleToggleSelection}
-          className="w-5 h-5 rounded border-gray-300 cursor-pointer"
-          aria-label={`Select ${product.productName}`}
+          onChange={handleCheckboxChange}
+          className="w-5 h-5 rounded border-gray-300 cursor-pointer hover:border-blue-500 hover:bg-blue-50 transition"
+          aria-label={`Select ` + product.productName}
         />
       </td>
 
@@ -101,12 +110,8 @@ export default function TableRow({ product, rowIndex, isSelected }) {
         return (
           <td
             key={field.key}
-            className={`px-4 py-4 text-sm whitespace-normal ${
-              isChanged ? "bg-yellow-50" : ""
-            } ${hasError ? "border-l-2 border-red-500" : ""} ${
-              field.type === "checkbox" ? "text-center cursor-pointer" : "cursor-pointer"
-            }`}
-            onClick={() => handleCellClick(field.key, field.type)}
+            className={tdEditorClassName(field)}
+            onClick={() => handleCellClick(field.key)}
           >
             {editingField === field.key ? (
               <InlineEditor
@@ -119,7 +124,7 @@ export default function TableRow({ product, rowIndex, isSelected }) {
                 autoFocus
               />
             ) : (
-              <div className={`flex ${field.type === "checkbox" ? "justify-center" : "justify-between"} items-center`}>
+              <div className={(field.type === "checkbox" ? "flex justify-center" : "flex justify-between") + " items-center gap-2"}>
                 <span className="text-gray-700 line-clamp-2">
                   {field.type === "checkbox" ? (
                     <span className="inline-flex items-center gap-2 font-medium">
@@ -129,7 +134,7 @@ export default function TableRow({ product, rowIndex, isSelected }) {
                         readOnly
                         onClick={(e) => {
                           e.stopPropagation();
-                          handleCellClick(field.key, field.type);
+                          handleCheckboxChange(e);
                         }}
                         className="w-4 h-4 pointer-events-auto cursor-pointer"
                       />
@@ -139,7 +144,7 @@ export default function TableRow({ product, rowIndex, isSelected }) {
                     getDisplayValue(value, field.type)
                   )}
                 </span>
-                {isChanged && !field.type === "checkbox" && (
+                {isChanged && field.type !== "checkbox" && (
                   <span className="ml-2 text-xs font-bold text-blue-600 shrink-0">●</span>
                 )}
               </div>
@@ -155,3 +160,4 @@ export default function TableRow({ product, rowIndex, isSelected }) {
     </tr>
   );
 }
+

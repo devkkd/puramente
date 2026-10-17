@@ -1,4 +1,5 @@
-﻿"use client";
+﻿// FIXED: BulkEditTable.jsx - Pass filteredProducts to TableHeader
+"use client";
 import { useState, useMemo } from "react";
 import { useSelector } from "react-redux";
 import { Search, X } from "lucide-react";
@@ -124,7 +125,7 @@ export default function BulkEditTable() {
       {filteredProducts.length > 0 && (
         <div className="overflow-x-auto relative z-10">
           <table className="w-full">
-            <TableHeader productCount={filteredProducts.length} />
+            <TableHeader productCount={filteredProducts.length} filteredProducts={filteredProducts} />
             <tbody className="divide-y divide-gray-200 bg-white">
               {filteredProducts.map((product, idx) => (
                 <TableRow

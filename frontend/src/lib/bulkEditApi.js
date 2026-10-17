@@ -12,7 +12,7 @@ apiClient.interceptors.request.use((config) => {
       ? localStorage.getItem("adminToken") || localStorage.getItem("token")
       : null;
   if (token) {
-    config.headers.Authorization = `Bearer ${token}`;
+    config.headers.Authorization = "Bearer " + token;
   }
   return config;
 });
@@ -20,7 +20,6 @@ apiClient.interceptors.request.use((config) => {
 export async function fetchCategories() {
   try {
     const response = await apiClient.get("/api/categories");
-    // Backend returns { success, count, data }
     return {
       success: true,
       data: response.data.data || [],
@@ -36,11 +35,10 @@ export async function fetchCategories() {
 
 export async function fetchProductsByCategory(categoryId) {
   try {
-    console.log(`Fetching products for category: ${categoryId}`);
-    const response = await apiClient.get(`/api/products?category=${categoryId}`);
-    // Backend returns { success, count, data }
+    console.log("Fetching products for category:", categoryId);
+    const response = await apiClient.get("/api/products?category=" + categoryId);
     const products = response.data.data || [];
-    console.log(`Received ${products.length} products for category ${categoryId}`);
+    console.log("Received " + products.length + " products for category " + categoryId);
     return {
       success: true,
       data: products,
@@ -58,9 +56,8 @@ export async function fetchAllProducts() {
   try {
     console.log("Fetching all products");
     const response = await apiClient.get("/api/products");
-    // Backend returns { success, count, data }
     const products = response.data.data || [];
-    console.log(`Received ${products.length} total products`);
+    console.log("Received " + products.length + " total products");
     return {
       success: true,
       data: products,
@@ -76,14 +73,31 @@ export async function fetchAllProducts() {
 
 export async function submitBulkChanges(payload) {
   try {
+        console.log("BULK_EDIT_API: Submitting bulk changes");
+    console.log("BULK_EDIT_API: Total products to update:", payload.products.length);
+    
+    // Log each product's updates
+    payload.products.forEach((item, idx) => {
+      console.log("BULK_EDIT_API: Product " + idx + " ID:", item._id);
+      console.log("BULK_EDIT_API: Product " + idx + " updates:", Object.keys(item.updates));
+      console.log("BULK_EDIT_API: Product " + idx + " full data:", item.updates);
+    });
+    
+    console.log("BULK_EDIT_API: Full payload =", JSON.stringify(payload, null, 2));
+    
     const response = await apiClient.post("/api/products/bulk-edit", payload);
+    
+    console.log("BULK_EDIT_API: Response received =", response.data);
+    
     return {
       success: response.data.success,
       data: response.data.data,
       error: response.data.error,
     };
   } catch (error) {
-    console.error("Error submitting bulk changes:", error);
+    console.error("BULK_EDIT_API: Error caught =", error);
+    console.error("BULK_EDIT_API: Error response =", error.response?.data);
+    
     return {
       success: false,
       error: error.response?.data?.error || error.message,
@@ -92,3 +106,4 @@ export async function submitBulkChanges(payload) {
 }
 
 export default apiClient;
+

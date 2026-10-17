@@ -107,14 +107,14 @@ export default function Testimonials() {
               ))}
             </div>
 
-            <div className="mt-6 lg:mt-6 flex justify-center lg:justify-start">
+            {/* <div className="mt-6 lg:mt-6 flex justify-center lg:justify-start">
               <Link 
                 href="/testimonials" 
                 className="inline-flex items-center text-[#00a3c4] text-xs lg:text-sm font-medium uppercase tracking-widest border-b border-[#00a3c4]/40 hover:border-[#00a3c4] transition-colors"
               >
                 See All What Our Customers Say &rarr;
               </Link>
-            </div>
+            </div> */}
           </div>
         </div>
       </div>

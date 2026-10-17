@@ -52,22 +52,22 @@ export default function Footer() {
             <img 
               src="/images/logo/puramenteLogoDark.png" 
               alt="Puramente International" 
-              className="h-6 sm:h-8 md:h-10 w-auto object-contain"
+              className="h-6 sm:h-8 md:h-16 w-auto object-contain"
             />
           </div>
 
           {/* Newsletter Section */}
           <div className="flex flex-col lg:flex-row items-center justify-between gap-4 md:gap-6 mb-4">
-            <div className="w-full lg:w-1/2 text-center lg:text-left">
+            <div className="w-full lg:w-full border text-center lg:text-center">
               <h2 className="font-playfair text-xl md:text-2xl lg:text-3xl font-bold text-black mb-1.5 md:mb-2">
                 Stay Ahead in Jewelry <span className="italic text-[#0082A4] font-medium">Trends</span>
               </h2>
-              <p className="text-[13px] md:text-sm font-normal text-gray-800 max-w-md mx-auto lg:mx-0 leading-relaxed">
+              <p className="text-[13px] md:text-sm font-normal text-gray-800   mx-auto lg:mx-0 leading-relaxed">
                 Get exclusive access to new collections, wholesale pricing insights, and trend forecasts—crafted for retailers and jewelry brands worldwide.
               </p>
             </div>
             
-            <div className="w-full lg:w-1/2 flex justify-center lg:justify-end mt-2 lg:mt-0">
+            {/* <div className="w-full lg:w-1/2 flex justify-center lg:justify-end mt-2 lg:mt-0">
               <form onSubmit={handleSubscribe} className="flex w-full max-w-md shadow-sm">
                 <input
                   type="email"
@@ -85,7 +85,7 @@ export default function Footer() {
                   <span className="sm:hidden">Subscribe</span> &rarr;
                 </button>
               </form>
-            </div>
+            </div> */}
           </div>
 
           <hr className="border-[#c4eee5] my-4 md:my-5" />

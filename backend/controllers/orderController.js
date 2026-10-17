@@ -1,4 +1,4 @@
-const Order = require("../models/Order");
+﻿const Order = require("../models/Order");
 const Cart = require("../models/Cart");
 const sendEmail = require("../utils/sendEmail");
 const ExcelJS = require("exceljs"); 
@@ -60,18 +60,18 @@ exports.submitOrder = async (req, res) => {
 
       // Column layout (0-indexed): A=sr, B=name, C=code, D=image, E=finish, F=metal, G=qty, H=price, I=total
       sheet.columns = [
-        { key: 'sr',     width: 6  }, // A — Sr. No.
-        { key: 'name',   width: 28 }, // B — Product Name
-        { key: 'code',   width: 16 }, // C — Design Code
-        { key: 'image',  width: 22 }, // D — Product Image
-        { key: 'finish', width: 22 }, // E — Custom Finish
-        { key: 'metal',  width: 16 }, // F — Metal Type
-        { key: 'qty',    width: 18 }, // G — Quantity Range
-        { key: 'price',  width: 25 }, // H — Unit Price (Fill Here)
-        { key: 'total',  width: 25 }, // I — Total Price (Fill Here)
+        { key: 'sr',     width: 6  }, // A â€” Sr. No.
+        { key: 'name',   width: 28 }, // B â€” Product Name
+        { key: 'code',   width: 16 }, // C â€” Design Code
+        { key: 'image',  width: 22 }, // D â€” Product Image
+        { key: 'finish', width: 22 }, // E â€” Custom Finish
+        { key: 'metal',  width: 16 }, // F â€” Metal Type
+        { key: 'qty',    width: 18 }, // G â€” Quantity Range
+        { key: 'price',  width: 25 }, // H â€” Unit Price (Fill Here)
+        { key: 'total',  width: 25 }, // I â€” Total Price (Fill Here)
       ];
 
-      // ── Customer Details block (rows 1–9) ──────────────────────────────
+      // â”€â”€ Customer Details block (rows 1â€“9) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
       sheet.insertRow(1, ['--- CUSTOMER DETAILS ---']);
       sheet.insertRow(2, ['Order Number:', orderSerialNumber]);
       sheet.insertRow(3, ['Name:',         contactDetails.fullName]);
@@ -82,7 +82,7 @@ exports.submitOrder = async (req, res) => {
       sheet.insertRow(8, ['Message:',      contactDetails.message]);
       sheet.insertRow(9, []);
 
-      // ── "PRODUCT DETAILS" heading row (row 10) — merged across all 9 columns ──
+      // â”€â”€ "PRODUCT DETAILS" heading row (row 10) â€” merged across all 9 columns â”€â”€
       sheet.insertRow(10, ['PRODUCT DETAILS']);
       const headingRow = sheet.getRow(10);
       headingRow.height = 28;
@@ -92,7 +92,7 @@ exports.submitOrder = async (req, res) => {
       // Merge A10:I10 so the heading spans all 9 columns
       sheet.mergeCells('A10:I10');
 
-      // ── Product table column headers (row 11) ──────────────────────────
+      // â”€â”€ Product table column headers (row 11) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
       const productHeaderRow = sheet.insertRow(11, [
         'Sr.', 'Product Name', 'Design Code', 'Product Image',
         'Custom Finish', 'Metal Type', 'Quantity Range',
@@ -109,16 +109,16 @@ exports.submitOrder = async (req, res) => {
         };
       });
 
-      // ── Product data rows (row 11 onwards) ────────────────────────────
+      // â”€â”€ Product data rows (row 11 onwards) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
       for (let i = 0; i < orderItems.length; i++) {
         const item = orderItems[i];
 
-        // Image column (D) is left empty for text — image overlaid separately
+        // Image column (D) is left empty for text â€” image overlaid separately
         const addedRow = sheet.addRow({
           sr:     i + 1,
           name:   item.productName,
           code:   item.designCode,
-          image:  '',            // D — filled by addImage below
+          image:  '',            // D â€” filled by addImage below
           finish: item.customFinish,
           metal:  item.metalType,
           qty:    item.quantityBand,
@@ -127,7 +127,7 @@ exports.submitOrder = async (req, res) => {
         });
 
         const currentRowNumber = addedRow.number;
-        addedRow.height = 100; // ~133px — enough room for the image
+        addedRow.height = 100; // ~133px â€” enough room for the image
 
         addedRow.eachCell((cell) => {
           cell.alignment = { vertical: 'middle', horizontal: 'center', wrapText: true };
@@ -139,7 +139,7 @@ exports.submitOrder = async (req, res) => {
         // Product Name left-aligned for readability
         addedRow.getCell('name').alignment = { vertical: 'middle', horizontal: 'left', wrapText: true };
 
-        // ── Inline image in column D (index 3) ─────────────────────────
+        // â”€â”€ Inline image in column D (index 3) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
         if (item.imageUrl) {
           try {
             const imageFetchResponse = await fetch(item.imageUrl);
@@ -171,7 +171,7 @@ exports.submitOrder = async (req, res) => {
               });
 
               // Center image inside column D cell
-              // Column D width = 22 chars ≈ 165px; row height = 100pt ≈ 133px
+              // Column D width = 22 chars â‰ˆ 165px; row height = 100pt â‰ˆ 133px
               const colWidthPx  = 22 * 7.5;   // ~165px
               const rowHeightPx = 100 * 1.33;  // ~133px
 
@@ -202,7 +202,7 @@ exports.submitOrder = async (req, res) => {
 
       const emailHtml = `
         <div style="font-family: Arial, sans-serif; max-w: 700px; padding: 20px; border: 1px solid #e0e0e0; border-radius: 10px;">
-          <h2 style="color: #0082A4;">New Wholesale Order / Price Request 🛍️</h2>
+          <h2 style="color: #0082A4;">New Wholesale Order / Price Request ðŸ›ï¸</h2>
           <p>A client has submitted their cart for a wholesale pricing request.</p>
           <hr style="border: none; border-top: 1px solid #eee; margin: 20px 0;" />
           
@@ -220,7 +220,7 @@ exports.submitOrder = async (req, res) => {
           </div>
 
           <p style="margin-top: 25px; font-size: 14px; color: #555;">
-            <strong>📎 Attached Spreadsheet:</strong> Open the attached Excel file <code>Quote_Request_${orderSerialNumber}.xlsx</code> to view full inline image designs. Fill out the pricing column structure manually and return it to your buyer.
+            <strong>ðŸ“Ž Attached Spreadsheet:</strong> Open the attached Excel file <code>Quote_Request_${orderSerialNumber}.xlsx</code> to view full inline image designs. Fill out the pricing column structure manually and return it to your buyer.
           </p>
           
           <br/>
@@ -264,17 +264,33 @@ exports.getAllOrders = async (req, res) => {
 exports.getOrderById = async (req, res) => {
   try {
     const order = await Order.findById(req.params.id).populate("items.product");
+    if (!order) {
+      return res.status(404).json({ success: false, error: "Order not found" });
+    }
     res.status(200).json({ success: true, data: order });
   } catch (error) { 
-    res.status(500).json({ success: false }); 
+    res.status(500).json({ success: false, error: "Server error" }); 
   }
 };
 
 exports.updateOrderStatus = async (req, res) => {
   try {
-    const order = await Order.findByIdAndUpdate(req.params.id, { status: req.body.status }, { new: true });
+    const { id } = req.params;
+    const { status } = req.body;
+    
+    if (!status) {
+      return res.status(400).json({ success: false, error: "Status is required" });
+    }
+    
+    const order = await Order.findByIdAndUpdate(id, { status }, { new: true });
+    if (!order) {
+      return res.status(404).json({ success: false, error: "Order not found" });
+    }
     res.status(200).json({ success: true, data: order });
-  } catch (error) { res.status(500).json({ success: false }); }
+  } catch (error) {
+    console.error("Update Order Status Error:", error);
+    res.status(500).json({ success: false, error: "Server error" });
+  }
 };
 
 // Admin: Delete order
@@ -289,6 +305,12 @@ exports.deleteOrder = async (req, res) => {
     res.status(500).json({ success: false, error: "Server error" });
   }
 };
+
+
+
+
+
+
 
 
 

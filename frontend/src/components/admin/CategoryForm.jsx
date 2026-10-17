@@ -68,10 +68,25 @@ export default function CategoryForm({ initialData = {}, onSubmit, isLoading }) 
     e.preventDefault();
     if (seoData.schema && !validateSchema(seoData.schema)) return;
     const formData = new FormData(e.target);
-    formData.append("seo[metaTitle]", seoData.metaTitle);
-    formData.append("seo[metaDescription]", seoData.metaDescription);
-    seoData.metaKeywords.forEach(k => formData.append("seo[metaKeywords][]", k));
-    if (seoData.schema) formData.append("seo[schema]", seoData.schema);
+    
+    // ALWAYS append SEO fields for debugging
+    console.log("🔵 [FORM_SUBMIT] seoData state:", seoData);
+    
+    formData.append("seo[metaTitle]", seoData.metaTitle || "");
+    formData.append("seo[metaDescription]", seoData.metaDescription || "");
+    if (seoData.metaKeywords && seoData.metaKeywords.length > 0) {
+      seoData.metaKeywords.forEach(k => formData.append("seo[metaKeywords][]", k));
+    }
+    if (seoData.schema) {
+      formData.append("seo[schema]", seoData.schema);
+    }
+    
+    console.log("📝 [FORM_SUBMIT] FormData being sent with:");
+    console.log("   - seo[metaTitle]:", seoData.metaTitle);
+    console.log("   - seo[metaDescription]:", seoData.metaDescription);
+    console.log("   - seo[metaKeywords][]:", seoData.metaKeywords);
+    console.log("   - seo[schema]:", seoData.schema ? "YES" : "NO");
+    
     onSubmit(formData);
   };
 
@@ -80,27 +95,25 @@ export default function CategoryForm({ initialData = {}, onSubmit, isLoading }) 
     if (seoData.schema && !validateSchema(seoData.schema)) return;
     setSeoSaveLoading(true);
     try {
-      const token = localStorage.getItem("adminToken") || localStorage.getItem("token");
       const payload = {
         metaTitle: seoData.metaTitle,
         metaDescription: seoData.metaDescription,
         metaKeywords: seoData.metaKeywords,
         schema: seoData.schema ? JSON.parse(seoData.schema) : null
       };
-      // Use PROD_API_URL for existing categories (they live in production DB)
-      const baseUrl = process.env.NEXT_PUBLIC_PROD_API_URL || process.env.NEXT_PUBLIC_API_URL;
-      const res = await fetch(`${baseUrl}/categories/${initialData._id}/seo`, {
-        method: "PUT",
-        headers: { "Content-Type": "application/json", "Authorization": `Bearer ${token}` },
-        body: JSON.stringify(payload)
-      });
-      if (res.ok) alert("SEO & Schema saved!");
-      else {
-        const err = await res.json().catch(() => ({}));
-        alert("Failed to save SEO: " + (err.error || res.status));
+      
+      const res = await updateCategorySeo(initialData._id, payload);
+      if (res.success) {
+        alert("SEO & Schema saved!");
+      } else {
+        alert("Failed to save SEO: " + (res.error || "Unknown error"));
       }
-    } catch (err) { alert("Error saving SEO: " + err.message); }
-    finally { setSeoSaveLoading(false); }
+    } catch (err) { 
+      console.error("SEO save error:", err);
+      alert("Error saving SEO: " + err.message); 
+    } finally { 
+      setSeoSaveLoading(false); 
+    }
   };
 
   const titleLen = seoData.metaTitle.length;
@@ -168,7 +181,10 @@ export default function CategoryForm({ initialData = {}, onSubmit, isLoading }) 
               <span className={`text-xs font-semibold ${titleLen > 50 ? "text-orange-500" : "text-gray-400"}`}>{titleLen}/60</span>
             </div>
             <input type="text" value={seoData.metaTitle} maxLength={60}
-              onChange={e => setSeoData(p => ({ ...p, metaTitle: e.target.value }))}
+              onChange={e => {
+              console.log("📝 Meta Title changed to:", e.target.value);
+              setSeoData(p => ({ ...p, metaTitle: e.target.value }));
+            }}
               placeholder="e.g., Wholesale Necklaces Manufacturer India | Puramente Jewel"
               className="w-full bg-gray-50 border border-gray-200 rounded-xl p-3 text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-[#0082A4]/20 focus:border-[#0082A4] transition-all" />
             {seoData.metaTitle && <p className="text-xs text-gray-400 mt-1">Preview: <span className="text-blue-600 underline">{seoData.metaTitle}</span></p>}
@@ -265,3 +281,10 @@ export default function CategoryForm({ initialData = {}, onSubmit, isLoading }) 
     </form>
   );
 }
+
+
+
+
+
+
+

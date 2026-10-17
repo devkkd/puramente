@@ -6,25 +6,33 @@ import { toggleSelectAll } from "@/redux/slices/excelBulkEditSlice";
 /**
  * TableHeader - Header row with select-all checkbox and column titles
  */
-export default function TableHeader({ productCount }) {
+export default function TableHeader({ productCount, filteredProducts }) {
   const dispatch = useDispatch();
   const checkboxRef = useRef(null);
-  const { products, selectedProductIds } = useSelector(
+  const { selectedProductIds } = useSelector(
     (state) => state.excelBulkEdit
   );
 
-  const allSelected = products.length > 0 && selectedProductIds.length === products.length;
-  const someSelected = selectedProductIds.length > 0 && selectedProductIds.length < products.length;
+  // Use filteredProducts if provided, otherwise use all products from Redux
+  const visibleProducts = filteredProducts || [];
+  
+  const allSelected = visibleProducts.length > 0 && 
+    selectedProductIds.length === visibleProducts.length &&
+    visibleProducts.every(p => selectedProductIds.includes(p._id));
+  
+  const someSelected = selectedProductIds.length > 0 && 
+    selectedProductIds.length < visibleProducts.length;
 
   // Update indeterminate state directly on the DOM element
   useEffect(() => {
     if (checkboxRef.current) {
-      checkboxRef.current.indeterminate = someSelected;
+      checkboxRef.current.indeterminate = someSelected && !allSelected;
     }
-  }, [someSelected]);
+  }, [someSelected, allSelected]);
 
   const handleSelectAll = () => {
-    dispatch(toggleSelectAll(products.map((p) => p._id)));
+    const productIds = visibleProducts.map((p) => p._id);
+    dispatch(toggleSelectAll(productIds));
   };
 
   const columns = [
@@ -46,7 +54,7 @@ export default function TableHeader({ productCount }) {
         {columns.map((col) => (
           <th
             key={col.key}
-            className={`${col.width} px-4 py-4 text-left text-sm font-bold`}
+            className={col.width + " px-4 py-4 text-left text-sm font-bold"}
           >
             {col.key === "checkbox" ? (
               <input
@@ -54,8 +62,9 @@ export default function TableHeader({ productCount }) {
                 type="checkbox"
                 checked={allSelected}
                 onChange={handleSelectAll}
-                className="w-5 h-5 rounded border-gray-300 cursor-pointer"
-                aria-label="Select all products"
+                className="w-5 h-5 rounded border-gray-300 cursor-pointer hover:brightness-110 transition"
+                aria-label="Select all visible products"
+                title={allSelected ? "Deselect all" : "Select all"}
               />
             ) : (
               col.label
