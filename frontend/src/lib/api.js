@@ -643,6 +643,128 @@ export async function bulkUploadProducts(formData) {
 }
 
 
+
+/**
+ * Submit contact enquiry
+ */
+export async function submitContactEnquiry(data) {
+  try {
+    const response = await apiClient.post('/api/contact', data);
+    return {
+      success: true,
+      data: response.data.data || response.data
+    };
+  } catch (error) {
+    console.error('Error submitting contact enquiry:', error);
+    return {
+      success: false,
+      error: error.response?.data?.error || error.message,
+      data: null
+    };
+  }
+}
+
+/**
+ * Update contact enquiry status (admin)
+ */
+export async function updateContactEnquiryStatus(id, status) {
+  try {
+    const response = await apiClient.put(`/api/contact/admin/${id}/status`, { status });
+    return {
+      success: true,
+      data: response.data.data || response.data
+    };
+  } catch (error) {
+    console.error('Error updating contact status:', error);
+    return {
+      success: false,
+      error: error.response?.data?.error || error.message,
+      data: null
+    };
+  }
+}
+
+/**
+ * Delete contact enquiry (admin)
+ */
+export async function deleteAdminContactEnquiry(id) {
+  try {
+    const response = await apiClient.delete(`/api/contact/admin/${id}`);
+    return {
+      success: true,
+      data: response.data.data || response.data
+    };
+  } catch (error) {
+    console.error('Error deleting contact enquiry:', error);
+    return {
+      success: false,
+      error: error.response?.data?.error || error.message,
+      data: null
+    };
+  }
+}
+
+/**
+ * Submit custom request
+ */
+export async function submitCustomRequest(data) {
+  try {
+    const response = await apiClient.post('/api/custom-requests', data);
+    return {
+      success: true,
+      data: response.data.data || response.data
+    };
+  } catch (error) {
+    console.error('Error submitting custom request:', error);
+    return {
+      success: false,
+      error: error.response?.data?.error || error.message,
+      data: null
+    };
+  }
+}
+
+/**
+ * Update custom request status (admin)
+ */
+export async function updateCustomRequestStatus(id, status) {
+  try {
+    const response = await apiClient.put(`/api/custom-requests/admin/${id}/status`, { status });
+    return {
+      success: true,
+      data: response.data.data || response.data
+    };
+  } catch (error) {
+    console.error('Error updating custom request status:', error);
+    return {
+      success: false,
+      error: error.response?.data?.error || error.message,
+      data: null
+    };
+  }
+}
+
+/**
+ * Delete custom request (admin)
+ */
+export async function deleteAdminCustomRequest(id) {
+  try {
+    const response = await apiClient.delete(`/api/custom-requests/admin/${id}`);
+    return {
+      success: true,
+      data: response.data.data || response.data
+    };
+  } catch (error) {
+    console.error('Error deleting custom request:', error);
+    return {
+      success: false,
+      error: error.response?.data?.error || error.message,
+      data: null
+    };
+  }
+}
+
+
 export async function createProduct(formData) {
   try {
     const response = await apiClient.post('/api/products', formData, {
