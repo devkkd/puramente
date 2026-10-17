@@ -493,6 +493,156 @@ export async function getCategories() {
 /**
  * Create a new product
  */
+
+/**
+ * Create a new category
+ */
+export async function createCategory(formData) {
+  try {
+    const response = await apiClient.post('/api/categories', formData, {
+      headers: { 'Content-Type': 'multipart/form-data' }
+    });
+    return {
+      success: true,
+      data: response.data.data || response.data
+    };
+  } catch (error) {
+    console.error('Error creating category:', error);
+    return {
+      success: false,
+      error: error.response?.data?.error || error.message,
+      data: null
+    };
+  }
+}
+
+/**
+ * Get category by ID
+ */
+export async function getCategoryById(id) {
+  try {
+    const response = await apiClient.get(`/api/categories/${id}`);
+    return {
+      success: true,
+      data: response.data.data || response.data
+    };
+  } catch (error) {
+    console.error('Error fetching category:', error);
+    return {
+      success: false,
+      error: error.response?.data?.error || error.message,
+      data: null
+    };
+  }
+}
+
+/**
+ * Update category
+ */
+export async function updateCategory(id, formData) {
+  try {
+    const response = await apiClient.put(`/api/categories/${id}`, formData, {
+      headers: { 'Content-Type': 'multipart/form-data' }
+    });
+    return {
+      success: true,
+      data: response.data.data || response.data
+    };
+  } catch (error) {
+    console.error('Error updating category:', error);
+    return {
+      success: false,
+      error: error.response?.data?.error || error.message,
+      data: null
+    };
+  }
+}
+
+/**
+ * Update category SEO
+ */
+export async function updateCategorySeo(id, seoData) {
+  try {
+    const response = await apiClient.put(`/api/categories/${id}/seo`, seoData);
+    return {
+      success: true,
+      data: response.data.data || response.data
+    };
+  } catch (error) {
+    console.error('Error updating category SEO:', error);
+    return {
+      success: false,
+      error: error.response?.data?.error || error.message,
+      data: null
+    };
+  }
+}
+
+/**
+ * Delete category
+ */
+export async function deleteCategory(id) {
+  try {
+    const response = await apiClient.delete(`/api/categories/${id}`);
+    return {
+      success: true,
+      data: response.data.data || response.data
+    };
+  } catch (error) {
+    console.error('Error deleting category:', error);
+    return {
+      success: false,
+      error: error.response?.data?.error || error.message,
+      data: null
+    };
+  }
+}
+
+
+
+/**
+ * Get blog by ID
+ */
+export async function getBlogById(id) {
+  try {
+    const response = await apiClient.get(`/api/blog/${id}`);
+    return {
+      success: true,
+      data: response.data.data || response.data
+    };
+  } catch (error) {
+    console.error('Error fetching blog:', error);
+    return {
+      success: false,
+      error: error.response?.data?.error || error.message,
+      data: null
+    };
+  }
+}
+
+/**
+ * Bulk upload products (Excel import)
+ */
+export async function bulkUploadProducts(formData) {
+  try {
+    const response = await apiClient.post('/api/products/bulk-upload', formData, {
+      headers: { 'Content-Type': 'multipart/form-data' }
+    });
+    return {
+      success: true,
+      data: response.data.data || response.data
+    };
+  } catch (error) {
+    console.error('Error bulk uploading products:', error);
+    return {
+      success: false,
+      error: error.response?.data?.error || error.message,
+      data: null
+    };
+  }
+}
+
+
 export async function createProduct(formData) {
   try {
     const response = await apiClient.post('/api/products', formData, {
