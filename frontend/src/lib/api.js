@@ -690,3 +690,110 @@ export async function getAdminUserCart(userId) {
   }
 }
 
+
+
+/**
+ * Get user's cart
+ */
+export async function getCart(params) {
+  try {
+    const response = await apiClient.post('/api/cart/view', params);
+    return {
+      success: true,
+      data: response.data.data || response.data
+    };
+  } catch (error) {
+    console.error('Error fetching cart:', error);
+    return {
+      success: false,
+      error: error.response?.data?.error || error.message,
+      data: null
+    };
+  }
+}
+
+/**
+ * Add item to cart
+ */
+export async function addToCart(params) {
+  try {
+    const response = await apiClient.post('/api/cart/add', params);
+    return {
+      success: true,
+      data: response.data.data || response.data
+    };
+  } catch (error) {
+    console.error('Error adding to cart:', error);
+    return {
+      success: false,
+      error: error.response?.data?.error || error.message,
+      data: null
+    };
+  }
+}
+
+/**
+ * Update cart item
+ */
+export async function updateCartItem(params) {
+  try {
+    const response = await apiClient.put('/api/cart/update', params);
+    return {
+      success: true,
+      data: response.data.data || response.data
+    };
+  } catch (error) {
+    console.error('Error updating cart:', error);
+    return {
+      success: false,
+      error: error.response?.data?.error || error.message,
+      data: null
+    };
+  }
+}
+
+/**
+ * Remove item from cart
+ */
+export async function removeFromCart(params) {
+  try {
+    const response = await apiClient.post('/api/cart/remove', params);
+    return {
+      success: true,
+      data: response.data.data || response.data
+    };
+  } catch (error) {
+    console.error('Error removing from cart:', error);
+    return {
+      success: false,
+      error: error.response?.data?.error || error.message,
+      data: null
+    };
+  }
+}
+
+
+
+
+/**
+ * Submit order/price request
+ */
+export async function submitOrderRequest(payload) {
+  try {
+    const response = await apiClient.post('/api/orders/submit', payload);
+    return {
+      success: true,
+      data: response.data.data || response.data,
+      message: response.data.message
+    };
+  } catch (error) {
+    console.error('Error submitting order request:', error);
+    return {
+      success: false,
+      error: error.response?.data?.error || error.message,
+      data: null
+    };
+  }
+}
+
+
