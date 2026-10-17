@@ -727,43 +727,6 @@ export async function submitCustomRequest(data) {
 /**
  * Update custom request status (admin)
  */
-export async function updateCustomRequestStatus(id, status) {
-  try {
-    const response = await apiClient.put(`/api/custom-requests/admin/${id}/status`, { status });
-    return {
-      success: true,
-      data: response.data.data || response.data
-    };
-  } catch (error) {
-    console.error('Error updating custom request status:', error);
-    return {
-      success: false,
-      error: error.response?.data?.error || error.message,
-      data: null
-    };
-  }
-}
-
-/**
- * Delete custom request (admin)
- */
-export async function deleteAdminCustomRequest(id) {
-  try {
-    const response = await apiClient.delete(`/api/custom-requests/admin/${id}`);
-    return {
-      success: true,
-      data: response.data.data || response.data
-    };
-  } catch (error) {
-    console.error('Error deleting custom request:', error);
-    return {
-      success: false,
-      error: error.response?.data?.error || error.message,
-      data: null
-    };
-  }
-}
-
 
 export async function createProduct(formData) {
   try {
