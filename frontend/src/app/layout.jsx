@@ -38,7 +38,7 @@ export default function RootLayout({ children }) {
       className={`${monaSans.variable} ${playfair.variable} h-full antialiased`}
     >
       <body className="min-h-full">
-        <ExhibitionPopup />
+        {/* <ExhibitionPopup /> */}
         <ReduxProvider>
           {children}
         </ReduxProvider>

@@ -56,36 +56,36 @@ export default function HeroSection() {
   };
 
   const banners = [
-    // {
-    //   id: 1,
-    //   desktopImage: "/images/home/banner_1.png",
-    //   mobileImage: "/images/home/mobilebanner2.png",
-    //   altText: "Puramente International New Collection 1",
-    // },
-    // {
-    //   id: 2,
-    //   desktopImage: "/images/home/heroBanner3.png", 
-    //   mobileImage: "/images/home/mobileBanner3.png", 
-    //   altText: "Puramente International New Collection 3",
-    // },
-    // {
-    //   id: 3,
-    //   desktopImage: "/images/home/heroBanner4.png", 
-    //   mobileImage: "/images/home/mobileBanner4.png", 
-    //   altText: "Puramente International New Collection 4",
-    // },
-    //  {
-    //   id: 4,
-    //   desktopImage: "/images/home/heroBanner2.png", 
-    //   mobileImage: "/images/home/mobileBanner3.png", 
-    //   altText: "Puramente International New Collection 2",
-    // },
-     {
+    {
       id: 1,
-      desktopImage: "/images/home/heroBanner5.PNG", 
-      mobileImage: "/images/home/mobileBanner5.jpeg", 
+      desktopImage: "/images/home/banner_1.png",
+      mobileImage: "/images/home/mobilebanner2.png",
+      altText: "Puramente International New Collection 1",
+    },
+    {
+      id: 2,
+      desktopImage: "/images/home/heroBanner3.png", 
+      mobileImage: "/images/home/mobileBanner3.png", 
+      altText: "Puramente International New Collection 3",
+    },
+    {
+      id: 3,
+      desktopImage: "/images/home/heroBanner4.png", 
+      mobileImage: "/images/home/mobileBanner4.png", 
+      altText: "Puramente International New Collection 4",
+    },
+     {
+      id: 4,
+      desktopImage: "/images/home/heroBanner2.png", 
+      mobileImage: "/images/home/mobileBanner3.png", 
       altText: "Puramente International New Collection 2",
     },
+    //  {
+    //   id: 1,
+    //   desktopImage: "/images/home/heroBanner5.PNG", 
+    //   mobileImage: "/images/home/mobileBanner5.jpeg", 
+    //   altText: "Puramente International New Collection 2",
+    // },
   ];
 
   const features = [
