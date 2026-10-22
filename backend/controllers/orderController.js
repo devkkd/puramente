@@ -262,21 +262,21 @@ exports.submitOrder = async (req, res) => {
       if (contactDetails?.email) {
         const clientEmailHtml = `
         <div style="font-family: Arial, sans-serif; max-width: 600px; padding: 30px; border: 1px solid #e0e0e0; border-radius: 10px; background: #f9fafb;">
-          <h1 style="color: #0082A4; text-align: center; margin: 0 0 30px;">✓ Order Confirmed</h1>
+          <h1 style="color: #0082A4; text-align: center; margin: 0 0 30px;"> Order Confirmed</h1>
           <p style="font-size: 16px; color: #333;">Dear <strong>${contactDetails.fullName}</strong>,</p>
           <p style="line-height: 1.6;">Thank you for submitting your wholesale price request! We have received your order and are excited to work with you.</p>
           <div style="background: #E8F5E9; border-left: 4px solid #0082A4; padding: 15px; margin: 20px 0; border-radius: 4px;">
             <p style="margin: 0;"><strong>Order Reference:</strong> <code style="background: #fff; padding: 2px 6px; border-radius: 3px;">${orderSerialNumber}</code></p>
           </div>
-          <h3 style="color: #333; margin-top: 25px;">📎 Your Quote Template</h3>
+          <h3 style="color: #333; margin-top: 25px;"> Your Quote Template</h3>
           <p style="color: #555; line-height: 1.6;">We have attached an Excel spreadsheet that includes:</p>
           <ul style="color: #555; line-height: 1.8;">
-            <li>✓ All your selected products with design images</li>
-            <li>✓ Product specifications and design codes</li>
-            <li>✓ Your requested quantity ranges</li>
-            <li>✓ Empty price columns for you to fill</li>
+            <li> All your selected products with design images</li>
+            <li> Product specifications and design codes</li>
+            <li> Your requested quantity ranges</li>
+            <li> Empty price columns for you to fill</li>
           </ul>
-          <h3 style="color: #333; margin-top: 25px;">📋 Next Steps</h3>
+          <h3 style="color: #333; margin-top: 25px;"> Next Steps</h3>
           <ol style="color: #555; line-height: 1.8;">
             <li>Download the attached Excel file</li>
             <li>Fill in the pricing for each product based on your requirements</li>
@@ -302,7 +302,7 @@ exports.submitOrder = async (req, res) => {
             }
           ]
         });
-        console.log("[ORDER_EMAIL] ✓ Client confirmation sent to:", contactDetails.email);
+        console.log("[ORDER_EMAIL]  Client confirmation sent to:", contactDetails.email);
       } else {
         console.warn("[ORDER_EMAIL] ⚠ WARNING: No client email - client won't receive confirmation");
       }
@@ -321,7 +321,7 @@ exports.submitOrder = async (req, res) => {
           }
         ]
       });
-      console.log("[ORDER_EMAIL] ✓ Admin notification sent to:", process.env.RECEIVER_EMAIL);
+      console.log("[ORDER_EMAIL]  Admin notification sent to:", process.env.RECEIVER_EMAIL);
 
 
     } catch (emailError) {
