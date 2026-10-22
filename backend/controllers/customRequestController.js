@@ -97,6 +97,8 @@ exports.submitCustomRequest = async (req, res) => {
       `;
 
       try {
+        console.log("[CUSTOM_REQUEST_EMAIL] Attempting to send customer email to:", data.email);
+        console.log("[CUSTOM_REQUEST_EMAIL] data object keys:", Object.keys(data));
         await sendEmail({
           to: data.email,
           subject: "Your Bespoke Jewelry Request - Confirmation",
@@ -104,7 +106,7 @@ exports.submitCustomRequest = async (req, res) => {
         });
         console.log(`[CUSTOM_REQUEST_EMAIL] ? Customer confirmation sent to ${data.email}`);
       } catch (customerEmailError) {
-        console.error(`[CUSTOM_REQUEST_EMAIL] ? Customer confirmation failed: ${customerEmailError.message}`);
+        console.error(`[CUSTOM_REQUEST_EMAIL] ? Customer confirmation failed for ${data.email}: ${customerEmailError.message}`);
       }
 
       console.log(`[CUSTOM_REQUEST_EMAIL] Sending email for request from ${data.fullName}...`);

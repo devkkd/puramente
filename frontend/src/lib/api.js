@@ -605,7 +605,7 @@ export async function deleteCategory(id) {
  */
 export async function getBlogById(id) {
   try {
-    const response = await apiClient.get(`/api/blog/${id}`);
+    const response = await apiClient.get(`/api/blogs/${id}`);
     return {
       success: true,
       data: response.data.data || response.data

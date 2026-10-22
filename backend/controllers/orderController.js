@@ -8,6 +8,11 @@ exports.submitOrder = async (req, res) => {
   try {
     const { userId, sessionId, contactDetails } = req.body;
     
+    // ===== DEBUG: Log incoming request =====
+    console.log("[ORDER_SUBMIT_DBG] Full body received:", JSON.stringify(req.body, null, 2));
+    console.log("[ORDER_SUBMIT_DBG] Contact details:", JSON.stringify(contactDetails, null, 2));
+    console.log("[ORDER_SUBMIT_DBG] Email from form:", contactDetails?.email || "UNDEFINED");
+    
     // 1. Find the cart using userId or sessionId
     const query = userId ? { userId } : { sessionId: sessionId || 'guest' };
     const cart = await Cart.findOne(query).populate("items.product");
@@ -228,11 +233,86 @@ exports.submitOrder = async (req, res) => {
         </div>
       `;
 
-      console.log("?? SENDING ORDER EMAIL WITH ATTACHMENT...");
+      console.log("[ORDER_EMAIL] ===== ATTEMPTING TO SEND ORDER EMAIL =====");
+      console.log("[ORDER_EMAIL] Email recipient:", contactDetails?.email);
+      console.log("[ORDER_EMAIL] Email recipient type:", typeof contactDetails?.email);
+      console.log("[ORDER_EMAIL] Full contactDetails:", JSON.stringify(contactDetails, null, 2));
+      console.log("[ORDER_EMAIL] Order number:", orderSerialNumber);
+      
+      // IMPORTANT: Use contactDetails.email if it exists, otherwise use RECEIVER_EMAIL (admin)
+      // const recipientEmail = contactDetails?.email || process.env.RECEIVER_EMAIL;
+      // console.log("[ORDER_EMAIL] Final recipient:", recipientEmail);
+      
+      // await sendEmail({
+      //   to: recipientEmail,
+      //   subject: `New Cart Request [${orderSerialNumber}] from ${contactDetails.fullName}`,
+      //   html: emailHtml,
+      //   attachments: [
+      //     {
+      //       filename: `Quote_Request_${orderSerialNumber}.xlsx`,
+      //       content: outputWorkbookBuffer,
+      //       contentType: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+      //     }
+      //   ]
+      // });
+
+            // ===== SEND DUAL EMAILS: CLIENT CONFIRMATION + ADMIN NOTIFICATION =====
+
+      // EMAIL 1: Friendly confirmation to CLIENT
+      if (contactDetails?.email) {
+        const clientEmailHtml = `
+        <div style="font-family: Arial, sans-serif; max-width: 600px; padding: 30px; border: 1px solid #e0e0e0; border-radius: 10px; background: #f9fafb;">
+          <h1 style="color: #0082A4; text-align: center; margin: 0 0 30px;">✓ Order Confirmed</h1>
+          <p style="font-size: 16px; color: #333;">Dear <strong>${contactDetails.fullName}</strong>,</p>
+          <p style="line-height: 1.6;">Thank you for submitting your wholesale price request! We have received your order and are excited to work with you.</p>
+          <div style="background: #E8F5E9; border-left: 4px solid #0082A4; padding: 15px; margin: 20px 0; border-radius: 4px;">
+            <p style="margin: 0;"><strong>Order Reference:</strong> <code style="background: #fff; padding: 2px 6px; border-radius: 3px;">${orderSerialNumber}</code></p>
+          </div>
+          <h3 style="color: #333; margin-top: 25px;">📎 Your Quote Template</h3>
+          <p style="color: #555; line-height: 1.6;">We have attached an Excel spreadsheet that includes:</p>
+          <ul style="color: #555; line-height: 1.8;">
+            <li>✓ All your selected products with design images</li>
+            <li>✓ Product specifications and design codes</li>
+            <li>✓ Your requested quantity ranges</li>
+            <li>✓ Empty price columns for you to fill</li>
+          </ul>
+          <h3 style="color: #333; margin-top: 25px;">📋 Next Steps</h3>
+          <ol style="color: #555; line-height: 1.8;">
+            <li>Download the attached Excel file</li>
+            <li>Fill in the pricing for each product based on your requirements</li>
+            <li>Send the completed spreadsheet back to us</li>
+          </ol>
+          <p style="color: #666; margin-top: 25px; border-top: 1px solid #ddd; padding-top: 20px;"><strong>Timeline:</strong> Our team will review your request within 24-48 hours and get back to you with any questions.</p>
+          <div style="margin-top: 30px; padding-top: 20px; border-top: 1px solid #eee; text-align: center; font-size: 12px; color: #999;">
+            <p style="margin: 0;">Best regards,<br/>Puramente Jewelry Team</p>
+          </div>
+        </div>
+      `;
+
+        await sendEmail({
+          to: contactDetails.email,
+          subject: `Order Confirmation [${orderSerialNumber}] - Puramente Jewelry`,
+          html: clientEmailHtml,
+          emailType: "customer",
+          attachments: [
+            {
+              filename: `Quote_Request_${orderSerialNumber}.xlsx`,
+              content: outputWorkbookBuffer,
+              contentType: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+            }
+          ]
+        });
+        console.log("[ORDER_EMAIL] ✓ Client confirmation sent to:", contactDetails.email);
+      } else {
+        console.warn("[ORDER_EMAIL] ⚠ WARNING: No client email - client won't receive confirmation");
+      }
+
+      // EMAIL 2: Admin notification to ADMIN
       await sendEmail({
-        to: contactDetails.email,
+        to: process.env.RECEIVER_EMAIL,
         subject: `New Cart Request [${orderSerialNumber}] from ${contactDetails.fullName}`,
         html: emailHtml,
+        emailType: "admin",
         attachments: [
           {
             filename: `Quote_Request_${orderSerialNumber}.xlsx`,
@@ -241,6 +321,8 @@ exports.submitOrder = async (req, res) => {
           }
         ]
       });
+      console.log("[ORDER_EMAIL] ✓ Admin notification sent to:", process.env.RECEIVER_EMAIL);
+
 
     } catch (emailError) {
       console.error("Non-Fatal Error: Record successfully saved but excel attachment module failed:", emailError);

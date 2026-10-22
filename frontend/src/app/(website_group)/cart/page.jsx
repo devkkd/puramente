@@ -1,10 +1,11 @@
-"use client";
+﻿"use client";
 
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import { useCart } from "@/context/CartContext"; 
 import { getUserProfile, submitOrderRequest } from "@/lib/api"; 
-import { CheckCircle2, ShoppingBag, User } from "lucide-react"; 
+import { CheckCircle2, ShoppingBag, User } from "lucide-react";
+import { COUNTRIES } from "@/lib/countries";
 
 export default function CartPage() {
   const { cart, loading, updateQuantity, removeFromCart, refreshCart, clearCart } = useCart();
@@ -309,11 +310,12 @@ export default function CartPage() {
                     <label className="text-[13px] lg:text-sm text-gray-800">Country</label>
                     <div className="relative">
                       <select name="country" value={formData.country} onChange={handleInputChange} className="appearance-none w-full border border-gray-300 p-2.5 lg:p-3 text-[13px] lg:text-sm bg-white focus:outline-none focus:border-[#00a3c4] text-gray-900 cursor-pointer">
-                        <option>Select Country</option>
-                        <option>United States</option>
-                        <option>United Kingdom</option>
-                        <option>Australia</option>
-                        <option>India</option>
+                        <option disabled>Select Country</option>
+                        {COUNTRIES.map((country) => (
+                          <option key={country} value={country}>
+                            {country}
+                          </option>
+                        ))}
                       </select>
                       <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-3 text-gray-500">
                         <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M19 9l-7 7-7-7"></path></svg>
@@ -344,7 +346,7 @@ export default function CartPage() {
                     : 'bg-[#0082A4] hover:bg-[#006a85]'
                   }`}
                 >
-                  {isSubmitting ? "Submitting..." : "Submit Request \u2192"}
+                  {isSubmitting ? "Submitting..." : "Submit Request →"}
                 </button>
               </form>
 
