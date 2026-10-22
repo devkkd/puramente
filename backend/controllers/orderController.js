@@ -291,7 +291,7 @@ exports.submitOrder = async (req, res) => {
 
         await sendEmail({
           to: contactDetails.email,
-          subject: `Order Confirmation [${orderSerialNumber}] - Puramente Jewelry`,
+          subject: `Order Confirmation from Puramente Jewelry - ${orderSerialNumber}`,
           html: clientEmailHtml,
           emailType: "customer",
           attachments: [

@@ -23,13 +23,30 @@ const sendEmail = async (options) => {
       },
       logger: true,
       debug: true,
-      textEncoding: "utf-8"
+      textEncoding: "utf-8",
+      tls: {
+        rejectUnauthorized: false
+      }
     });
 
-    // Build email with proper headers for inbox delivery
-    // IMPORTANT: Do NOT set Content-Type in headers when attachments present
-    // Nodemailer will automatically set multipart/mixed with proper boundaries
-    
+    // Convert HTML to plain text by stripping tags and decoding entities
+    const stripHtmlAndDecode = (html) => {
+      return html
+        .replace(/<style[^>]*>[\s\S]*?<\/style>/gi, '') // Remove style tags
+        .replace(/<script[^>]*>[\s\S]*?<\/script>/gi, '') // Remove script tags
+        .replace(/<[^>]+>/g, '') // Remove all HTML tags
+        .replace(/&nbsp;/g, ' ')
+        .replace(/&lt;/g, '<')
+        .replace(/&gt;/g, '>')
+        .replace(/&amp;/g, '&')
+        .replace(/&quot;/g, '"')
+        .replace(/&#039;/g, "'")
+        .split('\n')
+        .map(line => line.trim())
+        .filter(line => line.length > 0)
+        .join('\n');
+    };
+
     // Headers for different email types
     let baseHeaders = {
       "X-Priority": "3 (Normal)",
@@ -37,25 +54,37 @@ const sendEmail = async (options) => {
       "Importance": "Normal",
       "X-Mailer": "Puramente-CMS",
       "X-Entity-Ref-ID": options.messageId || `${Date.now()}@puramente.com`,
-      "X-Originating-IP": "[127.0.0.1]",
-      "X-Mail-Type": "Transactional"
+      "MIME-Version": "1.0"
     };
 
-    // Only add bulk/precedence headers for admin emails, NOT for customer transactional emails
-    if (options.emailType === "admin") {
+    // For CUSTOMER emails - optimized for inbox delivery
+    if (options.emailType === "customer") {
+      baseHeaders["Return-Path"] = process.env.EMAIL_USER;
+      baseHeaders["Reply-To"] = process.env.EMAIL_USER;
+      baseHeaders["Sender"] = process.env.EMAIL_USER;
+      baseHeaders["X-Mail-Type"] = "Transactional";
+      // No bulk headers for customer emails - keeps them in inbox
+    } 
+    // For ADMIN emails - can include bulk headers
+    else if (options.emailType === "admin") {
       baseHeaders["Precedence"] = "bulk";
       baseHeaders["List-Unsubscribe"] = `<mailto:${process.env.EMAIL_USER}?subject=Unsubscribe>`;
+      baseHeaders["Return-Path"] = process.env.EMAIL_USER;
+      baseHeaders["X-Mail-Type"] = "Transactional";
     }
-    // For "customer" emails, keep headers minimal to avoid spam filters
+
+    // Generate plain text version from HTML
+    const plainText = stripHtmlAndDecode(options.html);
 
     const mailOptions = {
       from: `Puramente Jewelry <${process.env.EMAIL_USER}>`,
       to: options.to || process.env.RECEIVER_EMAIL,
       subject: options.subject,
+      text: plainText, // Plain text alternative (important for spam filters)
       html: options.html,
       attachments: options.attachments || [],
       headers: baseHeaders,
-      replyTo: options.replyTo || process.env.EMAIL_USER,
+      replyTo: process.env.EMAIL_USER,
       inReplyTo: options.messageId || undefined,
       references: options.messageId || undefined
     };
@@ -65,12 +94,13 @@ const sendEmail = async (options) => {
     if (!mailOptions.references) delete mailOptions.references;
 
     console.log("[EMAIL] Mail options prepared");
+    console.log("[EMAIL] Email Type:", options.emailType || "transactional");
     console.log("[EMAIL] Has attachments:", (options.attachments || []).length > 0);
     console.log("[EMAIL] Attachments:", (options.attachments || []).map(a => ({ filename: a.filename, contentType: a.contentType })));
-    console.log("[EMAIL] Sending mail with options:", { to: mailOptions.to, subject: mailOptions.subject, emailType: options.emailType || "transactional" });
+    console.log("[EMAIL] Sending mail...");
     const result = await transporter.sendMail(mailOptions);
 
-    console.log(`[EMAIL_SUCCESS] Email sent to ${mailOptions.to} | MessageID: ${result.messageId}`);
+    console.log(`[EMAIL_SUCCESS] Email sent to ${mailOptions.to} | MessageID: ${result.messageId} | Type: ${options.emailType || "transactional"}`);
     return { success: true, messageId: result.messageId };
   } catch (error) {
     console.error("[EMAIL_ERROR] Exception occurred:", error.message);
