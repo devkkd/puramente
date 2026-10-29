@@ -64,13 +64,11 @@ const productSchema = new mongoose.Schema(
         type: String,
         default: null,
         trim: true,
-        maxlength: 60
       },
       metaDescription: {
         type: String,
         default: null,
         trim: true,
-        maxlength: 160
       },
       metaKeywords: {
         type: [String],

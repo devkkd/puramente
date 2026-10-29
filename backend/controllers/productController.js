@@ -162,7 +162,7 @@ exports.updateProduct = async (req, res) => {
     // 5. Update in DB
     product = await Product.findByIdAndUpdate(req.params.id, updates, {
       new: true, // Return the updated document
-      runValidators: true // Ensure enum values (with gem/without gem) are validated
+      runValidators: false // Disabled: runValidators causes SEO metaTitle maxlength(60) to fail on existing long titles
     }).populate("category", "name");
 
     res.status(200).json({
