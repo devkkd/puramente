@@ -1,6 +1,7 @@
 ﻿"use client";
 import React, { useState } from "react";
 import { UploadCloud, CheckCircle2, X, Info, Code, RefreshCw, ChevronDown, ChevronUp } from "lucide-react";
+import { updateCategorySeo } from "@/lib/api";
 
 function buildCategorySchema(data) {
   const base = "https://puramentejewel.com";
