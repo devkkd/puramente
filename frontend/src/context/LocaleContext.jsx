@@ -5,6 +5,8 @@ import { LOCALES, DEFAULT_LOCALE } from "@/middleware";
 
 export const LOCALE_CONFIG = {
   "en-in": { currency: "INR", symbol: "₹",  label: "India",          flag: "🇮🇳", countryCode: "IN" },
+  "en-ae": { currency: "AED", symbol: "د.إ", label: "UAE",           flag: "🇦🇪", countryCode: "AE" },
+  "en-ca": { currency: "CAD", symbol: "C$", label: "Canada",         flag: "🇨🇦", countryCode: "CA" },
   "en-gb": { currency: "GBP", symbol: "£",  label: "United Kingdom", flag: "🇬🇧", countryCode: "GB" },
   "en-fr": { currency: "EUR", symbol: "€",  label: "France",         flag: "🇫🇷", countryCode: "FR" },
   "en-de": { currency: "EUR", symbol: "€",  label: "Germany",        flag: "🇩🇪", countryCode: "DE" },

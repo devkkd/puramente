@@ -166,13 +166,10 @@ const nextConfig = {
         permanent: true,
       },
 
-      // /[locale] (bare locale homepage, not en-in) -> /
-      // This catches /en-ae, /en-ca, /en-gb etc. bare homepages
-      {
-        source: "/:locale(en-(?!in)[a-z]{2})",
-        destination: "/",
-        permanent: false,
-      },
+      // NOTE: /[locale] bare homepage redirects (e.g. /en-gb -> /) were removed
+      // because they created an infinite redirect loop with middleware.js.
+      // middleware.js already handles / -> /[locale] redirection based on IP,
+      // and [locale]/page.js serves the homepage for each locale directly.
     ];
   },
 };
