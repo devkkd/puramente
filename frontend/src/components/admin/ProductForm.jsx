@@ -87,26 +87,34 @@ export default function ProductForm({ initialData = {}, categories = [], onSubmi
     if (seoData.schema && !validateSchema(seoData.schema)) return;
     setSeoSaveLoading(true);
     try {
-      const token = localStorage.getItem("adminToken") || localStorage.getItem("token");
       // Don't save placeholder/default text accidentally
-    const cleanTitle = seoData.metaTitle === "Meta Title (Google page title)" ? "" : seoData.metaTitle;
-    const cleanDesc = seoData.metaDescription === "Meta Description (search snippet)" ? "" : seoData.metaDescription;
-    const payload = {
+      const cleanTitle = seoData.metaTitle === "Meta Title (Google page title)" ? "" : seoData.metaTitle;
+      const cleanDesc = seoData.metaDescription === "Meta Description (search snippet)" ? "" : seoData.metaDescription;
+      const payload = {
         metaTitle: cleanTitle,
         metaDescription: cleanDesc,
         metaKeywords: seoData.metaKeywords,
         schema: seoData.schema ? JSON.parse(seoData.schema) : null
       };
-      const baseUrl = process.env.NEXT_PUBLIC_PROD_API_URL || process.env.NEXT_PUBLIC_API_URL;
-      const res = await fetch(`${baseUrl}/products/${initialData._id}/seo`, {
+      // Use same baseURL and token key as apiClient interceptor in api.js
+      const token = localStorage.getItem("adminToken") || localStorage.getItem("token");
+      const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:5001";
+      const res = await fetch(`${baseUrl}/api/products/${initialData._id}/seo`, {
         method: "PUT",
-        headers: { "Content-Type": "application/json", "Authorization": `Bearer ${token}` },
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${token}`
+        },
         body: JSON.stringify(payload)
       });
       if (res.ok) alert("SEO & Schema saved!");
       else alert("Failed to save SEO");
-    } catch (err) { alert("Error saving SEO"); }
-    finally { setSeoSaveLoading(false); }
+    } catch (err) {
+      console.error("SEO save error:", err);
+      alert("Error saving SEO");
+    } finally {
+      setSeoSaveLoading(false);
+    }
   };
 
   const titleLen = seoData.metaTitle.length;
