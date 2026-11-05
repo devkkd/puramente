@@ -43,7 +43,7 @@ export default async function LocaleHomePage({ params }) {
       <OurStory />
       <InstagramFeed />
       <Bespoke />
-      <DelhiFair />
+      {/* <DelhiFair /> */}
       <ExhibitionMail />
       <VideoPlayer />
       <Testimonials />

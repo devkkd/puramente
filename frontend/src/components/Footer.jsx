@@ -58,7 +58,7 @@ export default function Footer() {
 
           {/* Newsletter Section */}
           <div className="flex flex-col lg:flex-row items-center justify-between gap-4 md:gap-6 mb-4">
-            <div className="w-full lg:w-full border text-center lg:text-center">
+            <div className="w-full lg:w-full text-center lg:text-center">
               <h2 className="font-playfair text-xl md:text-2xl lg:text-3xl font-bold text-black mb-1.5 md:mb-2">
                 Stay Ahead in Jewelry <span className="italic text-[#0082A4] font-medium">Trends</span>
               </h2>
