@@ -69,9 +69,67 @@ export default function ExhibitionsPage() {
         )}
 
         {activeTab === "PAST" && (
-          <section className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8 animate-in fade-in duration-500">
-            
-            {/* Past Event Card - DECREASED BOX SIZE AND FIXED IMAGE CROPPING */}
+          <section className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8 animate-in fade-in duration-500 space-y-8">
+
+            {/* Past Event Card - IHGF Delhi Fair Autumn 2026 */}
+            <div className="grid grid-cols-1 lg:grid-cols-2 border border-gray-200 shadow-sm bg-white overflow-hidden rounded-xl">
+
+              {/* Event Image */}
+              <div className="w-full bg-[#f8f5f1] relative flex items-center justify-center p-6 min-h-[300px] lg:min-h-[400px]">
+                <img
+                  src="/images/New folder/past-2.jpeg"
+                  alt="IHGF Delhi Fair Autumn 2026"
+                  className="w-full h-full object-contain"
+                />
+              </div>
+
+              {/* Event Details */}
+              <div className="p-8 md:p-10 flex flex-col justify-center">
+                <p className="text-[#00a3c4] text-xs md:text-sm font-medium mb-3">
+                 Crafting Timeless Jewellery for a Conscious Tomorrow
+                </p>
+
+                <h3 className="font-playfair text-2xl md:text-3xl lg:text-4xl font-bold text-gray-900 mb-4">
+                  IHGF Delhi Fair Autumn Oct-2026
+                </h3>
+
+                <p className="text-sm font-normal text-gray-700 leading-relaxed mb-8">
+                 IHGF Delhi Fair Autumn 2026 was a premier international trade fair showcasing world-class home, lifestyle, fashion, and handcrafted products, bringing together global buyers and Indian manufacturers under one platform.
+                </p>
+
+                <div className="space-y-4 mb-8 text-sm text-gray-700">
+                  <div className="flex items-center gap-3">
+                    <Calendar size={18} className="text-[#00a3c4]" />
+                    <span> 2026-10-13</span>
+                  </div>
+                  <div className="flex items-start gap-3">
+                    <MapPin size={18} className="text-[#00a3c4] shrink-0 mt-0.5" />
+                    <span className="leading-relaxed">Hall No. 18, Booth No. K-02/14, India Expo Centre, Greater Noida</span>
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <Ticket size={18} className="text-[#00a3c4]" />
+                    <span>By Invitation / Buyer Registration Only</span>
+                  </div>
+                </div>
+
+                <div className="flex flex-col gap-6">
+                  <div className="flex gap-3 flex-wrap">
+                    <span className="bg-[#E6FDF9] text-gray-800 text-xs px-4 py-2 rounded-full">IHGF Delhi Fair</span>
+                    <span className="bg-[#E6FDF9] text-gray-800 text-xs px-4 py-2 rounded-full">IHGF Autumn 2026</span>
+                  </div>
+
+                  <Link
+                    href="/exhibitions/ihgf-autumn-2026"
+                    className="bg-[#0082A4] text-white px-8 py-3 text-sm text-center font-bold tracking-wide hover:bg-[#006a85] transition-colors w-fit rounded-sm"
+                  >
+                    See Event Details →
+                  </Link>
+                </div>
+              </div>
+
+            </div>
+
+            {/* Past Event Card - IHGF Delhi Fair Spring 2026 */}
             <div className="grid grid-cols-1 lg:grid-cols-2 border border-gray-200 shadow-sm bg-white overflow-hidden rounded-xl">
               
               {/* Event Image - Using object-contain and flex-center to ensure the entire SVG shows */}
@@ -90,7 +148,7 @@ export default function ExhibitionsPage() {
                 </p>
                 
                 <h3 className="font-playfair text-2xl md:text-3xl lg:text-4xl font-bold text-gray-900 mb-4">
-                  IHGF Delhi Fair Spring 2026
+                  IHGF Delhi Fair Spring Feb-2026
                 </h3>
                 
                 <p className="text-sm font-normal text-gray-700 leading-relaxed mb-8">
