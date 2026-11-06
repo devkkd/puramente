@@ -66,10 +66,10 @@ const DelhiFair = ({ isExhibitionPage = false }) => {
           {/* LEFT COLUMN: Exhibition Image */}
           <div className="w-full lg:col-span-5 relative min-h-[400px] lg:min-h-full rounded-xl overflow-hidden">
             <img
-              src="/images/home/delhi-2027.png"
+              src="/images/home/Delhi-2027.png"
               alt="Puramente International Exhibition Booth"
               className="hidden lg:block absolute inset-0 w-full h-full object-contain"
-            />  
+            />
             <img
               src="/images/home/mobile-delhi-2027.png"
               alt="Puramente International Exhibition Booth"
